@@ -17,12 +17,10 @@ public class Config {
 	public static int blockGlassesBridgeId = 3000;
 	
 	static void readConfig(Configuration configFile) {
-		 
 		ConfigUtils.processAnnotations(configFile, Config.class);
 	}
 
 	public static void register() {
-
 		@SuppressWarnings("unchecked")
 		final List<IRecipe> recipeList = CraftingManager.getInstance().getRecipeList();
 
