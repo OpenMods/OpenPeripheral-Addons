@@ -28,6 +28,8 @@ public class OpenPeripheralAddons implements IOpenMod {
 
 	public static class Items {
 	}
+
+	public static final String CHANNEL = "OpenPeripheral";
 	
 	public static int renderId;
 	
