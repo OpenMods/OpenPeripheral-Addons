@@ -1,7 +1,7 @@
 package openperipheral.addons.client;
 
-import cpw.mods.fml.common.network.IGuiHandler;
 import openmods.api.IProxy;
+import cpw.mods.fml.common.network.IGuiHandler;
 
 public class ClientProxy implements IProxy {
 
@@ -11,19 +11,15 @@ public class ClientProxy implements IProxy {
 	}
 
 	@Override
-	public void preInit() {
-	}
+	public void preInit() {}
 
 	@Override
-	public void init() {
-	}
+	public void init() {}
 
 	@Override
-	public void postInit() {
-	}
+	public void postInit() {}
 
 	@Override
-	public void registerRenderInformation() {
-	}
+	public void registerRenderInformation() {}
 
 }

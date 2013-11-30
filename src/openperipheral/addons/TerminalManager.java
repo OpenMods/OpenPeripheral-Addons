@@ -2,11 +2,7 @@ package openperipheral.addons;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.NetLoginHandler;
@@ -17,7 +13,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.event.ForgeSubscribe;
-
 import openmods.utils.ByteUtils;
 import openmods.utils.io.PacketChunker;
 import openperipheral.addons.drawable.DrawableBox;
@@ -25,7 +20,6 @@ import openperipheral.addons.drawable.DrawableIcon;
 import openperipheral.addons.drawable.DrawableLiquid;
 import openperipheral.addons.drawable.DrawableText;
 import openperipheral.addons.interfaces.IDrawable;
-
 import cpw.mods.fml.common.network.IConnectionHandler;
 import cpw.mods.fml.common.network.Player;
 

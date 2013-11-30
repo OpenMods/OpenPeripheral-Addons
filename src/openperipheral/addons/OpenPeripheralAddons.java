@@ -28,26 +28,25 @@ public class OpenPeripheralAddons {
 		public static BlockGlassesBridge glassesBridge;
 	}
 
-	public static class Items {
-	}
+	public static class Items {}
 
 	public static final String CHANNEL = "OpenPeripheral";
-	
+
 	public static int renderId;
-	
+
 	@Instance(value = "OpenPeripheralAddons")
 	public static OpenPeripheralAddons instance;
 
 	@SidedProxy(clientSide = "openperipheral.addons.client.ClientProxy", serverSide = "openperipheral.addons.common.ServerProxy")
 	public static IProxy proxy;
-	
+
 	public static CreativeTabs tabOpenPeripheralAddons = new CreativeTabs("tabOpenPeripheralAddons") {
 		@Override
 		public ItemStack getIconItemStack() {
 			return new ItemStack(ObjectUtils.firstNonNull(OpenPeripheralAddons.Blocks.glassesBridge), 1, 0);
 		}
 	};
-	
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent evt) {
 		Configuration configFile = new Configuration(evt.getSuggestedConfigurationFile());
@@ -58,14 +57,13 @@ public class OpenPeripheralAddons {
 		Config.register();
 		proxy.preInit();
 	}
-	
 
 	@EventHandler
 	public void init(FMLInitializationEvent evt) {
 		proxy.init();
 		proxy.registerRenderInformation();
 	}
-	
+
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent evt) {
 		proxy.postInit();

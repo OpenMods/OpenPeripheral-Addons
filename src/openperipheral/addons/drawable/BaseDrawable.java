@@ -41,7 +41,7 @@ public abstract class BaseDrawable implements IDrawable {
 				return new Object[] {};
 			}
 		}
-		
+
 		return result;
 	}
 

@@ -6,19 +6,19 @@ import java.io.DataOutputStream;
 import dan200.computer.api.ILuaObject;
 
 public interface IDrawable extends ILuaObject {
-	
-    public int getX();
 
-    public int getY();
+	public int getX();
 
-    public int getZIndex();
+	public int getY();
 
-    public int setZIndex(byte z);
+	public int getZIndex();
 
-    public void writeTo(DataOutputStream stream, Short changeMask);
+	public int setZIndex(byte z);
 
-    public void readFrom(DataInputStream stream, Short changeMask);
+	public void writeTo(DataOutputStream stream, Short changeMask);
 
-    public void draw(float partialTicks);
-    
+	public void readFrom(DataInputStream stream, Short changeMask);
+
+	public void draw(float partialTicks);
+
 }
