@@ -1,3 +1,6 @@
 [submodule "openmodslib"]
 	path = openmodslib
 	url = https://github.com/OpenMods/OpenModsLib.git
+[submodule "core"]
+	path = core
+	url = https://github.com/OpenMods/OpenPeripheral.git

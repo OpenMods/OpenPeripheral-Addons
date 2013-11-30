@@ -1,0 +1,21 @@
+[
+{
+  "modid" : "OpenPeripheral",
+  "name" : "OpenPeripheralAddons",
+  "version" : "@VERSION@",
+  "url" : "http://www.openperipheral.info",
+  "credits" : "Everyone in #ComputerCraft, #OpenMods and #OpenCCSensors, also ChickenBones",
+  "authors": [
+    "Mikeemoo",
+    "cybcaoyibo",
+    "SinZ",
+    "theoriginalbit",
+    "Foone"
+  ],
+  "description": "Random CC peripherals",
+  "logoFile" : "",
+  "updateUrl" : "",
+  "parent" : "",
+  "screenshots": [
+  ]
+}]
