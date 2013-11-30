@@ -1,28 +1,30 @@
 package openperipheral.addons;
 
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.Configuration;
+import openmods.api.IProxy;
+import openmods.config.RegisterBlock;
+import openperipheral.addons.common.block.BlockGlassesBridge;
+import openperipheral.addons.common.tileentity.TileEntityGlassesBridge;
+
 import org.apache.commons.lang3.ObjectUtils;
 
 import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.Configuration;
-import openmods.Log;
-import openmods.api.IOpenMod;
-import openmods.api.IProxy;
-import openperipheral.addons.common.block.BlockGlassesBridge;
 
-@Mod(modid = "OpenPeripheralAddons", name = "OpenPeripheralAddons", version = "@VERSION@", dependencies = "required-after:OpenPeripheral")
+@Mod(modid = "OpenPeripheral", name = "OpenPeripheral", version = "@VERSION@", dependencies = "required-after:OpenPeripheralCore,required-after:OpenMods")
 @NetworkMod(serverSideRequired = true, clientSideRequired = true)
-public class OpenPeripheralAddons implements IOpenMod {
+public class OpenPeripheralAddons {
 
 	public static class Blocks {
+		@RegisterBlock(name = "glassesbridge", tileEntity = TileEntityGlassesBridge.class)
 		public static BlockGlassesBridge glassesBridge;
 	}
 
@@ -68,25 +70,4 @@ public class OpenPeripheralAddons implements IOpenMod {
 	public void postInit(FMLPostInitializationEvent evt) {
 		proxy.postInit();
 	}
-	
-	@Override
-	public Log getLog() {
-		return null;
-	}
-
-	@Override
-	public CreativeTabs getCreativeTab() {
-		return tabOpenPeripheralAddons;
-	}
-
-	@Override
-	public String getId() {
-		return "openperipheraladdons";
-	}
-
-	@Override
-	public int getRenderId() {
-		return renderId;
-	}
-
 }

@@ -1,17 +1,11 @@
 package openperipheral.addons.drawable;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 
-import openperipheral.TypeConversionRegistry;
 import openperipheral.addons.interfaces.IDrawable;
 import openperipheral.addons.interfaces.ISurface;
-import openperipheral.util.ReflectionHelper;
-
+import openperipheral.addons.utils.CCUtils;
 import dan200.computer.api.ILuaContext;
-
 
 public abstract class BaseDrawable implements IDrawable {
 
@@ -25,7 +19,7 @@ public abstract class BaseDrawable implements IDrawable {
 	public BaseDrawable() {}
 
 	public BaseDrawable(ISurface _bridge) {
-	    surface = new WeakReference<ISurface>(_bridge);
+		surface = new WeakReference<ISurface>(_bridge);
 	}
 
 	@Override
@@ -38,39 +32,24 @@ public abstract class BaseDrawable implements IDrawable {
 
 		if (deleted) { return null; }
 
-		Method method = ReflectionHelper.getMethod(this.getClass(), new String[] { methodNames[methodId] }, arguments.length);
+		final String methodName = methodNames[methodId];
+		Object[] result = CCUtils.callSelfMethod(this, methodName, arguments);
 
-		ArrayList<Object> args = new ArrayList<Object>(Arrays.asList(arguments));
-
-		if (method == null) { throw new Exception("Invalid number of arguments"); }
-
-		Class<?>[] requiredParameters = method.getParameterTypes();
-
-		for (int i = 0; i < requiredParameters.length; i++) {
-			Object converted = TypeConversionRegistry.fromLua(args.get(i), requiredParameters[i]);
-			if (converted == null) { throw new Exception("Invalid parameter number " + (i + 1)); }
-			args.set(i, converted);
-		}
-
-		final Object[] argsToUse = args.toArray(new Object[args.size()]);
-
-		Object v = method.invoke(this, argsToUse);
-
-		if (methodNames[methodId].startsWith("set")) {
+		if (methodName.startsWith("set")) {
 			if (surface.get() != null) {
-			    surface.get().markChanged(this, (Integer)v);
+				surface.get().markChanged(this, (Integer)result[0]);
 				return new Object[] {};
 			}
 		}
-
-		return new Object[] { TypeConversionRegistry.toLua(v) };
+		
+		return result;
 	}
 
 	public void delete() {
 		deleted = true;
 		if (surface.get() != null) {
-		    surface.get().setDeleted(this);
-		    surface.clear();
+			surface.get().setDeleted(this);
+			surface.clear();
 		}
 	}
 

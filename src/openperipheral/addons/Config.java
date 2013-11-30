@@ -14,7 +14,7 @@ public class Config {
 	@BlockId(description = "The id of the glasses bridge")
 	public static int blockGlassesBridgeId = 3000;
 	
-	static void readConfig(Configuration configFile) {
+	public static void readConfig(Configuration configFile) {
 		ConfigProcessing.processAnnotations(configFile, Config.class);
 	}
 

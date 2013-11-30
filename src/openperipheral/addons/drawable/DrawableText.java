@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-
 import openmods.utils.ByteUtils;
 import openmods.utils.render.FontSizeChecker;
 import openperipheral.addons.interfaces.IDrawable;
@@ -88,6 +87,7 @@ public class DrawableText extends BaseDrawable implements IDrawable {
 		return y;
 	}
 
+	@Override
 	public int getZIndex() {
 		return zIndex;
 	}
@@ -149,6 +149,7 @@ public class DrawableText extends BaseDrawable implements IDrawable {
 		return Y_CHANGED;
 	}
 
+	@Override
 	public int setZIndex(byte z) {
 		if (zIndex == z) { return -1; }
 		zIndex = z;

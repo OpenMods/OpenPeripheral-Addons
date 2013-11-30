@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import net.minecraft.client.renderer.Tessellator;
-
 import openmods.utils.ByteUtils;
 import openperipheral.addons.interfaces.IDrawable;
 import openperipheral.addons.interfaces.ISurface;
@@ -140,7 +139,8 @@ public class DrawableBox extends BaseDrawable implements IDrawable {
                 return y;
         }
 
-        public int getZIndex() {
+        @Override
+		public int getZIndex() {
                 return zIndex;
         }
 
@@ -227,7 +227,8 @@ public class DrawableBox extends BaseDrawable implements IDrawable {
                 return Y_CHANGED;
         }
 
-        public int setZIndex(byte z) {
+        @Override
+		public int setZIndex(byte z) {
                 if (z == zIndex) { return -1; }
                 zIndex = z;
                 return Z_CHANGED;

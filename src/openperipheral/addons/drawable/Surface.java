@@ -4,28 +4,22 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
+import net.minecraft.network.packet.Packet;
 import openmods.utils.ByteUtils;
 import openmods.utils.io.PacketChunker;
 import openmods.utils.render.FontSizeChecker;
-import openperipheral.TypeConversionRegistry;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.addons.TerminalManager;
 import openperipheral.addons.common.tileentity.TileEntityGlassesBridge;
 import openperipheral.addons.interfaces.IDrawable;
 import openperipheral.addons.interfaces.ISurface;
-import openperipheral.util.ReflectionHelper;
-
+import openperipheral.addons.utils.CCUtils;
 import dan200.computer.api.ILuaContext;
 import dan200.computer.api.ILuaObject;
-
-import net.minecraft.network.packet.Packet;
 
 
 public class Surface implements ISurface, ILuaObject {
@@ -303,7 +297,8 @@ public class Surface implements ISurface, ILuaObject {
         return obj;
     }
     
-    public ILuaObject addLiquid(int x, int y, int width, int height, int id) {
+    @Override
+	public ILuaObject addLiquid(int x, int y, int width, int height, int id) {
         ILuaObject obj = null;
         try{
             lock.lock();
@@ -406,29 +401,9 @@ public class Surface implements ISurface, ILuaObject {
     }
 
     @Override
-    public Object[] callMethod(ILuaContext context, int methodId,
-            Object[] arguments) throws Exception {
+    public Object[] callMethod(ILuaContext context, int methodId, Object[] arguments) throws Exception {
         
-        // Don't mind me, I'll just yank this out of BaseDrawable ;)  -NC
-        
-        Method method = ReflectionHelper.getMethod(this.getClass(), new String[] { methodNames[methodId] }, arguments.length);
-
-        ArrayList<Object> args = new ArrayList<Object>(Arrays.asList(arguments));
-
-        if (method == null) { throw new Exception("Invalid number of arguments"); }
-
-        Class<?>[] requiredParameters = method.getParameterTypes();
-
-        for (int i = 0; i < requiredParameters.length; i++) {
-            Object converted = TypeConversionRegistry.fromLua(args.get(i), requiredParameters[i]);
-            if (converted == null) { throw new Exception("Invalid parameter number " + (i + 1)); }
-            args.set(i, converted);
-        }
-
-        final Object[] argsToUse = args.toArray(new Object[args.size()]);
-
-        Object v = method.invoke(this, argsToUse);
-
-        return new Object[] { TypeConversionRegistry.toLua(v) };
+    	String methodName = methodNames[methodId];
+        return CCUtils.callSelfMethod(this, methodName, arguments);
     }
 }
