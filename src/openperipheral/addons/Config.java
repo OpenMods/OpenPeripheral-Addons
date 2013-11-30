@@ -1,6 +1,5 @@
 package openperipheral.addons;
 
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraftforge.common.Configuration;
 import openmods.config.BlockId;
 import openmods.config.ConfigProcessing;
@@ -16,12 +15,11 @@ public class Config {
 	}
 
 	public static void register() {
-		CraftingManager.getInstance().getRecipeList();
-
 		if (ConfigProcessing.canRegisterBlock(blockGlassesBridgeId)) {
 			OpenPeripheralAddons.Blocks.glassesBridge = new BlockGlassesBridge();
 		}
 
-		ConfigProcessing.registerItems(OpenPeripheralAddons.Items.class, "openperipheraladdons");
+		ConfigProcessing.registerItems(OpenPeripheralAddons.Items.class, "openperipheral");
+		ConfigProcessing.registerBlocks(OpenPeripheralAddons.Blocks.class, "openperipheral");
 	}
 }

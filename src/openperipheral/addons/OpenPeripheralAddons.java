@@ -19,7 +19,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 
-@Mod(modid = "OpenPeripheral", name = "OpenPeripheral", version = "@VERSION@", dependencies = "required-after:OpenPeripheralCore,required-after:OpenMods")
+@Mod(modid = "OpenPeripheral", name = "OpenPeripheralAddons", version = "@VERSION@", dependencies = "required-after:OpenMods;required-after:OpenPeripheralCore")
 @NetworkMod(serverSideRequired = true, clientSideRequired = true)
 public class OpenPeripheralAddons {
 
