@@ -1,13 +1,11 @@
 package openperipheral.addons.drawable;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 import java.io.IOException;
 
 import net.minecraft.client.renderer.Tessellator;
 import openmods.utils.ByteUtils;
-import openperipheral.addons.interfaces.IDrawable;
-import openperipheral.addons.interfaces.ISurface;
 
 import org.lwjgl.opengl.GL11;
 
@@ -145,7 +143,7 @@ public class DrawableBox extends BaseDrawable implements IDrawable {
 	}
 
 	@Override
-	public void readFrom(DataInputStream stream, Short changeMask) {
+	public void readFrom(DataInput stream, Short changeMask) {
 		try {
 
 			if (ByteUtils.get(changeMask, X_CHANGED)) x = stream.readShort();
@@ -235,7 +233,7 @@ public class DrawableBox extends BaseDrawable implements IDrawable {
 	}
 
 	@Override
-	public void writeTo(DataOutputStream stream, Short changeMask) {
+	public void writeTo(DataOutput stream, Short changeMask) {
 		try {
 
 			if (ByteUtils.get(changeMask, X_CHANGED)) stream.writeShort(x);

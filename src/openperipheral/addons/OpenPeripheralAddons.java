@@ -1,12 +1,15 @@
 package openperipheral.addons;
 
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.MinecraftForge;
 import openmods.api.IProxy;
 import openmods.config.RegisterBlock;
-import openperipheral.addons.common.block.BlockGlassesBridge;
-import openperipheral.addons.common.tileentity.TileEntityGlassesBridge;
+import openmods.config.RegisterItem;
+import openperipheral.api.IntegrationRegistry;
+import operperipheral.addons.glasses.*;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -28,22 +31,23 @@ public class OpenPeripheralAddons {
 		public static BlockGlassesBridge glassesBridge;
 	}
 
-	public static class Items {}
-
-	public static final String CHANNEL = "OpenPeripheral";
+	public static class Items {
+		@RegisterItem(name = "glasses")
+		public static ItemGlasses glasses;
+	}
 
 	public static int renderId;
 
 	@Instance(value = "OpenPeripheralAddons")
 	public static OpenPeripheralAddons instance;
 
-	@SidedProxy(clientSide = "openperipheral.addons.client.ClientProxy", serverSide = "openperipheral.addons.common.ServerProxy")
+	@SidedProxy(clientSide = "openperipheral.addons.proxy.ClientProxy", serverSide = "openperipheral.addons.proxy.ServerProxy")
 	public static IProxy proxy;
 
 	public static CreativeTabs tabOpenPeripheralAddons = new CreativeTabs("tabOpenPeripheralAddons") {
 		@Override
 		public ItemStack getIconItemStack() {
-			return new ItemStack(ObjectUtils.firstNonNull(OpenPeripheralAddons.Blocks.glassesBridge), 1, 0);
+			return new ItemStack(ObjectUtils.firstNonNull(Items.glasses, Item.fishRaw), 1, 0);
 		}
 	};
 
@@ -55,6 +59,11 @@ public class OpenPeripheralAddons {
 			configFile.save();
 		}
 		Config.register();
+
+		IntegrationRegistry.register(new AdapterGlassesBridge());
+		EventTypes.registerTypes();
+		MinecraftForge.EVENT_BUS.register(new TerminalManagerServer());
+
 		proxy.preInit();
 	}
 

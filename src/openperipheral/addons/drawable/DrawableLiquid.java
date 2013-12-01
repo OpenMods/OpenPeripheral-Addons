@@ -1,7 +1,7 @@
 package openperipheral.addons.drawable;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.DataInput;
+import java.io.DataOutput;
 
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -9,7 +9,6 @@ import net.minecraft.util.Icon;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import openmods.utils.ByteUtils;
-import openperipheral.addons.interfaces.ISurface;
 import openperipheral.addons.utils.GlassesRenderingUtils;
 import cpw.mods.fml.client.FMLClientHandler;
 
@@ -135,7 +134,7 @@ public class DrawableLiquid extends BaseDrawable {
 	}
 
 	@Override
-	public void writeTo(DataOutputStream stream, Short changeMask) {
+	public void writeTo(DataOutput stream, Short changeMask) {
 		try {
 			if (ByteUtils.get(changeMask, X_CHANGED)) {
 				stream.writeShort(x);
@@ -165,7 +164,7 @@ public class DrawableLiquid extends BaseDrawable {
 	}
 
 	@Override
-	public void readFrom(DataInputStream stream, Short changeMask) {
+	public void readFrom(DataInput stream, Short changeMask) {
 		try {
 			if (ByteUtils.get(changeMask, X_CHANGED)) {
 				this.x = stream.readShort();

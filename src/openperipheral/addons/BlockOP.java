@@ -1,8 +1,7 @@
-package openperipheral.addons.common.block;
+package openperipheral.addons;
 
 import net.minecraft.block.material.Material;
 import openmods.block.OpenBlock;
-import openperipheral.addons.OpenPeripheralAddons;
 
 public abstract class BlockOP extends OpenBlock {
 

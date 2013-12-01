@@ -2,8 +2,6 @@ package openperipheral.addons.drawable;
 
 import java.lang.ref.WeakReference;
 
-import openperipheral.addons.interfaces.IDrawable;
-import openperipheral.addons.interfaces.ISurface;
 import openperipheral.addons.utils.CCUtils;
 import dan200.computer.api.ILuaContext;
 

@@ -1,23 +1,23 @@
 package openperipheral.addons.drawable;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
+import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.locks.ReentrantLock;
 
-import net.minecraft.network.packet.Packet;
 import openmods.utils.ByteUtils;
-import openmods.utils.io.PacketChunker;
 import openmods.utils.render.FontSizeChecker;
-import openperipheral.addons.OpenPeripheralAddons;
-import openperipheral.addons.TerminalManager;
-import openperipheral.addons.common.tileentity.TileEntityGlassesBridge;
-import openperipheral.addons.interfaces.IDrawable;
-import openperipheral.addons.interfaces.ISurface;
 import openperipheral.addons.utils.CCUtils;
+import operperipheral.addons.glasses.TerminalDataEvent;
+import operperipheral.addons.glasses.TerminalManagerClient;
+import operperipheral.addons.glasses.TileEntityGlassesBridge;
+
+import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+
 import dan200.computer.api.ILuaContext;
 import dan200.computer.api.ILuaObject;
 
@@ -25,25 +25,26 @@ public class Surface implements ISurface, ILuaObject {
 
 	public WeakReference<TileEntityGlassesBridge> parent;
 
-	public HashMap<Short, IDrawable> drawables = new HashMap<Short, IDrawable>();
-	public HashMap<Short, Short> changes = new HashMap<Short, Short>();
+	public Map<Short, IDrawable> drawables = Maps.newHashMap();
+	public Map<Short, Short> changes = Maps.newHashMap();
 
 	private short count = 1;
-	private ReentrantLock lock = new ReentrantLock();
 
 	/**
 	 * This Surface belongs to the entire bridge, not just one user.
 	 */
-	public boolean isGlobal;
-	public String playerName = "GLOBAL";
+	public final boolean isGlobal;
+	public final String playerName;
 
 	public Surface(TileEntityGlassesBridge parent) {
 		this.parent = new WeakReference<TileEntityGlassesBridge>(parent);
-		isGlobal = true;
+		this.isGlobal = true;
+		this.playerName = "GLOBAL";
 	}
 
 	public Surface(TileEntityGlassesBridge parent, String username) {
 		this.parent = new WeakReference<TileEntityGlassesBridge>(parent);
+		this.isGlobal = false;
 		this.playerName = username;
 	}
 
@@ -57,293 +58,140 @@ public class Surface implements ISurface, ILuaObject {
 		changes.clear();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * openperipheral.glasses.drawable.ISurface#getKeyForDrawable(openperipheral
-	 * .core.interfaces.IDrawable)
-	 */
 	@Override
-	public Short getKeyForDrawable(IDrawable d) {
-		Short rtn = -1;
-		try {
-			lock.lock();
-			try {
-				for (Entry<Short, IDrawable> entry : drawables.entrySet()) {
-					if (entry.getValue().equals(d)) {
-						rtn = entry.getKey();
-					}
-				}
-			} finally {
-				lock.unlock();
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
+	public synchronized Short getKeyForDrawable(IDrawable d) {
+		for (Entry<Short, IDrawable> entry : drawables.entrySet()) {
+			if (entry.getValue().equals(d)) { return entry.getKey(); }
 		}
-		return rtn;
+
+		return -1;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * openperipheral.glasses.drawable.ISurface#setDeleted(openperipheral.core
-	 * .interfaces.IDrawable)
-	 */
 	@Override
-	public void setDeleted(IDrawable d) {
-		try {
-			lock.lock();
-			try {
-				Short key = getKeyForDrawable(d);
-				if (key != -1) {
-					changes.put(key, (short)0);
-					drawables.remove(key);
-				}
-			} finally {
-				lock.unlock();
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
+	public synchronized void setDeleted(IDrawable d) {
+		Short key = getKeyForDrawable(d);
+		if (key != -1) {
+			changes.put(key, (short)0);
+			drawables.remove(key);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * openperipheral.glasses.drawable.ISurface#markChanged(openperipheral.core
-	 * .interfaces.IDrawable, int)
-	 */
 	@Override
-	public void markChanged(IDrawable d, int slot) {
+	public synchronized void markChanged(IDrawable d, int slot) {
 		if (slot == -1) { return; }
-		try {
-			lock.lock();
-			try {
-				Short key = getKeyForDrawable(d);
-				if (key != -1) {
-					Short current = changes.get(key);
 
-					if (current == null) {
-						current = 0;
-					}
-					current = ByteUtils.set(current, slot, true);
-					current = ByteUtils.set(current, 0, true);
-					changes.put(key, current);
-				}
-			} catch (Exception e2) {
-				e2.printStackTrace();
-			} finally {
-				lock.unlock();
+		Short key = getKeyForDrawable(d);
+		if (key != -1) {
+			Short current = changes.get(key);
+
+			if (current == null) {
+				current = 0;
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
+			current = ByteUtils.set(current, slot, true);
+			current = ByteUtils.set(current, 0, true);
+			changes.put(key, current);
 		}
 	}
 
-	public Packet[] createFullPackets() {
+	public synchronized TerminalDataEvent createFullEvent() {
+		ByteArrayDataOutput outputStream = ByteStreams.newDataOutput();
+		/*
+		 * If this surface is not global, then it is private to this
+		 * player
+		 */
+		byte flag = (byte)(TerminalManagerClient.CHANGE_FLAG | (isGlobal? 0 : TerminalManagerClient.PRIVATE_FLAG));
 
-		Packet[] packets = null;
+		outputStream.writeByte(flag);
+		outputStream.writeShort((short)drawables.size());
 
 		try {
-			lock.lock();
-			try {
-				ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
-				DataOutputStream outputStream = new DataOutputStream(bos);
-
-				/*
-				 * If this surface is not global, then it is private to this
-				 * player
-				 */
-				byte flag = (byte)(TerminalManager.CHANGE_FLAG | (isGlobal? 0 : TerminalManager.PRIVATE_FLAG));
-
-				outputStream.writeByte(flag);
-				outputStream.writeShort((short)drawables.size());
-
-				for (Entry<Short, IDrawable> entries : drawables.entrySet()) {
-					Short drawableId = entries.getKey();
-					writeDrawableToStream(outputStream, drawableId, Short.MAX_VALUE);
-				}
-
-				packets = PacketChunker.instance.createPackets(OpenPeripheralAddons.CHANNEL, bos.toByteArray());
-
-			} catch (Exception e2) {
-				e2.printStackTrace();
-
-			} finally {
-				lock.unlock();
+			for (Entry<Short, IDrawable> entries : drawables.entrySet()) {
+				Short drawableId = entries.getKey();
+				writeDrawableToStream(outputStream, drawableId, Short.MAX_VALUE);
 			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
+		} catch (IOException e) {
+			throw Throwables.propagate(e);
 		}
 
-		return packets;
+		TerminalDataEvent result = new TerminalDataEvent();
+		result.payload = outputStream.toByteArray();
+		return result;
 	}
 
-	public Packet[] createChangePackets() {
+	public synchronized TerminalDataEvent createChangeEvent() {
 
-		Packet[] packets = null;
+		ByteArrayDataOutput outputStream = ByteStreams.newDataOutput();
+
+		/*
+		 * If this surface is not global, then it is private to this
+		 * player
+		 */
+		byte flag = (byte)(TerminalManagerClient.CHANGE_FLAG | (isGlobal? 0 : TerminalManagerClient.PRIVATE_FLAG));
+
+		// send the 'change' flag
+		outputStream.writeByte(flag);
+
+		// write the amount of drawables that have changed
+		outputStream.writeShort((short)changes.size());
 
 		try {
-			lock.lock();
-			try {
+			for (Entry<Short, Short> change : changes.entrySet()) {
+				Short drawableId = change.getKey();
+				Short changeMask = change.getValue();
+				writeDrawableToStream(outputStream, drawableId, changeMask);
 
-				ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
-				DataOutputStream outputStream = new DataOutputStream(bos);
-
-				/*
-				 * If this surface is not global, then it is private to this
-				 * player
-				 */
-				byte flag = (byte)(TerminalManager.CHANGE_FLAG | (isGlobal? 0 : TerminalManager.PRIVATE_FLAG));
-
-				// send the 'change' flag
-				outputStream.writeByte(flag);
-
-				// write the amount of drawables that have changed
-				outputStream.writeShort((short)changes.size());
-
-				// write each of the drawables
-				for (Entry<Short, Short> change : changes.entrySet()) {
-					Short drawableId = change.getKey();
-					Short changeMask = change.getValue();
-					writeDrawableToStream(outputStream, drawableId, changeMask);
-
-				}
-
-				packets = PacketChunker.instance.createPackets(OpenPeripheralAddons.CHANNEL, bos.toByteArray());
-
-				changes.clear();
-			} finally {
-				lock.unlock();
 			}
-		} catch (Exception ex) {}
-		return packets;
+		} catch (IOException e) {
+			throw Throwables.propagate(e);
+		}
+
+		changes.clear();
+
+		TerminalDataEvent result = new TerminalDataEvent();
+		result.payload = outputStream.toByteArray();
+		return result;
+
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see openperipheral.glasses.drawable.ISurface#addBox(int, int, int, int,
-	 * int, double)
-	 */
 	@Override
-	public ILuaObject addBox(int x, int y, int width, int height, int color, double alpha) throws InterruptedException {
+	public ILuaObject addBox(int x, int y, int width, int height, int color, double alpha) {
 		return addGradientBox(x, y, width, height, color, alpha, color, alpha, (byte)0);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see openperipheral.glasses.drawable.ISurface#addGradientBox(int, int,
-	 * int, int, int, double, int, double, byte)
-	 */
 	@Override
-	public ILuaObject addGradientBox(int x, int y, int width, int height, int color, double alpha, int color2, double alpha2, byte gradient) throws InterruptedException {
-		ILuaObject obj = null;
-
-		try {
-			lock.lock();
-			try {
-				drawables.put(count, new DrawableBox(this, x, y, width, height, color, alpha, color2, alpha2, gradient));
-				changes.put(count, Short.MAX_VALUE);
-				obj = drawables.get(count++);
-			} catch (Exception e2) {
-				e2.printStackTrace();
-			} finally {
-				lock.unlock();
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return obj;
+	public synchronized ILuaObject addGradientBox(int x, int y, int width, int height, int color, double alpha, int color2, double alpha2, byte gradient) {
+		drawables.put(count, new DrawableBox(this, x, y, width, height, color, alpha, color2, alpha2, gradient));
+		changes.put(count, Short.MAX_VALUE);
+		return drawables.get(count++);
 	}
 
 	@Override
-	public ILuaObject addIcon(int x, int y, int id, int meta) {
-		ILuaObject obj = null;
-		try {
-			lock.lock();
-			try {
-				drawables.put(count, new DrawableIcon(this, x, y, id, meta));
-				changes.put(count, Short.MAX_VALUE);
-				obj = drawables.get(count++);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			} finally {
-				lock.unlock();
-			}
-		} catch (Exception ex2) {
-			ex2.printStackTrace();
-		}
-		return obj;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see openperipheral.glasses.drawable.ISurface#getById(int)
-	 */
-	@Override
-	public ILuaObject getById(int id) {
-		try {
-			lock.lock();
-			try {
-				return drawables.get((short)id);
-			} finally {
-				lock.unlock();
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see openperipheral.glasses.drawable.ISurface#addText(int, int,
-	 * java.lang.String, int)
-	 */
-	@Override
-	public ILuaObject addText(int x, int y, String text, int color) {
-		ILuaObject obj = null;
-		try {
-			lock.lock();
-			try {
-				drawables.put(count, new DrawableText(this, x, y, text, color));
-				changes.put(count, Short.MAX_VALUE);
-				obj = drawables.get(count++);
-			} finally {
-				lock.unlock();
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return obj;
+	public synchronized ILuaObject addIcon(int x, int y, int id, int meta) {
+		drawables.put(count, new DrawableIcon(this, x, y, id, meta));
+		changes.put(count, Short.MAX_VALUE);
+		return drawables.get(count++);
 	}
 
 	@Override
-	public ILuaObject addLiquid(int x, int y, int width, int height, int id) {
-		ILuaObject obj = null;
-		try {
-			lock.lock();
-			try {
-				drawables.put(count, new DrawableLiquid(this, x, y, width, height, id));
-				changes.put(count, Short.MAX_VALUE);
-				obj = drawables.get(count++);
-			} finally {
-				lock.unlock();
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return obj;
+	public synchronized ILuaObject getById(int id) {
+		return drawables.get((short)id);
 	}
 
-	private void writeDrawableToStream(DataOutputStream outputStream, short drawableId, Short changeMask) throws IOException {
+	@Override
+	public synchronized ILuaObject addText(int x, int y, String text, int color) {
+		drawables.put(count, new DrawableText(this, x, y, text, color));
+		changes.put(count, Short.MAX_VALUE);
+		return drawables.get(count++);
+	}
+
+	@Override
+	public synchronized ILuaObject addLiquid(int x, int y, int width, int height, int id) {
+		drawables.put(count, new DrawableLiquid(this, x, y, width, height, id));
+		changes.put(count, Short.MAX_VALUE);
+		return drawables.get(count++);
+	}
+
+	private void writeDrawableToStream(DataOutput outputStream, short drawableId, Short changeMask) throws IOException {
 
 		// write the mask
 		outputStream.writeShort(changeMask);
@@ -379,45 +227,17 @@ public class Surface implements ISurface, ILuaObject {
 		return str.length() * 8;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see openperipheral.glasses.drawable.ISurface#getAllIds()
-	 */
 	@Override
-	public Short[] getAllIds() {
-		try {
-			lock.lock();
-			try {
-				return drawables.keySet().toArray(new Short[drawables.size()]);
-			} finally {
-				lock.unlock();
-			}
-		} catch (Exception ex) {}
-		return null;
-
+	public synchronized Short[] getAllIds() {
+		return drawables.keySet().toArray(new Short[drawables.size()]);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see openperipheral.glasses.drawable.ISurface#clear()
-	 */
 	@Override
-	public void clear() {
-		try {
-			lock.lock();
-			try {
-				for (Short key : drawables.keySet()) {
-					changes.put(key, (short)0);
-				}
-				drawables.clear();
-			} finally {
-				lock.unlock();
-			}
-		} catch (Exception ex) {
-			ex.printStackTrace();
+	public synchronized void clear() {
+		for (Short key : drawables.keySet()) {
+			changes.put(key, (short)0);
 		}
+		drawables.clear();
 	}
 
 	public String getPlayerName() {
@@ -433,7 +253,6 @@ public class Surface implements ISurface, ILuaObject {
 
 	@Override
 	public Object[] callMethod(ILuaContext context, int methodId, Object[] arguments) throws Exception {
-
 		String methodName = methodNames[methodId];
 		return CCUtils.callSelfMethod(this, methodName, arguments);
 	}

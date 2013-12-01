@@ -1,29 +1,20 @@
-package openperipheral.addons;
+package operperipheral.addons.glasses;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
+import java.io.DataInput;
+import java.io.IOException;
 import java.util.*;
 
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.NetLoginHandler;
-import net.minecraft.network.packet.NetHandler;
-import net.minecraft.network.packet.Packet1Login;
-import net.minecraft.network.packet.Packet250CustomPayload;
-import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.event.ForgeSubscribe;
 import openmods.utils.ByteUtils;
-import openmods.utils.io.PacketChunker;
-import openperipheral.addons.drawable.DrawableBox;
-import openperipheral.addons.drawable.DrawableIcon;
-import openperipheral.addons.drawable.DrawableLiquid;
-import openperipheral.addons.drawable.DrawableText;
-import openperipheral.addons.interfaces.IDrawable;
-import cpw.mods.fml.common.network.IConnectionHandler;
-import cpw.mods.fml.common.network.Player;
+import openperipheral.addons.drawable.*;
 
-public class TerminalManager implements IConnectionHandler {
+import com.google.common.base.Throwables;
+import com.google.common.io.ByteStreams;
+
+// TODO: rewrite receiving
+public class TerminalManagerClient {
 
 	public static final byte CLEAR_ALL_FLAG = 0;
 	public static final byte CHANGE_FLAG = 1;
@@ -44,28 +35,21 @@ public class TerminalManager implements IConnectionHandler {
 		}
 	};
 
-	public TerminalManager() {}
+	public TerminalManagerClient() {}
 
 	public Collection<IDrawable> getDrawables() {
 		return drawableList;
 	}
 
-	/**
-	 * Handle an incoming packet
-	 * 
-	 * @param packet
-	 */
-	public void handlePacket(Packet250CustomPayload packet) {
-
+	@ForgeSubscribe
+	public void handlePacket(TerminalDataEvent packet) {
 		try {
-
-			// get the bytes for the packet. Used for multi-chunk packets
-			byte[] bytes = PacketChunker.instance.getBytes(packet);
+			// TODO: make EventPacket use PacketChunker
+			byte[] bytes = packet.payload;
 
 			if (bytes == null) return;
 
-			DataInputStream inputStream = new DataInputStream(
-					new ByteArrayInputStream(bytes));
+			DataInput inputStream = ByteStreams.newDataInput(bytes);
 
 			byte type = inputStream.readByte();
 
@@ -143,12 +127,9 @@ public class TerminalManager implements IConnectionHandler {
 			drawableList.addAll(this.drawables.values());
 			drawableList.addAll(privateDrawables.values());
 			Collections.sort(drawableList, zIndexComparator);
-
-		} catch (Exception e) {
-			/* I'm adding this in for now - NC */
-			e.printStackTrace();
+		} catch (IOException e) {
+			Throwables.propagate(e);
 		}
-
 	}
 
 	@ForgeSubscribe
@@ -160,31 +141,4 @@ public class TerminalManager implements IConnectionHandler {
 			}
 		}
 	}
-
-	@Override
-	public void playerLoggedIn(Player player, NetHandler netHandler,
-			INetworkManager manager) {}
-
-	@Override
-	public String connectionReceived(NetLoginHandler netHandler, INetworkManager manager) {
-		return null;
-	}
-
-	@Override
-	public void connectionOpened(NetHandler netClientHandler, String server, int port, INetworkManager manager) {}
-
-	@Override
-	public void connectionOpened(NetHandler netClientHandler, MinecraftServer server, INetworkManager manager) {}
-
-	@Override
-	public void connectionClosed(INetworkManager manager) {}
-
-	@Override
-	public void clientLoggedIn(NetHandler clientHandler,
-			INetworkManager manager, Packet1Login login) {
-		drawables.clear();
-		privateDrawables.clear();
-		drawableList.clear();
-	}
-
 }

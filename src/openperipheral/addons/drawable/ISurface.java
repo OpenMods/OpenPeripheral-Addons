@@ -1,4 +1,4 @@
-package openperipheral.addons.interfaces;
+package openperipheral.addons.drawable;
 
 import dan200.computer.api.ILuaObject;
 

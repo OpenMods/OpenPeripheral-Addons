@@ -1,6 +1,8 @@
-package openperipheral.addons.client;
+package openperipheral.addons.proxy;
 
+import net.minecraftforge.common.MinecraftForge;
 import openmods.api.IProxy;
+import operperipheral.addons.glasses.TerminalManagerClient;
 import cpw.mods.fml.common.network.IGuiHandler;
 
 public class ClientProxy implements IProxy {
@@ -11,7 +13,9 @@ public class ClientProxy implements IProxy {
 	}
 
 	@Override
-	public void preInit() {}
+	public void preInit() {
+		MinecraftForge.EVENT_BUS.register(new TerminalManagerClient());
+	}
 
 	@Override
 	public void init() {}

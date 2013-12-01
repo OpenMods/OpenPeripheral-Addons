@@ -6,11 +6,12 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
+import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
@@ -54,11 +55,11 @@ public final class GlassesRenderingUtils {
 		if (itemStack.getItem() == null) return;
 		Icon icon = itemStack.getIconIndex();
 		GL11.glDisable(GL11.GL_LIGHTING);
-		if (itemStack.getItem() instanceof ItemBlock) {
-			FMLClientHandler.instance().getClient().renderEngine.bindTexture(TextureMap.locationBlocksTexture);
-		} else {
-			FMLClientHandler.instance().getClient().renderEngine.bindTexture(TextureMap.locationItemsTexture);
-		}
+
+		TextureManager manager = FMLClientHandler.instance().getClient().renderEngine;
+		ResourceLocation texture = manager.getResourceLocation(itemStack.getItemSpriteNumber());
+		manager.bindTexture(texture);
+
 		int overlayColour = itemStack.getItem().getColorFromItemStack(itemStack, 0);
 		float red = (overlayColour >> 16 & 255) / 255.0F;
 		float green = (overlayColour >> 8 & 255) / 255.0F;
