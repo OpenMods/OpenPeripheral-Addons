@@ -1,4 +1,4 @@
-package operperipheral.addons.glasses;
+package openperipheral.addons.glasses;
 
 import java.util.List;
 

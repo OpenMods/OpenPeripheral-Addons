@@ -8,8 +8,8 @@ import net.minecraftforge.common.MinecraftForge;
 import openmods.api.IProxy;
 import openmods.config.RegisterBlock;
 import openmods.config.RegisterItem;
+import openperipheral.addons.glasses.*;
 import openperipheral.api.IntegrationRegistry;
-import operperipheral.addons.glasses.*;
 
 import org.apache.commons.lang3.ObjectUtils;
 

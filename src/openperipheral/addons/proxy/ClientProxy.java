@@ -2,7 +2,7 @@ package openperipheral.addons.proxy;
 
 import net.minecraftforge.common.MinecraftForge;
 import openmods.api.IProxy;
-import operperipheral.addons.glasses.TerminalManagerClient;
+import openperipheral.addons.glasses.TerminalManagerClient;
 import cpw.mods.fml.common.network.IGuiHandler;
 
 public class ClientProxy implements IProxy {

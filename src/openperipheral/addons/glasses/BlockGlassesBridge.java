@@ -1,4 +1,4 @@
-package operperipheral.addons.glasses;
+package openperipheral.addons.glasses;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;

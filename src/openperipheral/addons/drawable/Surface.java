@@ -8,10 +8,10 @@ import java.util.Map.Entry;
 
 import openmods.utils.ByteUtils;
 import openmods.utils.render.FontSizeChecker;
+import openperipheral.addons.glasses.TerminalDataEvent;
+import openperipheral.addons.glasses.TerminalManagerClient;
+import openperipheral.addons.glasses.TileEntityGlassesBridge;
 import openperipheral.addons.utils.CCUtils;
-import operperipheral.addons.glasses.TerminalDataEvent;
-import operperipheral.addons.glasses.TerminalManagerClient;
-import operperipheral.addons.glasses.TileEntityGlassesBridge;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;

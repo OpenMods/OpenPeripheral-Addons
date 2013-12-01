@@ -1,4 +1,4 @@
-package operperipheral.addons.glasses;
+package openperipheral.addons.glasses;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;

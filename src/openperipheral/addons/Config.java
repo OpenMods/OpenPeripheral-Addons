@@ -6,8 +6,8 @@ import openmods.config.ConfigProcessing;
 import openmods.config.ItemId;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import openperipheral.addons.OpenPeripheralAddons.Items;
-import operperipheral.addons.glasses.BlockGlassesBridge;
-import operperipheral.addons.glasses.ItemGlasses;
+import openperipheral.addons.glasses.BlockGlassesBridge;
+import openperipheral.addons.glasses.ItemGlasses;
 
 public class Config {
 

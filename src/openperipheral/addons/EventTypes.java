@@ -4,7 +4,7 @@ import openmods.network.EventIdRanges;
 import openmods.network.EventPacket;
 import openmods.network.IEventPacketType;
 import openmods.network.PacketDirection;
-import operperipheral.addons.glasses.TerminalDataEvent;
+import openperipheral.addons.glasses.TerminalDataEvent;
 
 public enum EventTypes implements IEventPacketType {
 	TERMINAL_DATA {
