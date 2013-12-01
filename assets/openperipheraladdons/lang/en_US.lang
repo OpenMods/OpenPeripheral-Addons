@@ -1,5 +1,5 @@
 tile.openperipheral.glassesbridge.name=Terminal Glasses Bridge
-tile.openperipheral.proxyblock.name=Peripheral Proxy
+tile.openperipheral.peripheralproxy.name=Peripheral Proxy
 tile.openperipheral.playerinventory.name=PIM
 tile.openperipheral.ticketmachine.name=Ticket Machine
 tile.openperipheral.sensor.name=Sensor

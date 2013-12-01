@@ -14,6 +14,7 @@ import openperipheral.util.ReflectionHelper;
 public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeripheralProvider, INeighbourAwareTile {
 
 	public static final String CABLE_CLASS_NAME = "dan200.computer.shared.TileEntityCable";
+	public static final String BASECOMPUTER_CLASS_NAME = "dan200.computer.shared.BlockComputerBase";
 	
 	@Override
 	public IHostedPeripheral providePeripheral(World worldObj) {
@@ -21,7 +22,7 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeriph
 		ForgeDirection rotation = getRotation();
 		try {
 			peripheral = ReflectionHelper.callMethod(
-					"dan200.computer.shared.BlockComputerBase",
+					BASECOMPUTER_CLASS_NAME,
 					null,
 					new String[] { "getPeripheralAt" },
 					worldObj,
@@ -46,10 +47,8 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeriph
             int attachedY = yCoord + rot.offsetY;
             int attachedZ = zCoord + rot.offsetZ;
             TileEntity attachedTE = worldObj.getBlockTileEntity(attachedX, attachedY, attachedZ);
-            System.out.println(attachedTE.getClass().getName());
             if (attachedTE != null && attachedTE.getClass().getName().equals(CABLE_CLASS_NAME)) {
             	try {
-            		System.out.println("changed");
 					ReflectionHelper.callMethod("", attachedTE, new String[] { "networkChanged" });
 				} catch (Exception e) {
 					e.printStackTrace();
