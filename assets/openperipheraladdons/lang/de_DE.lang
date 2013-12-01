@@ -64,3 +64,5 @@ itemGroup.tabOpenPeripheral=OpenPeripheral
 openperipheral.gui.ticketmachine=Ticketmaschine
 openperipheral.turtle.sensor.adjective=Sensor
 openperipheral.turtle.narcissistic.adjective=Narzisstische
+
+openperipheral.misc.key=Taste: %s
