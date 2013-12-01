@@ -9,6 +9,7 @@ import openmods.api.IProxy;
 import openmods.config.RegisterBlock;
 import openmods.config.RegisterItem;
 import openperipheral.addons.glasses.*;
+import openperipheral.addons.peripheralproxy.*;
 import openperipheral.api.IntegrationRegistry;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -29,6 +30,9 @@ public class OpenPeripheralAddons {
 	public static class Blocks {
 		@RegisterBlock(name = "glassesbridge", tileEntity = TileEntityGlassesBridge.class)
 		public static BlockGlassesBridge glassesBridge;
+
+		@RegisterBlock(name = "peripheralproxy", tileEntity = TileEntityPeripheralProxy.class)
+		public static BlockPeripheralProxy peripheralProxy;
 	}
 
 	public static class Items {

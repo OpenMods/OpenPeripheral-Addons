@@ -8,6 +8,7 @@ import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import openperipheral.addons.OpenPeripheralAddons.Items;
 import openperipheral.addons.glasses.BlockGlassesBridge;
 import openperipheral.addons.glasses.ItemGlasses;
+import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 
 public class Config {
 
@@ -17,6 +18,9 @@ public class Config {
 	@BlockId(description = "The id of the glasses bridge")
 	public static int blockGlassesBridgeId = 3000;
 
+	@BlockId(description = "The id of the peripheral proxy")
+	public static int blockPeripheralProxyId = 3001;
+
 	public static void readConfig(Configuration configFile) {
 		ConfigProcessing.processAnnotations(configFile, Config.class);
 	}
@@ -24,6 +28,10 @@ public class Config {
 	public static void register() {
 		if (ConfigProcessing.canRegisterBlock(blockGlassesBridgeId)) {
 			Blocks.glassesBridge = new BlockGlassesBridge();
+		}
+
+		if (ConfigProcessing.canRegisterBlock(blockPeripheralProxyId)) {
+			Blocks.peripheralProxy = new BlockPeripheralProxy();
 		}
 
 		if (itemGlassesId > 0) {

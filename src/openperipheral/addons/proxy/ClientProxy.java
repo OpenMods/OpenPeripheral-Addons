@@ -2,7 +2,10 @@ package openperipheral.addons.proxy;
 
 import net.minecraftforge.common.MinecraftForge;
 import openmods.api.IProxy;
+import openperipheral.addons.OpenPeripheralAddons;
+import openperipheral.addons.client.BlockRenderingHandler;
 import openperipheral.addons.glasses.TerminalManagerClient;
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.network.IGuiHandler;
 
 public class ClientProxy implements IProxy {
@@ -24,6 +27,9 @@ public class ClientProxy implements IProxy {
 	public void postInit() {}
 
 	@Override
-	public void registerRenderInformation() {}
+	public void registerRenderInformation() {
+		OpenPeripheralAddons.renderId = RenderingRegistry.getNextAvailableRenderId();
+		RenderingRegistry.registerBlockHandler(new BlockRenderingHandler());
+	}
 
 }
