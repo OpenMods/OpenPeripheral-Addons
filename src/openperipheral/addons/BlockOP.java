@@ -15,9 +15,4 @@ public abstract class BlockOP extends OpenBlock {
 		return OpenPeripheralAddons.renderId;
 	}
 
-	@Override
-	protected String getModId() {
-		return "openperipheral";
-	}
-
 }
