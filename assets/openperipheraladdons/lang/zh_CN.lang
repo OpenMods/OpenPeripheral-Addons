@@ -1,7 +1,7 @@
 #zh_CN
 
 tile.openperipheral.glassesbridge.name=头戴显示终端机
-tile.openperipheral.proxyblock.name=电脑线缆接口
+tile.openperipheral.peripheralproxy.name=电脑线缆接口
 tile.openperipheral.playerinventory.name=携带物同步压力板
 tile.openperipheral.ticketmachine.name=票务机
 tile.openperipheral.sensor.name=传感器
@@ -66,3 +66,5 @@ itemGroup.tabOpenPeripheral=OpenPeripheral
 openperipheral.gui.ticketmachine=票务机
 openperipheral.turtle.sensor.adjective=传感器
 openperipheral.turtle.narcissistic.adjective=自恋的
+
+openperipheral.misc.key=钥匙: %s
