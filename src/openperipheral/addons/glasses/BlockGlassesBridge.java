@@ -34,9 +34,9 @@ public class BlockGlassesBridge extends BlockOP {
 
 		ItemStack glassesStack = player.getHeldItem();
 		if (glassesStack != null && glassesStack.getItem() instanceof ItemGlasses) {
-			te.writeDataToGlasses(glassesStack);
+			te.linkGlasses(glassesStack);
 		}
 
-		return true;
+		return false;
 	}
 }

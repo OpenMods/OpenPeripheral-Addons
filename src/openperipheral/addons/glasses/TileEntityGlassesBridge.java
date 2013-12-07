@@ -6,15 +6,11 @@ import java.util.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
+import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
-import openmods.utils.StringUtils;
-import openperipheral.addons.drawable.Surface;
+import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.api.IAttachable;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,9 +18,8 @@ import com.google.common.collect.Sets;
 
 import cpw.mods.fml.common.network.Player;
 import dan200.computer.api.IComputerAccess;
-import dan200.computer.api.ILuaObject;
 
-public class TileEntityGlassesBridge extends TileEntity implements IAttachable {
+public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable {
 
 	private static final String EVENT_CHAT_MESSAGE = "chat_command";
 
@@ -32,40 +27,48 @@ public class TileEntityGlassesBridge extends TileEntity implements IAttachable {
 
 	private static class PlayerInfo {
 		public final WeakReference<EntityPlayer> player;
-		public Surface surface;
+		public SurfaceServer surface;
 
 		public PlayerInfo(TileEntityGlassesBridge parent, EntityPlayer player) {
 			this.player = new WeakReference<EntityPlayer>(player);
-			this.surface = new Surface(parent, player.getEntityName());
+			this.surface = new SurfaceServer(player.getEntityName());
 		}
 	}
 
-	private Map<String, PlayerInfo> knownPlayers = Maps.newHashMap();
-	public Set<EntityPlayer> newPlayers = Sets.newSetFromMap(new WeakHashMap<EntityPlayer, Boolean>());
-
-	public Surface globalSurface = new Surface(this);
+	private final Map<String, PlayerInfo> knownPlayers = Maps.newHashMap();
+	private final Set<EntityPlayer> newPlayers = Sets.newSetFromMap(new WeakHashMap<EntityPlayer, Boolean>());
 
 	private List<IComputerAccess> computers = Lists.newArrayList();
 
-	/**
-	 * Unique GUID for this terminal
-	 */
-	private String guid = StringUtils.randomString(8);
+	public SurfaceServer globalSurface = new SurfaceServer(TerminalUtils.GLOBAL_MARKER);
+	private long guid = TerminalUtils.generateGuid();
 
 	public TileEntityGlassesBridge() {}
 
-	public void registerPlayer(EntityPlayer player) {
-		if (!knownPlayers.containsKey(player.getEntityName())) {
-			newPlayers.add(player);
+	public void onGlassesTick(EntityPlayer player) {
+		if (!knownPlayers.containsKey(player.getEntityName())) newPlayers.add(player);
+	}
+
+	public void onChatCommand(String command, String username) {
+		for (IComputerAccess computer : computers) {
+			computer.queueEvent(EVENT_CHAT_MESSAGE, new Object[] { command, username, guid, computer.getAttachmentName() });
 		}
+	}
+
+	@Override
+	public void validate() {
+		super.validate();
+		TerminalManagerServer.instance.registerBridge(guid, this);
 	}
 
 	@Override
 	public void updateEntity() {
 		super.updateEntity();
-		if (worldObj.isRemote) return;
+		if (worldObj.isRemote || globalSurface == null) return;
 
 		TerminalDataEvent globalChange = null;
+
+		final boolean globalUpdate = globalSurface.hasUpdates();
 
 		Iterator<PlayerInfo> it = knownPlayers.values().iterator();
 		while (it.hasNext()) {
@@ -77,27 +80,25 @@ public class TileEntityGlassesBridge extends TileEntity implements IAttachable {
 				continue;
 			}
 
-			if (globalChange == null) globalChange = globalSurface.createChangeEvent();
+			if (globalUpdate) {
+				if (globalChange == null) globalChange = TerminalManagerServer.createUpdateDataEvent(globalSurface, guid, false);
+				globalChange.sendToPlayer((Player)player);
+			}
 
-			globalChange.sendToPlayer((Player)player);
-
-			final Surface privateSurface = info.surface;
-			if (privateSurface != null) {
-				TerminalDataEvent privateData = privateSurface.createFullEvent();
+			final SurfaceServer privateSurface = info.surface;
+			if (privateSurface != null && privateSurface.hasUpdates()) {
+				TerminalDataEvent privateData = TerminalManagerServer.createUpdateDataEvent(privateSurface, guid, true);
 				privateData.sendToPlayer((Player)player);
-				privateSurface.clearChanges();
 			}
 		}
-
-		globalSurface.clearChanges();
 
 		TerminalDataEvent globalFull = null;
 
 		for (EntityPlayer newPlayer : newPlayers) {
 			if (isPlayerValid(newPlayer)) {
-				if (globalFull == null) globalFull = globalSurface.createFullEvent();
-
+				if (globalFull == null) globalFull = TerminalManagerServer.createFullDataEvent(globalSurface, guid, false);
 				globalFull.sendToPlayer((Player)newPlayer);
+
 				final String playerName = newPlayer.getEntityName();
 				knownPlayers.put(playerName, new PlayerInfo(this, newPlayer));
 				onPlayerJoin(playerName);
@@ -110,25 +111,15 @@ public class TileEntityGlassesBridge extends TileEntity implements IAttachable {
 	private boolean isPlayerValid(EntityPlayer player) {
 		if (player == null) return false;
 
-		ItemStack glasses = player.inventory.armorItemInSlot(3);
-		if (glasses == null || !(glasses.getItem() instanceof ItemGlasses)) return false;
+		ItemStack glasses = ItemGlasses.getGlassesItem(player);
+		if (glasses == null) return false;
 
-		NBTTagCompound tag = glasses.getTagCompound();
-		if (tag == null) return false;
-
-		NBTTagCompound openPTag = (NBTTagCompound)tag.getTag("openp");
-		if (openPTag == null) return false;
-
-		String guid = openPTag.getString("guid");
-		return !Strings.isNullOrEmpty(guid) && guid.equals(this.guid);
+		Long guid = ItemGlasses.extractGuid(glasses);
+		return guid != null && guid == this.guid;
 	}
 
-	public String getGuid() {
+	public long getGuid() {
 		return guid;
-	}
-
-	public void resetGuid() {
-		guid = StringUtils.randomString(8);
 	}
 
 	public List<String> getUsers() {
@@ -138,20 +129,14 @@ public class TileEntityGlassesBridge extends TileEntity implements IAttachable {
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
-		tag.setString("guid", guid);
+		tag.setLong("guid", guid);
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
-		guid = tag.getString("guid");
-	}
-
-	public void onChatCommand(String command, String username) {
-		for (IComputerAccess computer : computers) {
-			computer.queueEvent(EVENT_CHAT_MESSAGE, new Object[] { command,
-					username, getGuid(), computer.getAttachmentName() });
-		}
+		Long guid = TerminalUtils.extractGuid(tag);
+		if (guid != null) this.guid = guid;
 	}
 
 	public void onPlayerJoin(String playerName) {
@@ -172,35 +157,7 @@ public class TileEntityGlassesBridge extends TileEntity implements IAttachable {
 		computers.remove(computer);
 	}
 
-	public static TileEntityGlassesBridge getGlassesBridgeFromStack(ItemStack stack) {
-		if (stack.hasTagCompound()) {
-			NBTTagCompound tag = stack.getTagCompound();
-			if (tag.hasKey("openp")) {
-				NBTTagCompound openPTag = tag.getCompoundTag("openp");
-				String guid = openPTag.getString("guid");
-				int x = openPTag.getInteger("x");
-				int y = openPTag.getInteger("y");
-				int z = openPTag.getInteger("z");
-				int d = openPTag.getInteger("d");
-
-				World worldObj = DimensionManager.getWorld(d);
-
-				if (worldObj != null) {
-					if (worldObj.blockExists(x, y, z)) {
-						TileEntity tile = worldObj.getBlockTileEntity(x, y, z);
-						if (tile instanceof TileEntityGlassesBridge) {
-							if (!((TileEntityGlassesBridge)tile).getGuid()
-									.equals(guid)) return null;
-							return (TileEntityGlassesBridge)tile;
-						}
-					}
-				}
-			}
-		}
-		return null;
-	}
-
-	void writeDataToGlasses(ItemStack stack) {
+	void linkGlasses(ItemStack stack) {
 		NBTTagCompound tag = ItemUtils.getItemTag(stack);
 
 		NBTTagCompound openPTag = (NBTTagCompound)tag.getTag("openp");
@@ -209,18 +166,11 @@ public class TileEntityGlassesBridge extends TileEntity implements IAttachable {
 			tag.setTag("openp", openPTag);
 		}
 
-		openPTag.setString("guid", getGuid());
-		openPTag.setInteger("x", xCoord);
-		openPTag.setInteger("y", yCoord);
-		openPTag.setInteger("z", zCoord);
-		openPTag.setInteger("d", worldObj.provider.dimensionId);
+		openPTag.setLong("guid", getGuid());
 	}
 
-	public int getStringWidth(String text) {
-		return Surface.getStringWidth(text);
-	}
-
-	public ILuaObject getUserSurface(String username) {
+	public SurfaceServer getSurface(String username) {
+		if (TerminalUtils.GLOBAL_MARKER.equals(username)) return globalSurface;
 		PlayerInfo info = knownPlayers.get(username);
 		return info != null? info.surface : null;
 	}

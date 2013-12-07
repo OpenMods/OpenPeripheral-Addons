@@ -4,9 +4,23 @@ import openmods.network.EventIdRanges;
 import openmods.network.EventPacket;
 import openmods.network.IEventPacketType;
 import openmods.network.PacketDirection;
-import openperipheral.addons.glasses.TerminalDataEvent;
+import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
+import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
 
 public enum EventTypes implements IEventPacketType {
+	TERMINAL_RESET {
+
+		@Override
+		public EventPacket createPacket() {
+			return new TerminalResetEvent();
+		}
+
+		@Override
+		public PacketDirection getDirection() {
+			return PacketDirection.FROM_CLIENT;
+		}
+
+	},
 	TERMINAL_DATA {
 		@Override
 		public EventPacket createPacket() {

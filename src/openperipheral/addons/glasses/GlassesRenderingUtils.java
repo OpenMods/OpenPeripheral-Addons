@@ -1,4 +1,4 @@
-package openperipheral.addons.utils;
+package openperipheral.addons.glasses;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.FontRenderer;
@@ -12,6 +12,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraft.util.ResourceLocation;
+import openmods.utils.render.FontSizeChecker;
 
 import org.lwjgl.opengl.GL11;
 
@@ -90,5 +91,14 @@ public final class GlassesRenderingUtils {
 		tessellator.draw();
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glPopMatrix();
+	}
+
+	public static int getStringWidth(String str) {
+		try {
+			return FontSizeChecker.getInstance().getStringWidth(str);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return str.length() * 8;
 	}
 }

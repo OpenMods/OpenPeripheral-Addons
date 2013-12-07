@@ -1,31 +1,62 @@
 package openperipheral.addons.utils;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import openperipheral.TypeConversionRegistry;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
 public final class CCUtils {
-	public static Object[] callSelfMethod(Object target, String methodName, Object[] arguments) throws IllegalAccessException, InvocationTargetException {
-		METHOD_LOOP: for (Method method : target.getClass().getMethods()) {
+	public static Object[] wrap(Object... args) {
+		return args;
+	}
+
+	public static Object[] convertArgs(Class<?> needed[], Object args[]) {
+		if (needed.length != args.length) return null;
+
+		List<Object> conventedArgs = Lists.newArrayList();
+		for (int i = 0; i < needed.length; i++) {
+			Object converted = TypeConversionRegistry.fromLua(args[i], needed[i]);
+			if (converted == null) return null;
+			conventedArgs.add(converted);
+		}
+
+		return conventedArgs.toArray();
+	}
+
+	public static Object callSelfMethod(Object target, String methodName, Object[] arguments) {
+		for (Method method : target.getClass().getMethods()) {
 			if (!methodName.equals(method.getName())) continue;
-			Class<?>[] requiredParameters = method.getParameterTypes();
-			if (requiredParameters.length != arguments.length) continue;
+			Object[] converted = convertArgs(method.getParameterTypes(), arguments);
+			if (converted == null) continue;
 
-			List<Object> args = Lists.newArrayList();
-			for (int i = 0; i < requiredParameters.length; i++) {
-				Object converted = TypeConversionRegistry.fromLua(arguments[i], requiredParameters[i]);
-				if (converted == null) continue METHOD_LOOP;
-				args.add(converted);
+			try {
+				Object v = method.invoke(target, converted);
+				return TypeConversionRegistry.toLua(v);
+			} catch (Exception e) {
+				throw Throwables.propagate(e);
 			}
-
-			Object v = method.invoke(target, args.toArray());
-			return new Object[] { TypeConversionRegistry.toLua(v) };
 		}
 
 		throw new RuntimeException("Method " + methodName + " not found");
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <T> T callConstructor(Class<? extends T> klazz, Object[] arguments) {
+		for (Constructor<?> ctor : klazz.getConstructors()) {
+			Object[] converted = convertArgs(ctor.getParameterTypes(), arguments);
+			if (converted == null) continue;
+
+			try {
+				return (T)ctor.newInstance(converted);
+			} catch (Exception e) {
+				throw Throwables.propagate(e);
+			}
+		}
+
+		throw new RuntimeException("No valid constructor found");
 	}
 }

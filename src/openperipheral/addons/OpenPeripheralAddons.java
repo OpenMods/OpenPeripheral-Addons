@@ -10,8 +10,8 @@ import openmods.config.RegisterBlock;
 import openmods.config.RegisterItem;
 import openperipheral.OpenPeripheralCore;
 import openperipheral.addons.glasses.*;
-import openperipheral.addons.peripheralproxy.*;
-import openperipheral.api.IPeripheralProvider;
+import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
+import openperipheral.addons.peripheralproxy.TileEntityPeripheralProxy;
 import openperipheral.api.IntegrationRegistry;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -69,8 +69,8 @@ public class OpenPeripheralAddons {
 
 		IntegrationRegistry.register(new AdapterGlassesBridge());
 		EventTypes.registerTypes();
-		MinecraftForge.EVENT_BUS.register(new TerminalManagerServer());
-		
+		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
+
 		proxy.preInit();
 	}
 

@@ -59,7 +59,7 @@ item.openperipheral.tier2inventory.name=Tier 2 Inventory Unit
 item.openperipheral.tier3inventory.name=Tier 3 Inventory Unit
 item.openperipheral.robot.name=OpenMech: Warrior
 
-itemGroup.tabOpenPeripheral=OpenPeripheral 
+itemGroup.tabOpenPeripheralAddons=OpenPeripheral 
 
 openperipheral.gui.ticketmachine=Ticket Machine
 openperipheral.turtle.sensor.adjective=Sensor

@@ -4,8 +4,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.util.Icon;
 import net.minecraftforge.common.ForgeDirection;
-import openperipheral.addons.Config;
 import openperipheral.addons.BlockOP;
+import openperipheral.addons.Config;
 
 public class BlockPeripheralProxy extends BlockOP {
 
@@ -21,6 +21,7 @@ public class BlockPeripheralProxy extends BlockOP {
 		setPlacementMode(BlockPlacementMode.ENTITY_ANGLE);
 	}
 
+	@Override
 	public void registerIcons(IconRegister registry) {
 		Icons.top = registry.registerIcon("openperipheraladdons:proxy_top");
 		Icons.bottom = registry.registerIcon("openperipheraladdons:proxy_bottom");

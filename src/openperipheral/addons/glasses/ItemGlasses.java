@@ -28,15 +28,20 @@ public class ItemGlasses extends ItemArmor {
 		setUnlocalizedName("openperipheral.glasses");
 	}
 
+	public static Long extractGuid(ItemStack stack) {
+		NBTTagCompound tag = ItemUtils.getItemTag(stack);
+		if (!tag.hasKey("openp")) return null;
+
+		NBTTagCompound openp = tag.getCompoundTag("openp");
+		return TerminalUtils.extractGuid(openp);
+	}
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void addInformation(ItemStack itemStack, EntityPlayer player, List list, boolean par4) {
-		NBTTagCompound tag = ItemUtils.getItemTag(itemStack);
-		if (tag.hasKey("openp")) {
-			String key = tag.getCompoundTag("openp").getString("guid");
-			list.add(StatCollector.translateToLocalFormatted("openperipheral.misc.key", key));
-		}
+		Long guid = extractGuid(itemStack);
+		if (guid != null) list.add(StatCollector.translateToLocalFormatted("openperipheral.misc.key", TerminalUtils.formatTerminalId(guid)));
 	}
 
 	@Override
@@ -61,9 +66,16 @@ public class ItemGlasses extends ItemArmor {
 	@Override
 	public void onArmorTickUpdate(World world, EntityPlayer player, ItemStack itemStack) {
 		if (!world.isRemote) {
-			TileEntityGlassesBridge bridge = TileEntityGlassesBridge.getGlassesBridgeFromStack(itemStack);
-			if (bridge != null) bridge.registerPlayer(player);
+			Long guid = extractGuid(itemStack);
+			if (guid != null) TerminalManagerServer.instance.onGlassesTick(player, guid);
 		}
+	}
+
+	static ItemStack getGlassesItem(EntityPlayer player) {
+		if (player == null) return null;
+		ItemStack headSlot = player.inventory.armorItemInSlot(3);
+		if (headSlot == null || !(headSlot.getItem() instanceof ItemGlasses)) return null;
+		return headSlot;
 	}
 
 }
