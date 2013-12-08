@@ -9,6 +9,7 @@ import openperipheral.addons.OpenPeripheralAddons.Items;
 import openperipheral.addons.glasses.BlockGlassesBridge;
 import openperipheral.addons.glasses.ItemGlasses;
 import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
+import openperipheral.addons.pim.BlockPIM;
 
 public class Config {
 
@@ -21,6 +22,9 @@ public class Config {
 	@BlockId(description = "The id of the peripheral proxy")
 	public static int blockPeripheralProxyId = 3001;
 
+	@BlockId(description = "The id of the pim block")
+	public static int blockPIMId = 3002;
+
 	public static void readConfig(Configuration configFile) {
 		ConfigProcessing.processAnnotations(configFile, Config.class);
 	}
@@ -32,6 +36,10 @@ public class Config {
 
 		if (ConfigProcessing.canRegisterBlock(blockPeripheralProxyId)) {
 			Blocks.peripheralProxy = new BlockPeripheralProxy();
+		}
+		
+		if (ConfigProcessing.canRegisterBlock(blockPIMId)) {
+			Blocks.pim = new BlockPIM();
 		}
 
 		if (itemGlassesId > 0) {

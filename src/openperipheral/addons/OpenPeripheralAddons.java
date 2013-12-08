@@ -12,6 +12,8 @@ import openperipheral.OpenPeripheralCore;
 import openperipheral.addons.glasses.*;
 import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.peripheralproxy.TileEntityPeripheralProxy;
+import openperipheral.addons.pim.BlockPIM;
+import openperipheral.addons.pim.TileEntityPIM;
 import openperipheral.api.IntegrationRegistry;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -36,6 +38,9 @@ public class OpenPeripheralAddons {
 
 		@RegisterBlock(name = "peripheralproxy", tileEntity = TileEntityPeripheralProxy.class)
 		public static BlockPeripheralProxy peripheralProxy;
+
+		@RegisterBlock(name = "pim", tileEntity = TileEntityPIM.class)
+		public static BlockPIM pim;
 	}
 
 	public static class Items {
