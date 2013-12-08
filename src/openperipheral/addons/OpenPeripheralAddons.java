@@ -14,7 +14,7 @@ import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.peripheralproxy.TileEntityPeripheralProxy;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.pim.TileEntityPIM;
-import openperipheral.api.IntegrationRegistry;
+import openperipheral.api.OpenPeripheralAPI;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -72,7 +72,7 @@ public class OpenPeripheralAddons {
 		}
 		Config.register();
 
-		IntegrationRegistry.register(new AdapterGlassesBridge());
+		OpenPeripheralAPI.register(new AdapterGlassesBridge());
 		EventTypes.registerTypes();
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
 
