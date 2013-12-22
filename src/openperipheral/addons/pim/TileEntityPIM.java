@@ -12,15 +12,17 @@ import dan200.computer.api.IComputerAccess;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChunkCoordinates;
 import openmods.tileentity.OpenTileEntity;
 import openperipheral.api.IAttachable;
 
-public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttachable {
+public class TileEntityPIM extends OpenTileEntity implements IInventory,
+		IAttachable {
 
 	private WeakReference<EntityPlayer> player;
 
-	private Set<IComputerAccess> computers = Collections.newSetFromMap(
-			new WeakHashMap<IComputerAccess, Boolean>());
+	private Set<IComputerAccess> computers = Collections
+			.newSetFromMap(new WeakHashMap<IComputerAccess, Boolean>());
 
 	@Override
 	public int getSizeInventory() {
@@ -102,6 +104,25 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttach
 		computers.remove(computer);
 	}
 
+	public EntityPlayer getPlayer() {
+		return player != null? player.get() : null;
+	}
+
+	public boolean hasPlayer() {
+		if (worldObj == null) return false;
+		return worldObj.getBlockMetadata(xCoord, yCoord, zCoord) == 1;
+	}
+
+	public void setPlayer(EntityPlayer p) {
+		player = new WeakReference<EntityPlayer>(p);
+		worldObj.playSoundEffect((double)xCoord + 0.5D,
+				(double)yCoord + 0.1D, (double)zCoord + 0.5D, "random.click",
+				0.3F, 0.6F);
+		worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord,
+				p == null? 0 : 1, 3);
+		fireEvent(p == null? "player_off" : "player_on");
+	}
+
 	public void fireEvent(String eventName, Object... args) {
 		if (args == null) {
 			args = new Object[0];
@@ -109,6 +130,22 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttach
 		for (IComputerAccess computer : computers) {
 			args = ArrayUtils.add(args, computer.getAttachmentName());
 			computer.queueEvent(eventName, args);
+		}
+	}
+
+	/**
+	 * TODO: fix this. This doesnt seem.. efficient.
+	 */
+	@Override
+	public void updateEntity() {
+		if (!worldObj.isRemote) {
+			EntityPlayer player = getPlayer();
+			if (player != null) {
+				ChunkCoordinates coordinates = player.getPlayerCoordinates();
+				if (coordinates.posX != xCoord || coordinates.posY != yCoord || coordinates.posZ != zCoord) {
+					setPlayer(null);
+				}
+			}
 		}
 	}
 }
