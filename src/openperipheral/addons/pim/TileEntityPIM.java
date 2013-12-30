@@ -89,7 +89,7 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory,
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
 		if (player != null && player.get() != null) {
-			player.get().inventory.isItemValidForSlot(i, itemstack);
+			return player.get().inventory.isItemValidForSlot(i, itemstack);
 		}
 		return false;
 	}
