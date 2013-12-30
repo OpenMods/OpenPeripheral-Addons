@@ -67,10 +67,8 @@ public class BlockPIM extends BlockOP {
 			Entity entity) {
 		world.markBlockForRenderUpdate(x, y, z);
 		if (!world.isRemote) {
-			TileEntityPIM tile = this.getTileEntity(world, x, y, z,
-					TileEntityPIM.class);
-			if (entity instanceof EntityPlayer && tile != null) {
-				TileEntityPIM pi = (TileEntityPIM) tile;
+			TileEntityPIM pi = this.getTileEntity(world, x, y, z, TileEntityPIM.class);
+			if (entity instanceof EntityPlayer && pi != null) {
 				if (pi.getPlayer() == null) {
 					ChunkCoordinates coordinates = ((EntityPlayer) entity)
 							.getPlayerCoordinates();

@@ -8,8 +8,11 @@ import net.minecraftforge.common.MinecraftForge;
 import openmods.api.IProxy;
 import openmods.config.RegisterBlock;
 import openmods.config.RegisterItem;
-import openperipheral.OpenPeripheralCore;
-import openperipheral.addons.glasses.*;
+import openperipheral.addons.glasses.AdapterGlassesBridge;
+import openperipheral.addons.glasses.BlockGlassesBridge;
+import openperipheral.addons.glasses.ItemGlasses;
+import openperipheral.addons.glasses.TerminalManagerServer;
+import openperipheral.addons.glasses.TileEntityGlassesBridge;
 import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.peripheralproxy.TileEntityPeripheralProxy;
 import openperipheral.addons.pim.BlockPIM;
@@ -26,7 +29,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
-import dan200.computer.api.ComputerCraftAPI;
 
 @Mod(modid = "OpenPeripheral", name = "OpenPeripheralAddons", version = "@VERSION@", dependencies = "required-after:OpenMods;required-after:OpenPeripheralCore")
 @NetworkMod(serverSideRequired = true, clientSideRequired = true)
@@ -88,6 +90,5 @@ public class OpenPeripheralAddons {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent evt) {
 		proxy.postInit();
-		ComputerCraftAPI.registerExternalPeripheral(TileEntityPeripheralProxy.class, OpenPeripheralCore.peripheralHandler);
 	}
 }

@@ -57,8 +57,7 @@ public class AdapterGlassesBridge implements IPeripheralAdapter {
 					@Arg(name = "color", description = "The color of the other side of the box", type = LuaType.NUMBER),
 					@Arg(name = "opacity", description = "The opacity of the other side of the box (from 0 to 1)", type = LuaType.NUMBER),
 					@Arg(name = "gradient", description = "The gradient direction (1 for horizontal, 2 for vertical)", type = LuaType.NUMBER) })
-	public ILuaObject addGradientBox(IComputerAccess computer, TileEntityGlassesBridge bridge, short x, short y, short width, short height, int color, float alpha, int color2, float alpha2, int gradient)
-			throws InterruptedException {
+	public ILuaObject addGradientBox(IComputerAccess computer, TileEntityGlassesBridge bridge, short x, short y, short width, short height, int color, float alpha, int color2, float alpha2, int gradient) {
 		return bridge.globalSurface.addDrawable(new Drawable.GradientBox(x, y, width, height, color, alpha, color2, alpha2, gradient));
 	}
 

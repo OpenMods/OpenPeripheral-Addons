@@ -115,11 +115,8 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory,
 
 	public void setPlayer(EntityPlayer p) {
 		player = new WeakReference<EntityPlayer>(p);
-		worldObj.playSoundEffect((double)xCoord + 0.5D,
-				(double)yCoord + 0.1D, (double)zCoord + 0.5D, "random.click",
-				0.3F, 0.6F);
-		worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord,
-				p == null? 0 : 1, 3);
+		worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.1D, zCoord + 0.5D, "random.click", 0.3F, 0.6F);
+		worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, p == null? 0 : 1, 3);
 		fireEvent(p == null? "player_off" : "player_on");
 	}
 
