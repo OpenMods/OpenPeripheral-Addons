@@ -8,15 +8,15 @@ import net.minecraftforge.common.MinecraftForge;
 import openmods.api.IProxy;
 import openmods.config.RegisterBlock;
 import openmods.config.RegisterItem;
-import openperipheral.addons.glasses.AdapterGlassesBridge;
-import openperipheral.addons.glasses.BlockGlassesBridge;
-import openperipheral.addons.glasses.ItemGlasses;
-import openperipheral.addons.glasses.TerminalManagerServer;
-import openperipheral.addons.glasses.TileEntityGlassesBridge;
+import openperipheral.addons.glasses.*;
 import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.peripheralproxy.TileEntityPeripheralProxy;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.pim.TileEntityPIM;
+import openperipheral.addons.sensors.AdapterSensor;
+import openperipheral.addons.sensors.BlockSensor;
+import openperipheral.addons.sensors.TileEntitySensor;
+import openperipheral.addons.sensors.TurtleUpgradeSensor;
 import openperipheral.api.OpenPeripheralAPI;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -29,6 +29,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
+import dan200.turtle.api.TurtleAPI;
 
 @Mod(modid = "OpenPeripheral", name = "OpenPeripheralAddons", version = "@VERSION@", dependencies = "required-after:OpenMods;required-after:OpenPeripheralCore")
 @NetworkMod(serverSideRequired = true, clientSideRequired = true)
@@ -43,6 +44,9 @@ public class OpenPeripheralAddons {
 
 		@RegisterBlock(name = "pim", tileEntity = TileEntityPIM.class)
 		public static BlockPIM pim;
+		
+		@RegisterBlock(name = "sensor", tileEntity = TileEntitySensor.class)
+		public static BlockSensor sensor;
 	}
 
 	public static class Items {
@@ -75,6 +79,10 @@ public class OpenPeripheralAddons {
 		Config.register();
 
 		OpenPeripheralAPI.register(new AdapterGlassesBridge());
+		
+		OpenPeripheralAPI.register(new AdapterSensor());
+		TurtleAPI.registerUpgrade(new TurtleUpgradeSensor());
+		
 		EventTypes.registerTypes();
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
 
