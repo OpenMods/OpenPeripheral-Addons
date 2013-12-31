@@ -34,15 +34,15 @@ public class BlockPIM extends BlockOP {
 		blockIcon = Icons.black;
 	}
 
+	@Override
 	public Icon getBlockTexture(IBlockAccess par1IBlockAccess, int par2,
 			int par3, int par4, int par5) {
 		return getIcon(0, 0);
 	}
 
+	@Override
 	public Icon getIcon(int par1, int par2) {
-		if (secondPass) {
-			return Icons.black;
-		}
+		if (secondPass) { return Icons.black; }
 		return Icons.blue;
 	}
 
@@ -70,11 +70,11 @@ public class BlockPIM extends BlockOP {
 			TileEntityPIM pi = this.getTileEntity(world, x, y, z, TileEntityPIM.class);
 			if (entity instanceof EntityPlayer && pi != null) {
 				if (pi.getPlayer() == null) {
-					ChunkCoordinates coordinates = ((EntityPlayer) entity)
+					ChunkCoordinates coordinates = ((EntityPlayer)entity)
 							.getPlayerCoordinates();
 					if (coordinates.posX == x && coordinates.posY == y
 							&& coordinates.posZ == z) {
-						pi.setPlayer((EntityPlayer) entity);
+						pi.setPlayer((EntityPlayer)entity);
 					}
 				}
 			}

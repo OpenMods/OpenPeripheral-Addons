@@ -5,16 +5,16 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import dan200.computer.api.IComputerAccess;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChunkCoordinates;
 import openmods.tileentity.OpenTileEntity;
 import openperipheral.api.IAttachable;
+
+import org.apache.commons.lang3.ArrayUtils;
+
+import dan200.computer.api.IComputerAccess;
 
 public class TileEntityPIM extends OpenTileEntity implements IInventory,
 		IAttachable {
@@ -88,9 +88,7 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory,
 
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
-		if (player != null && player.get() != null) {
-			return player.get().inventory.isItemValidForSlot(i, itemstack);
-		}
+		if (player != null && player.get() != null) { return player.get().inventory.isItemValidForSlot(i, itemstack); }
 		return false;
 	}
 

@@ -41,7 +41,7 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 		}
 
 	}
-	
+
 	@Override
 	public int getUpgradeID() {
 		return 180;

@@ -7,7 +7,7 @@ import openmods.item.IMetaItem;
 import openmods.item.MetaGeneric;
 import openperipheral.addons.OpenPeripheralAddons.Items;
 
-public enum MetasGeneric {	
+public enum MetasGeneric {
 	duckAntenna {
 		@Override
 		public IMetaItem createMetaItem() {
@@ -15,7 +15,7 @@ public enum MetasGeneric {
 			return new MetaGeneric(MOD_ID, "duckantenna", new ShapedOreRecipe(result, " sl", "sll", "lll", 's', "stickWood", 'l', Item.leather), new ShapedOreRecipe(result, "ls ", "lls", "lll", 's', "stickWood", 'l', Item.leather));
 		}
 	};
-	
+
 	private static final String MOD_ID = "openperipheraladdons";
 
 	public ItemStack newItemStack(int size) {

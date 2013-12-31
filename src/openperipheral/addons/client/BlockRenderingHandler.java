@@ -10,7 +10,7 @@ public class BlockRenderingHandler extends BlockRenderingHandlerBase {
 	public BlockRenderingHandler() {
 		blockRenderers.put(Blocks.pim, new BlockPIMRenderer());
 	}
-	
+
 	@Override
 	public int getRenderId() {
 		return OpenPeripheralAddons.renderId;
