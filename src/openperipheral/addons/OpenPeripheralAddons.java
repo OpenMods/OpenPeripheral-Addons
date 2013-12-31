@@ -9,6 +9,7 @@ import openmods.api.IProxy;
 import openmods.config.RegisterBlock;
 import openmods.config.RegisterItem;
 import openperipheral.addons.glasses.*;
+import openperipheral.addons.narcissistic.TurtleUpgradeNarcissistic;
 import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.peripheralproxy.TileEntityPeripheralProxy;
 import openperipheral.addons.pim.BlockPIM;
@@ -44,7 +45,7 @@ public class OpenPeripheralAddons {
 
 		@RegisterBlock(name = "pim", tileEntity = TileEntityPIM.class)
 		public static BlockPIM pim;
-		
+
 		@RegisterBlock(name = "sensor", tileEntity = TileEntitySensor.class)
 		public static BlockSensor sensor;
 	}
@@ -52,6 +53,9 @@ public class OpenPeripheralAddons {
 	public static class Items {
 		@RegisterItem(name = "glasses")
 		public static ItemGlasses glasses;
+
+		@RegisterItem(name = "generic")
+		public static ItemOPGeneric generic;
 	}
 
 	public static int renderId;
@@ -78,11 +82,14 @@ public class OpenPeripheralAddons {
 		}
 		Config.register();
 
+		Items.generic.initRecipes();
+
 		OpenPeripheralAPI.register(new AdapterGlassesBridge());
-		
+
 		OpenPeripheralAPI.register(new AdapterSensor());
 		TurtleAPI.registerUpgrade(new TurtleUpgradeSensor());
-		
+		TurtleAPI.registerUpgrade(new TurtleUpgradeNarcissistic());
+
 		EventTypes.registerTypes();
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
 

@@ -5,12 +5,13 @@ tile.openperipheral.ticketmachine.name=Ticket Machine
 tile.openperipheral.sensor.name=Sensor
 tile.openperipheral.robot.name=Robot Controller
 
+item.openperipheraladdons.duckantenna.name=Duck Antenna
+
 item.openperipheral.glasses.name=Terminal Glasses
 item.openperipheral.remote.name=Remote
 item.openperipheral.capacitor.name=Capacitor
 item.openperipheral.carbon.name=Carbon
 item.openperipheral.coiledwire.name=Coiled Wire
-item.openperipheral.duckantenna.name=Duck Antenna
 item.openperipheral.electrode.name=Electrode
 item.openperipheral.lcdscreen.name=LCD Screen
 item.openperipheral.led.name=LED

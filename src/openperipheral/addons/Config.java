@@ -15,6 +15,9 @@ import openperipheral.addons.sensors.BlockSensor;
 
 public class Config {
 
+	@ItemId(description = "The id of the generic item")
+	public static int itemGenericId = 9257;
+
 	@ItemId(description = "The id of the glasses")
 	public static int itemGlassesId = 9258;
 
@@ -48,11 +51,11 @@ public class Config {
 		if (ConfigProcessing.canRegisterBlock(blockPeripheralProxyId)) {
 			Blocks.peripheralProxy = new BlockPeripheralProxy();
 		}
-		
+
 		if (ConfigProcessing.canRegisterBlock(blockPIMId)) {
 			Blocks.pim = new BlockPIM();
 		}
-		
+
 		if (ConfigProcessing.canRegisterBlock(sensorBlockId)) {
 			Blocks.sensor = new BlockSensor();
 		}
@@ -60,6 +63,9 @@ public class Config {
 		if (itemGlassesId > 0) {
 			Items.glasses = new ItemGlasses();
 		}
+
+		Items.generic = new ItemOPGeneric();
+		MetasGeneric.registerItems();
 
 		ConfigProcessing.registerItems(OpenPeripheralAddons.Items.class, "openperipheral");
 		ConfigProcessing.registerBlocks(OpenPeripheralAddons.Blocks.class, "openperipheral");
