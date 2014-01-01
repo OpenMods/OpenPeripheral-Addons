@@ -8,8 +8,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
+import openperipheral.adapter.AdapterManager;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
-import openperipheral.api.IAttachable;
+import openperipheral.api.*;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -18,7 +19,9 @@ import com.google.common.collect.Sets;
 
 import cpw.mods.fml.common.network.Player;
 import dan200.computer.api.IComputerAccess;
+import dan200.computer.api.ILuaObject;
 
+@Freeform
 public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable {
 
 	private static final String EVENT_CHAT_MESSAGE = "chat_command";
@@ -118,14 +121,6 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		return guid != null && guid == this.guid;
 	}
 
-	public long getGuid() {
-		return guid;
-	}
-
-	public List<String> getUsers() {
-		return ImmutableList.copyOf(knownPlayers.keySet());
-	}
-
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
@@ -166,12 +161,37 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 			tag.setTag("openp", openPTag);
 		}
 
-		openPTag.setLong("guid", getGuid());
+		openPTag.setLong("guid", guid);
 	}
 
 	public SurfaceServer getSurface(String username) {
 		if (TerminalUtils.GLOBAL_MARKER.equals(username)) return globalSurface;
 		PlayerInfo info = knownPlayers.get(username);
 		return info != null? info.surface : null;
+	}
+
+	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get the names of all the users linked up to this bridge")
+	public List<String> getUsers() {
+		return ImmutableList.copyOf(knownPlayers.keySet());
+	}
+
+	@LuaCallable(returnTypes = LuaType.STRING, description = "Get the Guid of this bridge")
+	public String getGuid() {
+		return TerminalUtils.formatTerminalId(guid);
+	}
+
+	@LuaCallable(returnTypes = LuaType.NUMBER, description = "Get the display width of some text")
+	public int getStringWidth(@Arg(name = "text", description = "The text you want to measure", type = LuaType.STRING) String text) {
+		return GlassesRenderingUtils.getStringWidth(text);
+	}
+
+	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
+	public ILuaObject getUserSurface(@Arg(name = "username", description = "The username of the user to get the draw surface for", type = LuaType.STRING) String username) {
+		return AdapterManager.wrapObject(getSurface(username));
+	}
+
+	@Include
+	public SurfaceServer getGlobalSurface() {
+		return globalSurface;
 	}
 }

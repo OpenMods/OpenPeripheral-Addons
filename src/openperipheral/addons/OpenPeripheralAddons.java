@@ -8,7 +8,10 @@ import net.minecraftforge.common.MinecraftForge;
 import openmods.api.IProxy;
 import openmods.config.RegisterBlock;
 import openmods.config.RegisterItem;
-import openperipheral.addons.glasses.*;
+import openperipheral.addons.glasses.BlockGlassesBridge;
+import openperipheral.addons.glasses.ItemGlasses;
+import openperipheral.addons.glasses.TerminalManagerServer;
+import openperipheral.addons.glasses.TileEntityGlassesBridge;
 import openperipheral.addons.narcissistic.TurtleUpgradeNarcissistic;
 import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.peripheralproxy.TileEntityPeripheralProxy;
@@ -84,7 +87,7 @@ public class OpenPeripheralAddons {
 
 		Items.generic.initRecipes();
 
-		OpenPeripheralAPI.register(new AdapterGlassesBridge());
+		OpenPeripheralAPI.createAdapter(TileEntityGlassesBridge.class);
 
 		OpenPeripheralAPI.register(new AdapterSensor());
 		TurtleAPI.registerUpgrade(new TurtleUpgradeSensor());
