@@ -35,7 +35,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import dan200.turtle.api.TurtleAPI;
 
-@Mod(modid = "OpenPeripheral", name = "OpenPeripheralAddons", version = "@VERSION@", dependencies = "required-after:OpenMods;required-after:OpenPeripheralCore")
+@Mod(modid = "OpenPeripheral", name = "OpenPeripheralAddons", version = "@VERSION@", dependencies = "required-after:OpenMods;after:OpenPeripheralCore")
 @NetworkMod(serverSideRequired = true, clientSideRequired = true)
 public class OpenPeripheralAddons {
 
