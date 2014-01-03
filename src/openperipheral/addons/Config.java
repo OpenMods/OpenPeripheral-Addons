@@ -47,6 +47,9 @@ public class Config {
 	@ConfigProperty(category = "sensor", name = "normalRange")
 	public static int sensorRange = 5;
 
+	@ConfigProperty(category = "misc", comment = "Should turtles with OPA updates be visible in creative")
+	public static boolean addTurtlesToCreative = true;
+
 	public static void readConfig(Configuration configFile) {
 		ConfigProcessing.processAnnotations(configFile, Config.class);
 	}

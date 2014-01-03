@@ -1,7 +1,10 @@
 package openperipheral.addons.sensors;
 
+import java.util.List;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -9,6 +12,7 @@ import net.minecraftforge.common.ForgeDirection;
 import openmods.block.OpenBlock;
 import openperipheral.addons.Config;
 import openperipheral.addons.OpenPeripheralAddons;
+import openperipheral.addons.utils.CCUtils;
 
 public class BlockSensor extends OpenBlock {
 
@@ -69,6 +73,13 @@ public class BlockSensor extends OpenBlock {
 	@Override
 	public boolean shouldRenderBlock() {
 		return false;
+	}
+
+	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void getSubBlocks(int id, CreativeTabs tab, List result) {
+		super.getSubBlocks(id, tab, result);
+		if (Config.addTurtlesToCreative) CCUtils.addUpgradedTurtles(result, OpenPeripheralAddons.sensorUpgrade);
 	}
 
 }

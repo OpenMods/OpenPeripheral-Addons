@@ -1,62 +1,55 @@
 package openperipheral.addons.utils;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.List;
 
-import openperipheral.TypeConversionRegistry;
-
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import cpw.mods.fml.common.registry.GameRegistry;
+import dan200.turtle.api.ITurtleUpgrade;
 
 public final class CCUtils {
+	private static final int NUMBER_OF_TURTLE_TOOLS = 7;
+
 	public static Object[] wrap(Object... args) {
 		return args;
 	}
 
-	public static Object[] convertArgs(Class<?> needed[], Object args[]) {
-		if (needed.length != args.length) return null;
-
-		List<Object> conventedArgs = Lists.newArrayList();
-		for (int i = 0; i < needed.length; i++) {
-			Object converted = TypeConversionRegistry.fromLua(args[i], needed[i]);
-			if (converted == null) return null;
-			conventedArgs.add(converted);
-		}
-
-		return conventedArgs.toArray();
+	public static ItemStack getExpandedTurtleItemStack() {
+		return GameRegistry.findItemStack("CCTurtle", "CC-TurtleExpanded", 1);
 	}
 
-	public static Object callSelfMethod(Object target, String methodName, Object[] arguments) {
-		for (Method method : target.getClass().getMethods()) {
-			if (!methodName.equals(method.getName())) continue;
-			Object[] converted = convertArgs(method.getParameterTypes(), arguments);
-			if (converted == null) continue;
-
-			try {
-				Object v = method.invoke(target, converted);
-				return TypeConversionRegistry.toLua(v);
-			} catch (Exception e) {
-				throw Throwables.propagate(e);
-			}
-		}
-
-		throw new RuntimeException("Method " + methodName + " not found");
+	public static ItemStack getAdvancedTurtleItemStack() {
+		return GameRegistry.findItemStack("CCTurtle", "CC-TurtleAdvanced", 1);
 	}
 
-	@SuppressWarnings("unchecked")
-	public static <T> T callConstructor(Class<? extends T> klazz, Object[] arguments) {
-		for (Constructor<?> ctor : klazz.getConstructors()) {
-			Object[] converted = convertArgs(ctor.getParameterTypes(), arguments);
-			if (converted == null) continue;
+	public static void createTurtleItemStack(List<ItemStack> result, boolean isAdvanced, Short left, Short right) {
+		ItemStack turtle = isAdvanced? getAdvancedTurtleItemStack() : getExpandedTurtleItemStack();
 
-			try {
-				return (T)ctor.newInstance(converted);
-			} catch (Exception e) {
-				throw Throwables.propagate(e);
-			}
+		if (turtle == null) return;
+
+		NBTTagCompound tag = turtle.getTagCompound();
+		if (tag == null) {
+			tag = new NBTTagCompound();
+			turtle.setTagCompound(tag);
 		}
 
-		throw new RuntimeException("No valid constructor found");
+		if (left != null) tag.setShort("leftUpgrade", left);
+
+		if (right != null) tag.setShort("rightUpgrade", right);
+
+		result.add(turtle);
 	}
+
+	private static void addUpgradedTurtles(List<ItemStack> result, ITurtleUpgrade upgrade, boolean isAdvanced) {
+		short upgradeId = (short)upgrade.getUpgradeID();
+		createTurtleItemStack(result, isAdvanced, upgradeId, null);
+		for (int i = 1; i < NUMBER_OF_TURTLE_TOOLS; i++)
+			createTurtleItemStack(result, isAdvanced, upgradeId, (short)i);
+	}
+
+	public static void addUpgradedTurtles(List<ItemStack> result, ITurtleUpgrade upgrade) {
+		addUpgradedTurtles(result, upgrade, false);
+		addUpgradedTurtles(result, upgrade, true);
+	}
+
 }

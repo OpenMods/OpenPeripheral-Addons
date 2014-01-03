@@ -50,7 +50,7 @@ public class OpenPeripheralAddons {
 		@RegisterBlock(name = "peripheralproxy", tileEntity = TileEntityPeripheralProxy.class)
 		public static BlockPeripheralProxy peripheralProxy;
 
-		@RegisterBlock(name = "pim", tileEntity = TileEntityPIM.class)
+		@RegisterBlock(name = "pim", tileEntity = TileEntityPIM.class, unlocalizedName = "playerinventory")
 		public static BlockPIM pim;
 
 		@RegisterBlock(name = "sensor", tileEntity = TileEntitySensor.class)
@@ -80,6 +80,10 @@ public class OpenPeripheralAddons {
 		}
 	};
 
+	public static TurtleUpgradeSensor sensorUpgrade;
+
+	public static TurtleUpgradeNarcissistic narcissiticUpgrade;
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent evt) {
 		Configuration configFile = new Configuration(evt.getSuggestedConfigurationFile());
@@ -94,8 +98,12 @@ public class OpenPeripheralAddons {
 		OpenPeripheralAPI.createAdapter(TileEntityGlassesBridge.class);
 
 		OpenPeripheralAPI.register(new AdapterSensor());
-		TurtleAPI.registerUpgrade(new TurtleUpgradeSensor());
-		TurtleAPI.registerUpgrade(new TurtleUpgradeNarcissistic());
+
+		sensorUpgrade = new TurtleUpgradeSensor();
+		TurtleAPI.registerUpgrade(sensorUpgrade);
+
+		narcissiticUpgrade = new TurtleUpgradeNarcissistic();
+		TurtleAPI.registerUpgrade(narcissiticUpgrade);
 
 		EventTypes.registerTypes();
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
