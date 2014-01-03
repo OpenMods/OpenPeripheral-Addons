@@ -1,10 +1,13 @@
 package openperipheral.addons;
 
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
+import openmods.Mods;
 import openmods.api.IProxy;
 import openmods.config.RegisterBlock;
 import openmods.config.RegisterItem;
@@ -33,6 +36,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.registry.GameRegistry;
 import dan200.turtle.api.TurtleAPI;
 
 @Mod(modid = "OpenPeripheral", name = "OpenPeripheralAddons", version = "@VERSION@", dependencies = "required-after:OpenMods;after:OpenPeripheralCore")
@@ -107,6 +111,14 @@ public class OpenPeripheralAddons {
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent evt) {
-		proxy.postInit();
+
+		Block peripheral = GameRegistry.findBlock(Mods.COMPUTERCRAFT, "CC-Peripheral");
+		Block cable = GameRegistry.findBlock(Mods.COMPUTERCRAFT, "CC-Cable");
+
+		CraftingManager crafting = CraftingManager.getInstance();
+
+		crafting.addRecipe(new ItemStack(Blocks.glassesBridge), new Object[] { "lwl", "wrw", "lwl", 'w', new ItemStack(cable, 1, 1), 'r', Block.blockRedstone, 'l', new ItemStack(peripheral, 1, 1) });
+		crafting.addRecipe(new ItemStack(Items.glasses), new Object[] { "mcm", 'm', new ItemStack(peripheral, 1, 4), 'c', new ItemStack(cable) });
+
 	}
 }

@@ -1,6 +1,14 @@
 package openperipheral.addons;
 
+import java.util.List;
+
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.common.Configuration;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import openmods.config.BlockId;
 import openmods.config.ConfigProcessing;
 import openmods.config.ConfigProperty;
@@ -44,24 +52,33 @@ public class Config {
 	}
 
 	public static void register() {
+
+		@SuppressWarnings("unchecked")
+		final List<IRecipe> recipeList = CraftingManager.getInstance().getRecipeList();
+
 		if (ConfigProcessing.canRegisterBlock(blockGlassesBridgeId)) {
 			Blocks.glassesBridge = new BlockGlassesBridge();
+			// bridge recipe added in postinit
 		}
 
 		if (ConfigProcessing.canRegisterBlock(blockPeripheralProxyId)) {
 			Blocks.peripheralProxy = new BlockPeripheralProxy();
+			recipeList.add(new ShapedOreRecipe(new ItemStack(Blocks.peripheralProxy), new Object[] { "iri", "iii", "iri", 'i', Item.ingotIron, 'r', Item.redstone }));
 		}
 
 		if (ConfigProcessing.canRegisterBlock(blockPIMId)) {
 			Blocks.pim = new BlockPIM();
+			recipeList.add(new ShapedOreRecipe(new ItemStack(Blocks.pim), new Object[] { "ooo", "rcr", 'o', Block.obsidian, 'r', Item.redstone, 'c', Block.chest }));
 		}
 
 		if (ConfigProcessing.canRegisterBlock(sensorBlockId)) {
 			Blocks.sensor = new BlockSensor();
+			recipeList.add(new ShapedOreRecipe(new ItemStack(Blocks.sensor), new Object[] { "ooo", " w ", "sss", 'o', Block.obsidian, 'w', "stickWood", 's', Block.stoneSingleSlab }));
 		}
 
 		if (itemGlassesId > 0) {
 			Items.glasses = new ItemGlasses();
+			// recipe added in postinit
 		}
 
 		Items.generic = new ItemOPGeneric();
