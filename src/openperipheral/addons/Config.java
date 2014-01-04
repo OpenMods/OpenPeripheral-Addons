@@ -9,6 +9,7 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import openmods.Mods;
 import openmods.config.*;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import openperipheral.addons.OpenPeripheralAddons.Items;
@@ -18,6 +19,7 @@ import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.sensors.BlockSensor;
 import openperipheral.addons.ticketmachine.BlockTicketMachine;
+import cpw.mods.fml.common.Loader;
 
 public class Config {
 
@@ -80,8 +82,9 @@ public class Config {
 			recipeList.add(new ShapedOreRecipe(new ItemStack(Blocks.sensor), new Object[] { "ooo", " w ", "sss", 'o', Block.obsidian, 'w', "stickWood", 's', Block.stoneSingleSlab }));
 		}
 
-		if (ConfigProcessing.canRegisterBlock(blockTicketMachineId)) {
+		if (Loader.isModLoaded(Mods.RAILCRAFT) && ConfigProcessing.canRegisterBlock(blockTicketMachineId)) {
 			Blocks.ticketMachine = new BlockTicketMachine();
+			CraftingManager.getInstance().addRecipe(new ItemStack(Blocks.ticketMachine), new Object[] { "iii", "iii", "igi", Character.valueOf('i'), new ItemStack(Item.ingotIron), Character.valueOf('g'), new ItemStack(Block.thinGlass) });
 		}
 
 		if (itemGlassesId > 0) {

@@ -28,9 +28,9 @@ import cpw.mods.fml.common.registry.GameRegistry;
 @Freeform
 public class TileEntityTicketMachine extends SyncedTileEntity implements ISidedInventory, IInventoryCallback, IPlaceAwareTile, IHasGui, IIconProvider {
 
-	private static final int SLOT_OUTPUT = 2;
 	private static final int SLOT_PAPER = 0;
 	private static final int SLOT_INK = 1;
+	private static final int SLOT_OUTPUT = 2;
 
 	private final Item ticketItem;
 
