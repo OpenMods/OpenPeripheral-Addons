@@ -1,9 +1,6 @@
 package openperipheral.addons;
 
-import openmods.network.EventIdRanges;
-import openmods.network.EventPacket;
-import openmods.network.IEventPacketType;
-import openmods.network.PacketDirection;
+import openmods.network.*;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
 

@@ -8,34 +8,31 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import openmods.Mods;
+import openmods.OpenMods;
 import openmods.api.IProxy;
 import openmods.config.RegisterBlock;
 import openmods.config.RegisterItem;
-import openperipheral.addons.glasses.BlockGlassesBridge;
-import openperipheral.addons.glasses.ItemGlasses;
-import openperipheral.addons.glasses.TerminalManagerServer;
-import openperipheral.addons.glasses.TileEntityGlassesBridge;
+import openperipheral.addons.glasses.*;
 import openperipheral.addons.narcissistic.TurtleUpgradeNarcissistic;
 import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.peripheralproxy.TileEntityPeripheralProxy;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.pim.TileEntityPIM;
-import openperipheral.addons.sensors.AdapterSensor;
-import openperipheral.addons.sensors.BlockSensor;
-import openperipheral.addons.sensors.TileEntitySensor;
-import openperipheral.addons.sensors.TurtleUpgradeSensor;
+import openperipheral.addons.sensors.*;
+import openperipheral.addons.ticketmachine.BlockTicketMachine;
+import openperipheral.addons.ticketmachine.TileEntityTicketMachine;
 import openperipheral.api.OpenPeripheralAPI;
 
 import org.apache.commons.lang3.ObjectUtils;
 
-import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import dan200.turtle.api.TurtleAPI;
 
@@ -55,6 +52,9 @@ public class OpenPeripheralAddons {
 
 		@RegisterBlock(name = "sensor", tileEntity = TileEntitySensor.class)
 		public static BlockSensor sensor;
+
+		@RegisterBlock(name = "ticketmachine", tileEntity = TileEntityTicketMachine.class)
+		public static BlockTicketMachine ticketMachine;
 	}
 
 	public static class Items {
@@ -67,7 +67,7 @@ public class OpenPeripheralAddons {
 
 	public static int renderId;
 
-	@Instance(value = "OpenPeripheralAddons")
+	@Instance(value = "OpenPeripheral")
 	public static OpenPeripheralAddons instance;
 
 	@SidedProxy(clientSide = "openperipheral.addons.proxy.ClientProxy", serverSide = "openperipheral.addons.proxy.ServerProxy")
@@ -96,7 +96,7 @@ public class OpenPeripheralAddons {
 		Items.generic.initRecipes();
 
 		OpenPeripheralAPI.createAdapter(TileEntityGlassesBridge.class);
-
+		OpenPeripheralAPI.createAdapter(TileEntityTicketMachine.class);
 		OpenPeripheralAPI.register(new AdapterSensor());
 
 		sensorUpgrade = new TurtleUpgradeSensor();
@@ -107,6 +107,8 @@ public class OpenPeripheralAddons {
 
 		EventTypes.registerTypes();
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
+
+		NetworkRegistry.instance().registerGuiHandler(instance, OpenMods.proxy.wrapHandler(null));
 
 		proxy.preInit();
 	}

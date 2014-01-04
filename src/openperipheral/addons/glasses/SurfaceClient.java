@@ -4,10 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Iterator;
 import java.util.List;
 
-import openmods.structured.ElementField;
-import openmods.structured.IStructureContainer;
-import openmods.structured.IStructureContainerFactory;
-import openmods.structured.StructuredDataSlave;
+import openmods.structured.*;
 import openperipheral.addons.glasses.SurfaceClient.DrawableWrapper;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
 import openperipheral.util.Property;

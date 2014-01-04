@@ -1,9 +1,6 @@
 package openperipheral.addons.glasses;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagLong;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.*;
 import openmods.utils.StringUtils;
 
 public class TerminalUtils {

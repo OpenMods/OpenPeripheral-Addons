@@ -9,19 +9,18 @@ import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
-import openmods.block.OpenBlock;
+import openperipheral.addons.BlockOP;
 import openperipheral.addons.Config;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.addons.utils.CCUtils;
 
-public class BlockSensor extends OpenBlock {
+public class BlockSensor extends BlockOP {
 
 	public Icon turtleIcon;
 
 	public BlockSensor() {
-		super(Config.sensorBlockId, Material.ground);
+		super(Config.blockSensorId, Material.ground);
 		setHardness(0.5F);
-		setCreativeTab(OpenPeripheralAddons.tabOpenPeripheralAddons);
 	}
 
 	@Override

@@ -12,10 +12,7 @@ import openperipheral.adapter.AdapterManager;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.api.*;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 
 import cpw.mods.fml.common.network.Player;
 import dan200.computer.api.IComputerAccess;

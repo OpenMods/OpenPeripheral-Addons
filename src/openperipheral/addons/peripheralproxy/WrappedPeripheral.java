@@ -1,10 +1,7 @@
 package openperipheral.addons.peripheralproxy;
 
 import net.minecraft.nbt.NBTTagCompound;
-import dan200.computer.api.IComputerAccess;
-import dan200.computer.api.IHostedPeripheral;
-import dan200.computer.api.ILuaContext;
-import dan200.computer.api.IPeripheral;
+import dan200.computer.api.*;
 
 public class WrappedPeripheral implements IHostedPeripheral {
 

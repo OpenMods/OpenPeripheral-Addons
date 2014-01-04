@@ -9,10 +9,7 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.oredict.ShapedOreRecipe;
-import openmods.config.BlockId;
-import openmods.config.ConfigProcessing;
-import openmods.config.ConfigProperty;
-import openmods.config.ItemId;
+import openmods.config.*;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import openperipheral.addons.OpenPeripheralAddons.Items;
 import openperipheral.addons.glasses.BlockGlassesBridge;
@@ -20,6 +17,7 @@ import openperipheral.addons.glasses.ItemGlasses;
 import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.sensors.BlockSensor;
+import openperipheral.addons.ticketmachine.BlockTicketMachine;
 
 public class Config {
 
@@ -39,7 +37,10 @@ public class Config {
 	public static int blockPIMId = 3002;
 
 	@BlockId(description = "The id of the sensor block")
-	public static int sensorBlockId = 3003;
+	public static int blockSensorId = 3003;
+
+	@BlockId(description = "The id of the ticket machine block")
+	public static int blockTicketMachineId = 3004;
 
 	@ConfigProperty(category = "sensor", name = "rangeInStorm")
 	public static int sensorRangeInStorm = 5;
@@ -74,9 +75,13 @@ public class Config {
 			recipeList.add(new ShapedOreRecipe(new ItemStack(Blocks.pim), new Object[] { "ooo", "rcr", 'o', Block.obsidian, 'r', Item.redstone, 'c', Block.chest }));
 		}
 
-		if (ConfigProcessing.canRegisterBlock(sensorBlockId)) {
+		if (ConfigProcessing.canRegisterBlock(blockSensorId)) {
 			Blocks.sensor = new BlockSensor();
 			recipeList.add(new ShapedOreRecipe(new ItemStack(Blocks.sensor), new Object[] { "ooo", " w ", "sss", 'o', Block.obsidian, 'w', "stickWood", 's', Block.stoneSingleSlab }));
+		}
+
+		if (ConfigProcessing.canRegisterBlock(blockTicketMachineId)) {
+			Blocks.ticketMachine = new BlockTicketMachine();
 		}
 
 		if (itemGlassesId > 0) {
