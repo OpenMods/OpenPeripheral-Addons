@@ -1,12 +1,16 @@
 package openperipheral.addons;
 
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import openmods.Mods;
 import openmods.OpenMods;
 import openmods.api.IProxy;
@@ -122,13 +126,19 @@ public class OpenPeripheralAddons {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent evt) {
 
-		Block peripheral = GameRegistry.findBlock(Mods.COMPUTERCRAFT, "CC-Peripheral");
-		Block cable = GameRegistry.findBlock(Mods.COMPUTERCRAFT, "CC-Cable");
+		Block blockPeripheral = GameRegistry.findBlock(Mods.COMPUTERCRAFT, "CC-Peripheral");
+		Block blockCable = GameRegistry.findBlock(Mods.COMPUTERCRAFT, "CC-Cable");
 
-		CraftingManager crafting = CraftingManager.getInstance();
+		final ItemStack cable = new ItemStack(blockCable, 1, 0);
+		final ItemStack wiredModem = new ItemStack(blockCable, 1, 1);
+		final ItemStack wirelessModem = new ItemStack(blockPeripheral, 1, 1);
+		final ItemStack advancedMonitor = new ItemStack(blockPeripheral, 1, 4);
 
-		crafting.addRecipe(new ItemStack(Blocks.glassesBridge), new Object[] { "lwl", "wrw", "lwl", 'w', new ItemStack(cable, 1, 1), 'r', Block.blockRedstone, 'l', new ItemStack(peripheral, 1, 1) });
-		crafting.addRecipe(new ItemStack(Items.glasses), new Object[] { "mcm", 'm', new ItemStack(peripheral, 1, 4), 'c', new ItemStack(cable) });
+		@SuppressWarnings("unchecked")
+		final List<IRecipe> recipeList = CraftingManager.getInstance().getRecipeList();
+
+		recipeList.add(new ShapedOreRecipe(Blocks.glassesBridge, "lwl", "wrw", "lwl", 'w', wiredModem, 'r', Block.blockRedstone, 'l', wirelessModem));
+		recipeList.add(new ShapedOreRecipe(Items.glasses, "mcm", 'm', advancedMonitor, 'c', cable));
 
 	}
 }

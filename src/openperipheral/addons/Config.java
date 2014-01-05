@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.common.Configuration;
@@ -69,22 +68,22 @@ public class Config {
 
 		if (ConfigProcessing.canRegisterBlock(blockPeripheralProxyId)) {
 			Blocks.peripheralProxy = new BlockPeripheralProxy();
-			recipeList.add(new ShapedOreRecipe(new ItemStack(Blocks.peripheralProxy), new Object[] { "iri", "iii", "iri", 'i', Item.ingotIron, 'r', Item.redstone }));
+			recipeList.add(new ShapedOreRecipe(Blocks.peripheralProxy, "iri", "iii", "iri", 'i', Item.ingotIron, 'r', Item.redstone));
 		}
 
 		if (ConfigProcessing.canRegisterBlock(blockPIMId)) {
 			Blocks.pim = new BlockPIM();
-			recipeList.add(new ShapedOreRecipe(new ItemStack(Blocks.pim), new Object[] { "ooo", "rcr", 'o', Block.obsidian, 'r', Item.redstone, 'c', Block.chest }));
+			recipeList.add(new ShapedOreRecipe(Blocks.pim, "ooo", "rcr", 'o', Block.obsidian, 'r', Item.redstone, 'c', Block.chest));
 		}
 
 		if (ConfigProcessing.canRegisterBlock(blockSensorId)) {
 			Blocks.sensor = new BlockSensor();
-			recipeList.add(new ShapedOreRecipe(new ItemStack(Blocks.sensor), new Object[] { "ooo", " w ", "sss", 'o', Block.obsidian, 'w', "stickWood", 's', Block.stoneSingleSlab }));
+			recipeList.add(new ShapedOreRecipe(Blocks.sensor, "ooo", " w ", "sss", 'o', Block.obsidian, 'w', "stickWood", 's', Block.stoneSingleSlab));
 		}
 
 		if (Loader.isModLoaded(Mods.RAILCRAFT) && ConfigProcessing.canRegisterBlock(blockTicketMachineId)) {
 			Blocks.ticketMachine = new BlockTicketMachine();
-			CraftingManager.getInstance().addRecipe(new ItemStack(Blocks.ticketMachine), new Object[] { "iii", "iii", "igi", Character.valueOf('i'), new ItemStack(Item.ingotIron), Character.valueOf('g'), new ItemStack(Block.thinGlass) });
+			recipeList.add(new ShapedOreRecipe(Blocks.ticketMachine, "iii", "iii", "igi", 'i', Item.ingotIron, 'g', Block.thinGlass));
 		}
 
 		if (itemGlassesId > 0) {

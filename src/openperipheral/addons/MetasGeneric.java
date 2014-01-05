@@ -15,7 +15,9 @@ public enum MetasGeneric {
 		@Override
 		public IMetaItem createMetaItem() {
 			ItemStack result = newItemStack();
-			return new MetaGeneric(MOD_ID, "duckantenna", new ShapedOreRecipe(result, " sl", "sll", "lll", 's', "stickWood", 'l', Item.leather), new ShapedOreRecipe(result, "ls ", "lls", "lll", 's', "stickWood", 'l', Item.leather)) {
+			return new MetaGeneric(MOD_ID, "duckantenna",
+					new ShapedOreRecipe(result, " sl", "sll", "lll", 's', "stickWood", 'l', Item.leather),
+					new ShapedOreRecipe(result, "ls ", "lls", "lll", 's', "stickWood", 'l', Item.leather)) {
 				@Override
 				public void addToCreativeList(int itemId, int meta, List<ItemStack> result) {
 					super.addToCreativeList(itemId, meta, result);
