@@ -33,10 +33,20 @@ public enum EventTypes implements IEventPacketType {
 		public boolean isCompressed() {
 			return true;
 		}
+
+		@Override
+		public boolean isChunked() {
+			return true;
+		}
 	};
 
 	@Override
 	public boolean isCompressed() {
+		return false;
+	}
+
+	@Override
+	public boolean isChunked() {
 		return false;
 	}
 
@@ -47,6 +57,6 @@ public enum EventTypes implements IEventPacketType {
 
 	public static void registerTypes() {
 		for (IEventPacketType type : values())
-			EventPacket.registerType(type);
+			EventPacketManager.registerType(type);
 	}
 }

@@ -14,7 +14,6 @@ import openperipheral.api.*;
 
 import com.google.common.collect.*;
 
-import cpw.mods.fml.common.network.Player;
 import dan200.computer.api.IComputerAccess;
 import dan200.computer.api.ILuaObject;
 
@@ -82,13 +81,13 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 			if (globalUpdate) {
 				if (globalChange == null) globalChange = TerminalManagerServer.createUpdateDataEvent(globalSurface, guid, false);
-				globalChange.sendToPlayer((Player)player);
+				globalChange.sendToPlayer(player);
 			}
 
 			final SurfaceServer privateSurface = info.surface;
 			if (privateSurface != null && privateSurface.hasUpdates()) {
 				TerminalDataEvent privateData = TerminalManagerServer.createUpdateDataEvent(privateSurface, guid, true);
-				privateData.sendToPlayer((Player)player);
+				privateData.sendToPlayer(player);
 			}
 		}
 
@@ -97,7 +96,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		for (EntityPlayer newPlayer : newPlayers) {
 			if (isPlayerValid(newPlayer)) {
 				if (globalFull == null) globalFull = TerminalManagerServer.createFullDataEvent(globalSurface, guid, false);
-				globalFull.sendToPlayer((Player)newPlayer);
+				globalFull.sendToPlayer(newPlayer);
 
 				final String playerName = newPlayer.getEntityName();
 				knownPlayers.put(playerName, new PlayerInfo(this, newPlayer));
