@@ -40,7 +40,7 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import dan200.turtle.api.TurtleAPI;
 
-@Mod(modid = "OpenPeripheral", name = "OpenPeripheralAddons", version = "@VERSION@", dependencies = "required-after:OpenMods;after:OpenPeripheralCore")
+@Mod(modid = "OpenPeripheral", name = "OpenPeripheralAddons", version = "@VERSION@", dependencies = "required-after:OpenMods;required-after:ComputerCraft;after:OpenPeripheralCore")
 @NetworkMod(serverSideRequired = true, clientSideRequired = true)
 public class OpenPeripheralAddons {
 
