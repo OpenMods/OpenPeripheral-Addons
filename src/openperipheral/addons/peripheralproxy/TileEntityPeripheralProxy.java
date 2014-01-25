@@ -5,9 +5,9 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import openmods.api.INeighbourAwareTile;
 import openmods.tileentity.OpenTileEntity;
+import openmods.utils.ReflectionHelper;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.api.IPeripheralProvider;
-import openperipheral.util.ReflectionHelper;
 import dan200.computer.api.IHostedPeripheral;
 import dan200.computer.api.IPeripheral;
 
