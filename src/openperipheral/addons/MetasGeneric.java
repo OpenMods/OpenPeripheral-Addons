@@ -4,9 +4,8 @@ import java.util.List;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 import openmods.item.IMetaItem;
-import openmods.item.MetaGeneric;
 import openperipheral.addons.OpenPeripheralAddons.Items;
 import openperipheral.addons.utils.CCUtils;
 
@@ -15,9 +14,8 @@ public enum MetasGeneric {
 		@Override
 		public IMetaItem createMetaItem() {
 			ItemStack result = newItemStack();
-			return new MetaGeneric(MOD_ID, "duckantenna",
-					new ShapedOreRecipe(result, " sl", "sll", "lll", 's', "stickWood", 'l', Item.leather),
-					new ShapedOreRecipe(result, "ls ", "lls", "lll", 's', "stickWood", 'l', Item.leather)) {
+			return new MetaGeneric("duckantenna",
+					new ShapelessOreRecipe(result, Item.redstone, Item.redstone, Item.ingotIron, Item.slimeBall)) {
 				@Override
 				public void addToCreativeList(int itemId, int meta, List<ItemStack> result) {
 					super.addToCreativeList(itemId, meta, result);
@@ -26,8 +24,6 @@ public enum MetasGeneric {
 			};
 		}
 	};
-
-	private static final String MOD_ID = "openperipheraladdons";
 
 	public ItemStack newItemStack(int size) {
 		return new ItemStack(Items.generic, size, ordinal());
