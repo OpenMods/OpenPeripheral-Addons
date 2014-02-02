@@ -8,7 +8,7 @@ import java.util.WeakHashMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.MathHelper;
 import openmods.tileentity.OpenTileEntity;
 import openperipheral.api.IAttachable;
 
@@ -16,30 +16,32 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import dan200.computer.api.IComputerAccess;
 
-public class TileEntityPIM extends OpenTileEntity implements IInventory,
-		IAttachable {
+public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttachable {
 
 	private WeakReference<EntityPlayer> player;
 
-	private Set<IComputerAccess> computers = Collections
-			.newSetFromMap(new WeakHashMap<IComputerAccess, Boolean>());
+	private Set<IComputerAccess> computers = Collections.newSetFromMap(new WeakHashMap<IComputerAccess, Boolean>());
+
+	public EntityPlayer getPlayer() {
+		return player != null? player.get() : null;
+	}
 
 	@Override
 	public int getSizeInventory() {
-		if (player != null && player.get() != null) { return player.get().inventory.getSizeInventory(); }
-		return 0;
+		EntityPlayer player = getPlayer();
+		return player != null? player.inventory.getSizeInventory() : 0;
 	}
 
 	@Override
 	public ItemStack getStackInSlot(int i) {
-		if (player != null && player.get() != null) { return player.get().inventory.getStackInSlot(i); }
-		return null;
+		EntityPlayer player = getPlayer();
+		return player != null? player.inventory.getStackInSlot(i) : null;
 	}
 
 	@Override
 	public ItemStack decrStackSize(int i, int j) {
-		if (player != null && player.get() != null) { return player.get().inventory.decrStackSize(i, j); }
-		return null;
+		EntityPlayer player = getPlayer();
+		return player != null? player.inventory.decrStackSize(i, j) : null;
 	}
 
 	@Override
@@ -49,17 +51,14 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory,
 
 	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack) {
-		if (player != null && player.get() != null) {
-			player.get().inventory.setInventorySlotContents(i, itemstack);
-		}
+		EntityPlayer player = getPlayer();
+		if (player != null) player.inventory.setInventorySlotContents(i, itemstack);
 	}
 
 	@Override
 	public String getInvName() {
-		if (player != null && player.get() != null) {
-			player.get().inventory.getInvName();
-		}
-		return "pim";
+		EntityPlayer player = getPlayer();
+		return player != null? player.username : "pim";
 	}
 
 	@Override
@@ -69,10 +68,8 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory,
 
 	@Override
 	public int getInventoryStackLimit() {
-		if (player != null && player.get() != null) {
-			player.get().inventory.getInventoryStackLimit();
-		}
-		return 0;
+		EntityPlayer player = getPlayer();
+		return player != null? player.inventory.getInventoryStackLimit() : 0;
 	}
 
 	@Override
@@ -88,8 +85,7 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory,
 
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
-		if (player != null && player.get() != null) { return player.get().inventory.isItemValidForSlot(i, itemstack); }
-		return false;
+		return getPlayer() != null;
 	}
 
 	@Override
@@ -102,30 +98,42 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory,
 		computers.remove(computer);
 	}
 
-	public EntityPlayer getPlayer() {
-		return player != null? player.get() : null;
-	}
-
 	public boolean hasPlayer() {
 		if (worldObj == null) return false;
 		return worldObj.getBlockMetadata(xCoord, yCoord, zCoord) == 1;
 	}
 
-	public void setPlayer(EntityPlayer p) {
-		player = new WeakReference<EntityPlayer>(p);
+	private void setPlayer(EntityPlayer p) {
 		worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.1D, zCoord + 0.5D, "random.click", 0.3F, 0.6F);
 		worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, p == null? 0 : 1, 3);
-		fireEvent(p == null? "player_off" : "player_on");
+		if (p != null) {
+			player = new WeakReference<EntityPlayer>(p);
+			fireEvent("player_on", p.username);
+		} else {
+			player = null;
+			fireEvent("player_off");
+		}
 	}
 
-	public void fireEvent(String eventName, Object... args) {
-		if (args == null) {
-			args = new Object[0];
-		}
+	public void trySetPlayer(EntityPlayer newPlayer) {
+		if (newPlayer == null) return;
+		EntityPlayer current = getPlayer();
+		if (current == null && isPlayerValid(newPlayer)) setPlayer(newPlayer);
+	}
+
+	private void fireEvent(String eventName, Object... args) {
 		for (IComputerAccess computer : computers) {
-			args = ArrayUtils.add(args, computer.getAttachmentName());
-			computer.queueEvent(eventName, args);
+			Object[] extendedArgs = ArrayUtils.add(args, computer.getAttachmentName());
+			computer.queueEvent(eventName, extendedArgs);
 		}
+	}
+
+	private boolean isPlayerValid(EntityPlayer player) {
+		if (player == null) return false;
+		int playerX = MathHelper.floor_double(player.posX);
+		int playerY = MathHelper.floor_double(player.posY + 0.5D);
+		int playerZ = MathHelper.floor_double(player.posZ);
+		return playerX == xCoord && playerY == yCoord && playerZ == zCoord;
 	}
 
 	/**
@@ -135,12 +143,7 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory,
 	public void updateEntity() {
 		if (!worldObj.isRemote) {
 			EntityPlayer player = getPlayer();
-			if (player != null) {
-				ChunkCoordinates coordinates = player.getPlayerCoordinates();
-				if (coordinates.posX != xCoord || coordinates.posY != yCoord || coordinates.posZ != zCoord) {
-					setPlayer(null);
-				}
-			}
+			if (player != null && !isPlayerValid(player)) setPlayer(null);
 		}
 	}
 }
