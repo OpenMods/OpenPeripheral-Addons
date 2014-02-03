@@ -17,6 +17,7 @@ import openperipheral.util.EntityUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+@OnTick
 @Prefixed("target")
 public class AdapterSensor implements IPeripheralAdapter {
 
@@ -45,7 +46,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return mob != null? EntityUtils.entityToMap(mob, sensor.getLocation()) : null;
 	}
 
-	@LuaMethod(returnType = LuaType.TABLE, onTick = false, description = "Get the usernames of all the players in range")
+	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get the usernames of all the players in range")
 	public List<String> getPlayerNames(ISensorEnvironment env) {
 		@SuppressWarnings("unchecked")
 		List<EntityPlayer> players = env.getWorld().getEntitiesWithinAABB(EntityPlayer.class, getBoundingBox(env.getLocation(), env.getSensorRange()));
