@@ -1,5 +1,7 @@
 package openperipheral.addons.glasses;
 
+import java.lang.reflect.Field;
+
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -10,15 +12,21 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
-import openperipheral.util.Property;
+import openperipheral.adapter.IPropertyCallback;
+import openperipheral.addons.glasses.SurfaceServer.DrawableWrapper;
+import openperipheral.api.CallbackProperty;
+import openperipheral.api.LuaCallable;
+import openperipheral.api.LuaType;
 
 import org.lwjgl.opengl.GL11;
+
+import com.google.common.base.Preconditions;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public abstract class Drawable {
+public abstract class Drawable implements IPropertyCallback {
 
 	private enum Type {
 		GRADIENT {
@@ -57,13 +65,15 @@ public abstract class Drawable {
 		public static final Type[] TYPES = values();
 	}
 
-	@Property
+	DrawableWrapper wrapper;
+
+	@CallbackProperty
 	public short x;
 
-	@Property
+	@CallbackProperty
 	public short y;
 
-	@Property
+	@CallbackProperty
 	public short z;
 
 	protected Drawable() {}
@@ -87,16 +97,16 @@ public abstract class Drawable {
 	protected abstract Type getType();
 
 	public static class SolidBox extends Drawable {
-		@Property
+		@CallbackProperty
 		public short width;
 
-		@Property
+		@CallbackProperty
 		public short height;
 
-		@Property
+		@CallbackProperty
 		public int color;
 
-		@Property
+		@CallbackProperty
 		public float opacity;
 
 		private SolidBox() {}
@@ -141,25 +151,25 @@ public abstract class Drawable {
 	}
 
 	public static class GradientBox extends Drawable {
-		@Property
+		@CallbackProperty
 		public short width;
 
-		@Property
+		@CallbackProperty
 		public short height;
 
-		@Property
+		@CallbackProperty
 		public int color1;
 
-		@Property
+		@CallbackProperty
 		public float opacity1;
 
-		@Property
+		@CallbackProperty
 		public int color2;
 
-		@Property
+		@CallbackProperty
 		public float opacity2;
 
-		@Property
+		@CallbackProperty
 		public int gradient;
 
 		private GradientBox() {}
@@ -230,32 +240,32 @@ public abstract class Drawable {
 	}
 
 	public static class ItemIcon extends Drawable {
-		@Property
+		@CallbackProperty
 		public float scale = 1;
 
-		@Property
+		@CallbackProperty
 		public float angle = 30;
 
-		@Property
-		public int id;
+		@CallbackProperty
+		public int itemId;
 
-		@Property
+		@CallbackProperty
 		public int meta;
 
 		private static ItemStack drawStack = new ItemStack(0, 1, 0);
 
 		private ItemIcon() {}
 
-		public ItemIcon(short x, short y, int id, int meta) {
+		public ItemIcon(short x, short y, int itemId, int meta) {
 			super(x, y);
-			this.id = id;
+			this.itemId = itemId;
 			this.meta = meta;
 		}
 
 		@Override
 		@SideOnly(Side.CLIENT)
 		protected void drawContents(float partialTicks) {
-			drawStack.itemID = id;
+			drawStack.itemID = itemId;
 
 			Item item;
 			try {
@@ -282,16 +292,16 @@ public abstract class Drawable {
 	}
 
 	public static class LiquidIcon extends Drawable {
-		@Property
+		@CallbackProperty
 		public short width;
 
-		@Property
+		@CallbackProperty
 		public short height;
 
-		@Property
+		@CallbackProperty
 		public String fluid;
 
-		@Property
+		@CallbackProperty
 		public float alpha = 1;
 
 		private LiquidIcon() {}
@@ -351,16 +361,16 @@ public abstract class Drawable {
 	}
 
 	public static class Text extends Drawable {
-		@Property
+		@CallbackProperty
 		public String text;
 
-		@Property
+		@CallbackProperty
 		public int color;
 
-		@Property
+		@CallbackProperty
 		public double alpha = 1;
 
-		@Property
+		@CallbackProperty
 		public float scale = 1;
 
 		private Text() {}
@@ -389,8 +399,38 @@ public abstract class Drawable {
 		return getType().ordinal();
 	}
 
-	public static Drawable createFromTypeId(int id) {
-		Type type = Type.TYPES[id];
+	public static Drawable createFromTypeId(int containerId, int typeId) {
+		Type type = Type.TYPES[typeId];
 		return type.create();
+	}
+
+	@LuaCallable(returnTypes = LuaType.STRING, name = "getType", description = "Get object type")
+	public String getTypeName() {
+		return getType().name().toLowerCase();
+	}
+
+	@LuaCallable
+	public void delete() {
+		Preconditions.checkNotNull(wrapper, "Object is already deleted");
+		wrapper.delete();
+		wrapper = null;
+	}
+
+	@LuaCallable(returnTypes = LuaType.NUMBER, name = "getId")
+	public int getId() {
+		Preconditions.checkNotNull(wrapper, "Object is deleted");
+		return wrapper.containerId + 1;
+	}
+
+	@Override
+	public void setField(Field field, Object value) {
+		Preconditions.checkNotNull(wrapper, "Object is deleted");
+		wrapper.setField(field, value);
+	}
+
+	@Override
+	public Object getField(Field field) {
+		Preconditions.checkNotNull(wrapper, "Object is deleted");
+		return wrapper.getField(field);
 	}
 }

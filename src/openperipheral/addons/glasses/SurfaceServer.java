@@ -7,11 +7,9 @@ import java.util.Map;
 import openmods.structured.ElementField;
 import openmods.structured.IStructureContainer;
 import openmods.structured.StructuredDataMaster;
+import openperipheral.adapter.AdapterManager;
 import openperipheral.addons.glasses.SurfaceServer.DrawableWrapper;
 import openperipheral.api.*;
-import openperipheral.util.LuaObjectBuilder;
-import openperipheral.util.LuaObjectBuilder.IAccessCallback;
-import openperipheral.util.Property;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -22,7 +20,12 @@ import dan200.computer.api.ILuaObject;
 @Freeform
 public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, ElementField> {
 
-	public class DrawableWrapper implements IStructureContainer<ElementField>, IAccessCallback {
+	// I know this one is in guava, but I'm getting name class on Objects
+	private static <T> T firstNonNull(T first, T second) {
+		return first != null? first : second;
+	}
+
+	public class DrawableWrapper implements IStructureContainer<ElementField> {
 		public int containerId;
 		public final Drawable target;
 		public final ILuaObject luaWrapper;
@@ -31,10 +34,10 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 
 		public DrawableWrapper(Drawable target) {
 			this.target = target;
-			luaWrapper = LuaObjectBuilder.build(target.getClass(), this);
+			target.wrapper = this;
+			luaWrapper = AdapterManager.wrapObject(target);
 		}
 
-		@Override
 		public void setField(Field field, Object value) {
 			ElementField fieldWrapper = fields.get(field);
 			Preconditions.checkNotNull(fieldWrapper, "LOGIC FAIL. BLAME MOD DEVS");
@@ -42,11 +45,18 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 			fieldWrapper.set(value);
 		}
 
-		@Override
 		public Object getField(Field field) {
 			ElementField fieldWrapper = fields.get(field);
 			Preconditions.checkNotNull(fieldWrapper, "LOGIC FAIL. BLAME MOD DEVS");
 			return fieldWrapper.get();
+		}
+
+		public void delete() {
+			removeContainer(containerId);
+		}
+
+		public void clear() {
+			target.wrapper = null;
 		}
 
 		@Override
@@ -59,7 +69,7 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 			List<ElementField> result = Lists.newArrayList();
 			for (Field field : target.getClass().getFields()) {
 				field.setAccessible(true);
-				if (!field.isAnnotationPresent(Property.class)) continue;
+				if (!field.isAnnotationPresent(CallbackProperty.class)) continue;
 
 				ElementField fieldWrapper = new ElementField(target, field);
 				result.add(fieldWrapper);
@@ -81,16 +91,18 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 		this.playerName = playerName;
 	}
 
-	public synchronized void setDeleted(DrawableWrapper d) {
-		removeContainer(d.containerId);
-	}
-
-	public synchronized ILuaObject getById(int id) {
-		return containers.get(id).luaWrapper;
+	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Get object by id")
+	public synchronized ILuaObject getById(
+			@Arg(name = "id", description = "Id of drawed object", type = LuaType.NUMBER) int id
+			) {
+		DrawableWrapper wrapper = containers.get(id - 1);
+		return wrapper != null? wrapper.luaWrapper : null;
 	}
 
 	@LuaCallable(description = "Clear all the objects from the screen")
 	public synchronized void clear() {
+		for (DrawableWrapper wrapper : containers.values())
+			wrapper.clear();
 		removeAll();
 	}
 
@@ -109,7 +121,8 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 
 	private synchronized ILuaObject addDrawable(Drawable drawable) {
 		DrawableWrapper wrapper = new DrawableWrapper(drawable);
-		wrapper.containerId = addContainer(wrapper);
+		int id = addContainer(wrapper);
+		wrapper.containerId = id;
 		return wrapper.luaWrapper;
 	}
 
@@ -118,9 +131,9 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 			@Arg(name = "x", description = "The x position from the top left", type = LuaType.NUMBER) short x,
 			@Arg(name = "y", description = "The y position from the top left", type = LuaType.NUMBER) short y,
 			@Arg(name = "text", description = "The text to display", type = LuaType.STRING) String text,
-			@Arg(name = "color", description = "The text color", type = LuaType.NUMBER) int color
+			@Optionals @Arg(name = "color", description = "The text color", type = LuaType.NUMBER) Integer color
 			) {
-		return addDrawable(new Drawable.Text(x, y, text, color));
+		return addDrawable(new Drawable.Text(x, y, text, firstNonNull(color, 0xFFFFFF)));
 	}
 
 	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Add a new box to the screen")
@@ -129,10 +142,10 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 			@Arg(name = "y", description = "The y position from the top left", type = LuaType.NUMBER) short y,
 			@Arg(name = "width", description = "The width of the box", type = LuaType.NUMBER) short width,
 			@Arg(name = "height", description = "The height of the box", type = LuaType.NUMBER) short height,
-			@Arg(name = "color", description = "The color of the box", type = LuaType.NUMBER) int color,
-			@Arg(name = "opacity", description = "The opacity of the box (from 0 to 1)", type = LuaType.NUMBER) float opacity
+			@Optionals @Arg(name = "color", description = "The color of the box", type = LuaType.NUMBER) Integer color,
+			@Arg(name = "opacity", description = "The opacity of the box (from 0 to 1)", type = LuaType.NUMBER) Float opacity
 			) {
-		return addDrawable(new Drawable.SolidBox(x, y, width, height, color, opacity));
+		return addDrawable(new Drawable.SolidBox(x, y, width, height, firstNonNull(color, 0xFFFFFF), firstNonNull(opacity, 1.0f)));
 	}
 
 	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Add a new gradient box to the screen")

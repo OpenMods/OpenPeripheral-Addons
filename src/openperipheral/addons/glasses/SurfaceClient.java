@@ -7,7 +7,7 @@ import java.util.List;
 import openmods.structured.*;
 import openperipheral.addons.glasses.SurfaceClient.DrawableWrapper;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
-import openperipheral.util.Property;
+import openperipheral.api.CallbackProperty;
 
 import com.google.common.collect.Lists;
 
@@ -31,7 +31,7 @@ public class SurfaceClient extends StructuredDataSlave<DrawableWrapper, ElementF
 			List<ElementField> result = Lists.newArrayList();
 			for (Field field : target.getClass().getFields()) {
 				field.setAccessible(true);
-				if (!field.isAnnotationPresent(Property.class)) continue;
+				if (!field.isAnnotationPresent(CallbackProperty.class)) continue;
 				result.add(new ElementField(target, field));
 			}
 
@@ -47,8 +47,8 @@ public class SurfaceClient extends StructuredDataSlave<DrawableWrapper, ElementF
 	private static final IStructureContainerFactory<DrawableWrapper> FACTORY = new IStructureContainerFactory<DrawableWrapper>() {
 
 		@Override
-		public DrawableWrapper createContainer(int type) {
-			Drawable newDrawable = Drawable.createFromTypeId(type);
+		public DrawableWrapper createContainer(int containerId, int type) {
+			Drawable newDrawable = Drawable.createFromTypeId(containerId, type);
 			return new DrawableWrapper(newDrawable);
 		}
 	};
