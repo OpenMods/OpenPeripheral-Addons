@@ -20,20 +20,15 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeriph
 	public IHostedPeripheral providePeripheral(World worldObj) {
 		Object peripheral = null;
 		ForgeDirection rotation = getRotation();
-		try {
-			peripheral = ReflectionHelper.callStatic(
-					BASECOMPUTER_CLASS,
-					"getPeripheralAt",
-					worldObj,
-					xCoord + rotation.offsetX,
-					yCoord + rotation.offsetY,
-					zCoord + rotation.offsetZ,
-					0);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		if (peripheral instanceof IPeripheral) { return new WrappedPeripheral((IPeripheral)peripheral, rotation.getOpposite().ordinal()); }
-		return null;
+		peripheral = ReflectionHelper.callStatic(
+				BASECOMPUTER_CLASS,
+				"getPeripheralAt",
+				ReflectionHelper.typed(worldObj, World.class),
+				ReflectionHelper.primitive(xCoord + rotation.offsetX),
+				ReflectionHelper.primitive(yCoord + rotation.offsetY),
+				ReflectionHelper.primitive(zCoord + rotation.offsetZ),
+				ReflectionHelper.primitive(0));
+		return (peripheral instanceof IPeripheral)? new WrappedPeripheral((IPeripheral)peripheral, rotation.getOpposite().ordinal()) : null;
 	}
 
 	@Override
@@ -44,12 +39,8 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeriph
 			int attachedY = yCoord + rot.offsetY;
 			int attachedZ = zCoord + rot.offsetZ;
 			TileEntity attachedTE = worldObj.getBlockTileEntity(attachedX, attachedY, attachedZ);
-			if (attachedTE != null && attachedTE.getClass().getName().equals(CABLE_CLASS)) {
-				try {
-					ReflectionHelper.call(attachedTE, "networkChanged");
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			if (attachedTE != null && CABLE_CLASS.isAssignableFrom(attachedTE.getClass())) {
+				ReflectionHelper.call(attachedTE, "networkChanged");
 			}
 			worldObj.notifyBlockOfNeighborChange(
 					attachedX,
