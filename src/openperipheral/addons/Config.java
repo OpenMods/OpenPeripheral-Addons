@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraftforge.common.Configuration;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import openmods.Mods;
 import openmods.config.*;
@@ -43,18 +42,17 @@ public class Config {
 	@BlockId(description = "The id of the ticket machine block")
 	public static int blockTicketMachineId = 3004;
 
+	@OnLineModifiable
 	@ConfigProperty(category = "sensor", name = "rangeInStorm")
 	public static int sensorRangeInStorm = 5;
 
+	@OnLineModifiable
 	@ConfigProperty(category = "sensor", name = "normalRange")
 	public static int sensorRange = 5;
 
+	@OnLineModifiable
 	@ConfigProperty(category = "misc", comment = "Should turtles with OPA updates be visible in creative")
 	public static boolean addTurtlesToCreative = true;
-
-	public static void readConfig(Configuration configFile) {
-		ConfigProcessing.processAnnotations(configFile, Config.class);
-	}
 
 	public static void register() {
 

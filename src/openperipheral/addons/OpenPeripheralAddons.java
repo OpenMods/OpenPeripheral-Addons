@@ -1,5 +1,6 @@
 package openperipheral.addons;
 
+import java.io.File;
 import java.util.List;
 
 import net.minecraft.block.Block;
@@ -14,6 +15,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import openmods.Mods;
 import openmods.OpenMods;
 import openmods.api.IProxy;
+import openmods.config.ConfigProcessing;
 import openmods.config.RegisterBlock;
 import openmods.config.RegisterItem;
 import openperipheral.addons.glasses.*;
@@ -90,10 +92,11 @@ public class OpenPeripheralAddons {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent evt) {
-		Configuration configFile = new Configuration(evt.getSuggestedConfigurationFile());
-		Config.readConfig(configFile);
-		if (configFile.hasChanged()) {
-			configFile.save();
+		final File configFile = evt.getSuggestedConfigurationFile();
+		Configuration config = new Configuration(configFile);
+		ConfigProcessing.processAnnotations(configFile, "OpenPeripheral", config, Config.class);
+		if (config.hasChanged()) {
+			config.save();
 		}
 		Config.register();
 
