@@ -115,7 +115,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 						Block block = Block.blocksList[id];
 
-						if (!(id == 0 || block == null)) {
+						if (block != null) {
 							Vec3 targetPos = Vec3.createVectorHelper(bX, bY, bZ);
 							if (sensorPos.distanceTo(targetPos) <= range) {
 								if (id == 0) {
@@ -127,13 +127,14 @@ public class AdapterSensor implements IPeripheralAdapter {
 								}
 							}
 						}
+						Map<String, Object> tmp = Maps.newHashMap();
+						tmp.put("x", x);
+						tmp.put("y", y);
+						tmp.put("z", z);
+						tmp.put("type", type);
+						results.put(++i, tmp);
 					}
-					Map<String, Object> tmp = Maps.newHashMap();
-					tmp.put("x", x);
-					tmp.put("y", y);
-					tmp.put("z", z);
-					tmp.put("type", type);
-					results.put(++i, tmp);
+
 				}
 			}
 		}
