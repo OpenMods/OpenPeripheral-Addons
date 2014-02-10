@@ -103,7 +103,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 			for (int y = -range; y <= range; y++) {
 				for (int z = -range; z <= range; z++) {
 
-					String type = "UNKNOWN";
+					String type = "AIR";
 
 					if (!(x == 0 && y == 0 && z == 0) && world.blockExists(sx + x, sy + y, sz + z)) {
 
@@ -115,26 +115,27 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 						Block block = Block.blocksList[id];
 
-						if (block != null) {
-							Vec3 targetPos = Vec3.createVectorHelper(bX, bY, bZ);
-							if (sensorPos.distanceTo(targetPos) <= range) {
-								if (id == 0) {
+						Vec3 targetPos = Vec3.createVectorHelper(bX, bY, bZ);
+						if (sensorPos.distanceTo(targetPos) <= range) {
+							if (block != null) {
+								if (world.isAirBlock(bX, bY, bZ)) {
 									type = "AIR";
 								} else if (block.blockMaterial.isLiquid()) {
 									type = "LIQUID";
 								} else if (block.blockMaterial.isSolid()) {
 									type = "SOLID";
+								}else{
+									type = "UNKNOWN";
 								}
 							}
+							Map<String, Object> tmp = Maps.newHashMap();
+							tmp.put("x", x);
+							tmp.put("y", y);
+							tmp.put("z", z);
+							tmp.put("type", type);
+							results.put(++i, tmp);
 						}
-						Map<String, Object> tmp = Maps.newHashMap();
-						tmp.put("x", x);
-						tmp.put("y", y);
-						tmp.put("z", z);
-						tmp.put("type", type);
-						results.put(++i, tmp);
 					}
-
 				}
 			}
 		}
