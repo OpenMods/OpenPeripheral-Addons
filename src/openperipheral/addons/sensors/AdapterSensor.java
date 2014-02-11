@@ -90,7 +90,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get a table of information about the surrounding area. Includes whether each block is UNKNOWN, AIR, LIQUID or SOLID")
 	public Map<Integer, Map<String, Object>> sonicScan(ISensorEnvironment env) {
 
-		int range = 1 + env.getSensorRange() / 6;
+		int range = 1 + env.getSensorRange() / 2;
 		World world = env.getWorld();
 		Map<Integer, Map<String, Object>> results = Maps.newHashMap();
 		Vec3 sensorPos = env.getLocation();
@@ -98,44 +98,34 @@ public class AdapterSensor implements IPeripheralAdapter {
 		int sy = (int)sensorPos.yCoord;
 		int sz = (int)sensorPos.zCoord;
 
+		final int rangeSq = range * range;
 		int i = 0;
 		for (int x = -range; x <= range; x++) {
 			for (int y = -range; y <= range; y++) {
 				for (int z = -range; z <= range; z++) {
+					final int bx = sx + x;
+					final int by = sy + y;
+					final int bz = sz + z;
+					if (!world.blockExists(bx, by, bz)) continue;
 
-					String type = "AIR";
+					final int distSq = bx * bx + by * by + bz * bz;
+					if (distSq == 0 || distSq > rangeSq) continue;
+					int id = world.getBlockId(bx, by, bz);
+					Block block = Block.blocksList[id];
 
-					if (!(x == 0 && y == 0 && z == 0) && world.blockExists(sx + x, sy + y, sz + z)) {
+					String type;
+					if (block == null || world.isAirBlock(bx, by, bz)) type = "AIR";
+					else if (block.blockMaterial.isLiquid()) type = "LIQUID";
+					else if (block.blockMaterial.isSolid()) type = "SOLID";
+					else type = "UNKNOWN";
 
-						int bX = sx + x;
-						int bY = sy + y;
-						int bZ = sz + z;
+					Map<String, Object> tmp = Maps.newHashMap();
+					tmp.put("x", x);
+					tmp.put("y", y);
+					tmp.put("z", z);
+					tmp.put("type", type);
+					results.put(++i, tmp);
 
-						int id = world.getBlockId(bX, bY, bZ);
-
-						Block block = Block.blocksList[id];
-
-						Vec3 targetPos = Vec3.createVectorHelper(bX, bY, bZ);
-						if (sensorPos.distanceTo(targetPos) <= range) {
-							if (block != null) {
-								if (world.isAirBlock(bX, bY, bZ)) {
-									type = "AIR";
-								} else if (block.blockMaterial.isLiquid()) {
-									type = "LIQUID";
-								} else if (block.blockMaterial.isSolid()) {
-									type = "SOLID";
-								}else{
-									type = "UNKNOWN";
-								}
-							}
-							Map<String, Object> tmp = Maps.newHashMap();
-							tmp.put("x", x);
-							tmp.put("y", y);
-							tmp.put("z", z);
-							tmp.put("type", type);
-							results.put(++i, tmp);
-						}
-					}
 				}
 			}
 		}
