@@ -8,7 +8,7 @@ import openperipheral.addons.pim.BlockPIMRenderer;
 public class BlockRenderingHandler extends BlockRenderingHandlerBase {
 
 	public BlockRenderingHandler() {
-		blockRenderers.put(Blocks.pim, new BlockPIMRenderer());
+		addRenderer(Blocks.pim, new BlockPIMRenderer());
 	}
 
 	@Override

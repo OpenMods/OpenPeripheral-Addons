@@ -1,6 +1,5 @@
 package openperipheral.addons.pim;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.tileentity.TileEntity;
@@ -12,7 +11,7 @@ import openmods.utils.render.RenderUtils;
 
 import org.lwjgl.opengl.GL11;
 
-public class BlockPIMRenderer implements IBlockRenderer {
+public class BlockPIMRenderer implements IBlockRenderer<BlockPIM> {
 
 	private static void renderTop(Tessellator tes, boolean pressed, double x, double y, double z) {
 		if (pressed) y -= 0.08;
@@ -69,7 +68,7 @@ public class BlockPIMRenderer implements IBlockRenderer {
 	}
 
 	@Override
-	public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer) {
+	public void renderInventoryBlock(BlockPIM block, int metadata, int modelID, RenderBlocks renderer) {
 		GL11.glPushMatrix();
 		GL11.glTranslatef(-0.5F, -0.4F, -0.5F);
 		RenderUtils.renderInventoryBlock(renderer, block, ForgeDirection.EAST);
@@ -81,7 +80,7 @@ public class BlockPIMRenderer implements IBlockRenderer {
 	}
 
 	@Override
-	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer) {
+	public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, BlockPIM block, int modelId, RenderBlocks renderer) {
 		renderer.renderStandardBlock(block, x, y, z);
 		boolean hasPlayer = hasPlayer(world, x, y, z);
 		renderTop(Tessellator.instance, hasPlayer, x, y, z);

@@ -69,7 +69,7 @@ public class BlockPIM extends BlockOP {
 			if (pi != null) pi.trySetPlayer((EntityPlayer)entity);
 		}
 	}
-	
+
 	@Override
 	public ArrayList<ItemStack> getBlockDropped(World world, int x, int y, int z, int metadata, int fortune) {
 		return Lists.newArrayList(new ItemStack(this, 1, 0));
