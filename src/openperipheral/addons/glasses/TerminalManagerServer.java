@@ -27,10 +27,12 @@ public class TerminalManagerServer {
 		if (!event.message.startsWith("$$")) return;
 
 		ItemStack headSlot = ItemGlasses.getGlassesItem(player);
-		Long guid = ItemGlasses.extractGuid(headSlot);
-		if (guid != null) {
-			TileEntityGlassesBridge listener = listeners.get(guid);
-			if (listener != null) listener.onChatCommand(event.message.substring(2).trim(), event.username);
+		if (headSlot != null) {
+			Long guid = ItemGlasses.extractGuid(headSlot);
+			if (guid != null) {
+				TileEntityGlassesBridge listener = listeners.get(guid);
+				if (listener != null) listener.onChatCommand(event.message.substring(2).trim(), event.username);
+			}
 		}
 
 		event.setCanceled(true);
