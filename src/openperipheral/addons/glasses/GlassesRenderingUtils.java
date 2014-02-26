@@ -52,6 +52,7 @@ public final class GlassesRenderingUtils {
 	public static void renderItemIntoGUI(FontRenderer fontRenderer, ItemStack itemStack, int x, int y, float scale) {
 		if (itemStack.getItem() == null) return;
 		Icon icon = itemStack.getIconIndex();
+		boolean lightingEnabled = GL11.glGetBoolean(GL11.GL_LIGHTING);
 		GL11.glDisable(GL11.GL_LIGHTING);
 
 		TextureManager manager = FMLClientHandler.instance().getClient().renderEngine;
@@ -64,7 +65,9 @@ public final class GlassesRenderingUtils {
 		float blue = (overlayColour & 255) / 255.0F;
 		GL11.glColor4f(red, green, blue, 1f);
 		drawTexturedQuad(x, y, icon, 16 * scale, 16 * scale);
-		GL11.glEnable(GL11.GL_LIGHTING);
+		if(lightingEnabled){
+			GL11.glEnable(GL11.GL_LIGHTING);
+		}
 
 	}
 
