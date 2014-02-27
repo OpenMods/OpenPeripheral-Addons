@@ -108,7 +108,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 					final int bz = sz + z;
 					if (!world.blockExists(bx, by, bz)) continue;
 
-					final int distSq = bx * bx + by * by + bz * bz;
+					final int distSq = x * x + y * y + z * z;
 					if (distSq == 0 || distSq > rangeSq) continue;
 					int id = world.getBlockId(bx, by, bz);
 					Block block = Block.blocksList[id];
