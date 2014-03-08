@@ -1,20 +1,15 @@
 package openperipheral.addons.pim;
 
-import java.util.ArrayList;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import openperipheral.addons.BlockOP;
 import openperipheral.addons.Config;
-
-import com.google.common.collect.Lists;
 
 public class BlockPIM extends BlockOP {
 
@@ -71,8 +66,7 @@ public class BlockPIM extends BlockOP {
 	}
 
 	@Override
-	public ArrayList<ItemStack> getBlockDropped(World world, int x, int y, int z, int metadata, int fortune) {
-		return Lists.newArrayList(new ItemStack(this, 1, 0));
+	protected boolean hasTileEntityDrops() {
+		return false;
 	}
-
 }
