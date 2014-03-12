@@ -5,30 +5,27 @@ import dan200.computer.api.*;
 
 public class WrappedPeripheral implements IHostedPeripheral {
 
-	private IPeripheral peripheral;
-	private int backSide;
+	private final IPeripheral peripheral;
+	private final int backSide;
 
-	public WrappedPeripheral(IPeripheral per, int backSide) {
-		peripheral = per;
+	public WrappedPeripheral(IPeripheral peripheral, int backSide) {
+		this.peripheral = peripheral;
 		this.backSide = backSide;
 	}
 
 	@Override
 	public String getType() {
-		if (peripheral == null) { return null; }
-		return peripheral.getType();
+		return (peripheral != null)? peripheral.getType() : null;
 	}
 
 	@Override
 	public String[] getMethodNames() {
-		if (peripheral == null) { return null; }
-		return peripheral.getMethodNames();
+		return (peripheral != null)? peripheral.getMethodNames() : null;
 	}
 
 	@Override
 	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws Exception {
-		if (peripheral == null) { return null; }
-		return peripheral.callMethod(computer, context, method, arguments);
+		return (peripheral != null)? peripheral.callMethod(computer, context, method, arguments) : null;
 	}
 
 	@Override
@@ -38,35 +35,27 @@ public class WrappedPeripheral implements IHostedPeripheral {
 
 	@Override
 	public void attach(IComputerAccess computer) {
-		if (peripheral == null) { return; }
-		peripheral.attach(computer);
+		if (peripheral != null) peripheral.attach(computer);
 	}
 
 	@Override
 	public void detach(IComputerAccess computer) {
-		if (peripheral == null) { return; }
-		peripheral.detach(computer);
+		if (peripheral != null) peripheral.detach(computer);
 	}
 
 	@Override
 	public void update() {
-		if (peripheral != null && peripheral instanceof IHostedPeripheral) {
-			((IHostedPeripheral)peripheral).update();
-		}
+		if (peripheral instanceof IHostedPeripheral) ((IHostedPeripheral)peripheral).update();
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbttagcompound) {
-		if (peripheral != null && peripheral instanceof IHostedPeripheral) {
-			((IHostedPeripheral)peripheral).readFromNBT(nbttagcompound);
-		}
+		if (peripheral instanceof IHostedPeripheral) ((IHostedPeripheral)peripheral).readFromNBT(nbttagcompound);
 	}
 
 	@Override
 	public void writeToNBT(NBTTagCompound nbttagcompound) {
-		if (peripheral != null && peripheral instanceof IHostedPeripheral) {
-			((IHostedPeripheral)peripheral).writeToNBT(nbttagcompound);
-		}
+		if (peripheral instanceof IHostedPeripheral) ((IHostedPeripheral)peripheral).writeToNBT(nbttagcompound);
 	}
 
 }

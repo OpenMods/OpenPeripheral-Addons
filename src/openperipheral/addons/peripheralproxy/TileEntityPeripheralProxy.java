@@ -8,9 +8,11 @@ import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ReflectionHelper;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.api.IPeripheralProvider;
+import openperipheral.api.Volatile;
 import dan200.computer.api.IHostedPeripheral;
 import dan200.computer.api.IPeripheral;
 
+@Volatile
 public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeripheralProvider, INeighbourAwareTile {
 
 	public static final Class<?> CABLE_CLASS = ReflectionHelper.getClass("dan200.computer.shared.TileEntityCable");
