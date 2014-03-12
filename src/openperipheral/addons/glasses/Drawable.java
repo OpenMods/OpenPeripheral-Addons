@@ -2,12 +2,13 @@ package openperipheral.addons.glasses;
 
 import java.lang.reflect.Field;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.fluids.Fluid;
@@ -240,11 +241,10 @@ public abstract class Drawable implements IPropertyCallback {
 	}
 
 	public static class ItemIcon extends Drawable {
-		@CallbackProperty
-		public float scale = 1;
+		private static final RenderItem RENDER_ITEM = new RenderItem();
 
 		@CallbackProperty
-		public float angle = 30;
+		public float scale = 1;
 
 		@CallbackProperty
 		public int itemId;
@@ -252,7 +252,12 @@ public abstract class Drawable implements IPropertyCallback {
 		@CallbackProperty
 		public int meta;
 
-		private static ItemStack drawStack = new ItemStack(0, 1, 0);
+		private static final ThreadLocal<ItemStack> TMP_STACK = new ThreadLocal<ItemStack>() {
+			@Override
+			protected ItemStack initialValue() {
+				return new ItemStack(0, 1, 0);
+			}
+		};
 
 		private ItemIcon() {}
 
@@ -265,6 +270,7 @@ public abstract class Drawable implements IPropertyCallback {
 		@Override
 		@SideOnly(Side.CLIENT)
 		protected void drawContents(float partialTicks) {
+			ItemStack drawStack = TMP_STACK.get();
 			drawStack.itemID = itemId;
 
 			Item item;
@@ -276,12 +282,9 @@ public abstract class Drawable implements IPropertyCallback {
 
 			if (item == null) return;
 			drawStack.setItemDamage(meta);
-
-			FontRenderer renderer = FMLClientHandler.instance().getClient().fontRenderer;
-
-			if (item instanceof ItemBlock) GlassesRenderingUtils.renderRotatingBlockIntoGUI(renderer, drawStack, 1, 1, scale, this.angle);
-			else GlassesRenderingUtils.renderItemIntoGUI(renderer, drawStack, 0, 0, this.scale);
-
+			GL11.glScalef(scale, scale, scale);
+			RENDER_ITEM.renderItemAndEffectIntoGUI(null, Minecraft.getMinecraft().getTextureManager(), drawStack, 0, 0);
+			GL11.glDisable(GL11.GL_LIGHTING);
 		}
 
 		@Override
@@ -339,7 +342,7 @@ public abstract class Drawable implements IPropertyCallback {
 					final float xDrawSize = Math.min(xIterations - xIteration, 1);
 					final float yDrawSize = Math.min(yIterations - yIteration, 1);
 
-					GlassesRenderingUtils.drawTexturedQuadAdvanced(
+					GlassesRenderingUtils.drawTexturedQuad(
 							xIteration * iconWidth,
 							yIteration * iconHeight,
 							fluidIcon,
