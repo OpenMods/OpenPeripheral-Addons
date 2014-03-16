@@ -241,7 +241,8 @@ public abstract class Drawable implements IPropertyCallback {
 	}
 
 	public static class ItemIcon extends Drawable {
-		private static final RenderItem RENDER_ITEM = new RenderItem();
+		@SideOnly(Side.CLIENT)
+		private RenderItem renderItem;
 
 		@CallbackProperty
 		public float scale = 1;
@@ -267,6 +268,12 @@ public abstract class Drawable implements IPropertyCallback {
 			this.meta = meta;
 		}
 
+		@SideOnly(Side.CLIENT)
+		private RenderItem getRenderItem() {
+			if (renderItem == null) renderItem = new RenderItem();
+			return renderItem;
+		}
+
 		@Override
 		@SideOnly(Side.CLIENT)
 		protected void drawContents(float partialTicks) {
@@ -283,7 +290,7 @@ public abstract class Drawable implements IPropertyCallback {
 			if (item == null) return;
 			drawStack.setItemDamage(meta);
 			GL11.glScalef(scale, scale, scale);
-			RENDER_ITEM.renderItemAndEffectIntoGUI(null, Minecraft.getMinecraft().getTextureManager(), drawStack, 0, 0);
+			getRenderItem().renderItemAndEffectIntoGUI(null, Minecraft.getMinecraft().getTextureManager(), drawStack, 0, 0);
 			GL11.glDisable(GL11.GL_LIGHTING);
 		}
 
