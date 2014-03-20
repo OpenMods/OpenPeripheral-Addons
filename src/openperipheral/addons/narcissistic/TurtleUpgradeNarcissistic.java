@@ -3,7 +3,7 @@ package openperipheral.addons.narcissistic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraft.util.StatCollector;
-import openperipheral.adapter.AdapterManager;
+import openperipheral.adapter.PeripheralHandlers;
 import openperipheral.addons.MetasGeneric;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import dan200.computer.api.IHostedPeripheral;
@@ -38,7 +38,7 @@ public class TurtleUpgradeNarcissistic implements ITurtleUpgrade {
 
 	@Override
 	public IHostedPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
-		return AdapterManager.createHostedPeripheral(turtle);
+		return PeripheralHandlers.createHostedPeripheral(turtle);
 	}
 
 	@Override

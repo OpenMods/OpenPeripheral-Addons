@@ -5,7 +5,7 @@ import net.minecraft.util.Icon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import openperipheral.adapter.AdapterManager;
+import openperipheral.adapter.PeripheralHandlers;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import dan200.computer.api.IHostedPeripheral;
 import dan200.turtle.api.*;
@@ -69,7 +69,7 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 
 	@Override
 	public IHostedPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
-		return AdapterManager.createHostedPeripheral(new TurtleSensorEnvironment(turtle));
+		return PeripheralHandlers.createHostedPeripheral(new TurtleSensorEnvironment(turtle));
 	}
 
 	@Override
