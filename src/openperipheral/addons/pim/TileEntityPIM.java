@@ -14,7 +14,7 @@ import openperipheral.api.IAttachable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import dan200.computer.api.IComputerAccess;
+import dan200.computercraft.api.peripheral.IComputerAccess;
 
 public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttachable {
 

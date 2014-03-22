@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import dan200.computer.api.ILuaObject;
+import dan200.computercraft.api.lua.ILuaObject;
 
 @Freeform
 public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, ElementField> {

@@ -1,7 +1,7 @@
 package openperipheral.addons.sensors;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import openperipheral.addons.Config;
 
@@ -28,8 +28,8 @@ public class TileEntitySensor extends TileEntity implements ISensorEnvironment {
 	}
 
 	@Override
-	public Vec3 getLocation() {
-		return worldObj.getWorldVec3Pool().getVecFromPool(xCoord, yCoord, zCoord);
+	public ChunkCoordinates getLocation() {
+		return new ChunkCoordinates(xCoord, yCoord, zCoord);
 	}
 
 	@Override

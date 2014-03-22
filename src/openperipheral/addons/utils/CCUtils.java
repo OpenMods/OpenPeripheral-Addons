@@ -5,7 +5,7 @@ import java.util.List;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.common.registry.GameRegistry;
-import dan200.turtle.api.ITurtleUpgrade;
+import dan200.computercraft.api.turtle.ITurtleUpgrade;
 
 public final class CCUtils {
 	private static final int NUMBER_OF_TURTLE_TOOLS = 7;

@@ -1,42 +1,36 @@
 package openperipheral.addons.peripheralproxy;
 
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
 import openmods.api.INeighbourAwareTile;
 import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ReflectionHelper;
 import openperipheral.addons.OpenPeripheralAddons;
-import openperipheral.api.IPeripheralProvider;
+import openperipheral.api.ICustomPeripheralProvider;
 import openperipheral.api.Volatile;
-import dan200.computer.api.IHostedPeripheral;
-import dan200.computer.api.IPeripheral;
+import dan200.computercraft.api.peripheral.IPeripheral;
 
 @Volatile
-public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeripheralProvider, INeighbourAwareTile {
+public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustomPeripheralProvider, INeighbourAwareTile {
 
-	public static final Class<?> CABLE_CLASS = ReflectionHelper.getClass("dan200.computer.shared.TileEntityCable");
-	public static final Class<?> BASECOMPUTER_CLASS = ReflectionHelper.getClass("dan200.computer.shared.BlockComputerBase");
+	public static final Class<?> CC_CLASS = ReflectionHelper.getClass("dan200.computercraft.ComputerCraft");
 
 	@Override
-	public IHostedPeripheral providePeripheral(World world) {
-		ForgeDirection rotation = getRotation();
-		final int targetX = xCoord + rotation.offsetX;
-		final int targetY = yCoord + rotation.offsetY;
-		final int targetZ = zCoord + rotation.offsetZ;
+	public IPeripheral createPeripheral(int side) {
+		final ForgeDirection rotation = getRotation();
+		if (rotation.getOpposite().ordinal() != side) return null;
 
-		TileEntity te = world.getBlockTileEntity(targetX, targetY, targetZ);
-		if (te instanceof TileEntityPeripheralProxy) return null;
+		Object peripheral = null;
 
-		Object peripheral = ReflectionHelper.callStatic(
-				BASECOMPUTER_CLASS,
+		peripheral = ReflectionHelper.callStatic(
+				CC_CLASS,
 				"getPeripheralAt",
 				ReflectionHelper.typed(worldObj, World.class),
-				ReflectionHelper.primitive(targetX),
-				ReflectionHelper.primitive(targetY),
-				ReflectionHelper.primitive(targetZ),
+				ReflectionHelper.primitive(xCoord + rotation.offsetX),
+				ReflectionHelper.primitive(yCoord + rotation.offsetY),
+				ReflectionHelper.primitive(zCoord + rotation.offsetZ),
 				ReflectionHelper.primitive(0));
-		return (peripheral instanceof IPeripheral)? new WrappedPeripheral((IPeripheral)peripheral, rotation.getOpposite().ordinal()) : null;
+		return (peripheral instanceof IPeripheral)? new WrappedPeripheral((IPeripheral)peripheral) : null;
 	}
 
 	@Override
@@ -46,14 +40,14 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeriph
 			int attachedX = xCoord + rot.offsetX;
 			int attachedY = yCoord + rot.offsetY;
 			int attachedZ = zCoord + rot.offsetZ;
-
-			TileEntity attachedTE = worldObj.getBlockTileEntity(attachedX, attachedY, attachedZ);
-
-			if (attachedTE instanceof TileEntityPeripheralProxy) return;
-
-			if (attachedTE != null && CABLE_CLASS.isAssignableFrom(attachedTE.getClass())) {
-				ReflectionHelper.call(attachedTE, "networkChanged");
-			}
+			/*
+			 * TileEntity attachedTE = worldObj.getBlockTileEntity(attachedX,
+			 * attachedY, attachedZ);
+			 * if (attachedTE != null &&
+			 * CABLE_CLASS.isAssignableFrom(attachedTE.getClass())) {
+			 * ReflectionHelper.call(attachedTE, "networkChanged");
+			 * }
+			 */
 			worldObj.notifyBlockOfNeighborChange(
 					attachedX,
 					attachedY,

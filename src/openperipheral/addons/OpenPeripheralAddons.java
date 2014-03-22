@@ -40,7 +40,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import dan200.turtle.api.TurtleAPI;
+import dan200.computercraft.api.ComputerCraftAPI;
 
 @Mod(modid = "OpenPeripheral", name = "OpenPeripheralAddons", version = "@VERSION@", dependencies = "required-after:OpenMods@[0.3,];required-after:ComputerCraft;after:OpenPeripheralCore")
 @NetworkMod(serverSideRequired = true, clientSideRequired = true)
@@ -107,10 +107,10 @@ public class OpenPeripheralAddons {
 		OpenPeripheralAPI.register(new AdapterSensor());
 
 		sensorUpgrade = new TurtleUpgradeSensor();
-		TurtleAPI.registerUpgrade(sensorUpgrade);
+		ComputerCraftAPI.registerUpgrade(sensorUpgrade);
 
 		narcissiticUpgrade = new TurtleUpgradeNarcissistic();
-		TurtleAPI.registerUpgrade(narcissiticUpgrade);
+		ComputerCraftAPI.registerUpgrade(narcissiticUpgrade);
 
 		EventTypes.registerTypes();
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);

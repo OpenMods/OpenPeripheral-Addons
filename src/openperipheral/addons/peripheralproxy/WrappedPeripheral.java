@@ -1,16 +1,15 @@
 package openperipheral.addons.peripheralproxy;
 
-import net.minecraft.nbt.NBTTagCompound;
-import dan200.computer.api.*;
+import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.peripheral.IComputerAccess;
+import dan200.computercraft.api.peripheral.IPeripheral;
 
-public class WrappedPeripheral implements IHostedPeripheral {
+public class WrappedPeripheral implements IPeripheral {
 
 	private final IPeripheral peripheral;
-	private final int backSide;
 
-	public WrappedPeripheral(IPeripheral peripheral, int backSide) {
+	public WrappedPeripheral(IPeripheral peripheral) {
 		this.peripheral = peripheral;
-		this.backSide = backSide;
 	}
 
 	@Override
@@ -29,11 +28,6 @@ public class WrappedPeripheral implements IHostedPeripheral {
 	}
 
 	@Override
-	public boolean canAttachToSide(int side) {
-		return side == backSide;
-	}
-
-	@Override
 	public void attach(IComputerAccess computer) {
 		if (peripheral != null) peripheral.attach(computer);
 	}
@@ -44,18 +38,8 @@ public class WrappedPeripheral implements IHostedPeripheral {
 	}
 
 	@Override
-	public void update() {
-		if (peripheral instanceof IHostedPeripheral) ((IHostedPeripheral)peripheral).update();
-	}
-
-	@Override
-	public void readFromNBT(NBTTagCompound nbttagcompound) {
-		if (peripheral instanceof IHostedPeripheral) ((IHostedPeripheral)peripheral).readFromNBT(nbttagcompound);
-	}
-
-	@Override
-	public void writeToNBT(NBTTagCompound nbttagcompound) {
-		if (peripheral instanceof IHostedPeripheral) ((IHostedPeripheral)peripheral).writeToNBT(nbttagcompound);
+	public boolean equals(IPeripheral other) {
+		return other == this;
 	}
 
 }
