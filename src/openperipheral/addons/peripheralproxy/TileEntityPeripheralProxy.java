@@ -19,16 +19,22 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeriph
 	public static final Class<?> BASECOMPUTER_CLASS = ReflectionHelper.getClass("dan200.computer.shared.BlockComputerBase");
 
 	@Override
-	public IHostedPeripheral providePeripheral(World worldObj) {
-		Object peripheral = null;
+	public IHostedPeripheral providePeripheral(World world) {
 		ForgeDirection rotation = getRotation();
-		peripheral = ReflectionHelper.callStatic(
+		final int targetX = xCoord + rotation.offsetX;
+		final int targetY = yCoord + rotation.offsetY;
+		final int targetZ = zCoord + rotation.offsetZ;
+
+		TileEntity te = world.getBlockTileEntity(targetX, targetY, targetZ);
+		if (te instanceof TileEntityPeripheralProxy) return null;
+
+		Object peripheral = ReflectionHelper.callStatic(
 				BASECOMPUTER_CLASS,
 				"getPeripheralAt",
 				ReflectionHelper.typed(worldObj, World.class),
-				ReflectionHelper.primitive(xCoord + rotation.offsetX),
-				ReflectionHelper.primitive(yCoord + rotation.offsetY),
-				ReflectionHelper.primitive(zCoord + rotation.offsetZ),
+				ReflectionHelper.primitive(targetX),
+				ReflectionHelper.primitive(targetY),
+				ReflectionHelper.primitive(targetZ),
 				ReflectionHelper.primitive(0));
 		return (peripheral instanceof IPeripheral)? new WrappedPeripheral((IPeripheral)peripheral, rotation.getOpposite().ordinal()) : null;
 	}
@@ -40,7 +46,11 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeriph
 			int attachedX = xCoord + rot.offsetX;
 			int attachedY = yCoord + rot.offsetY;
 			int attachedZ = zCoord + rot.offsetZ;
+
 			TileEntity attachedTE = worldObj.getBlockTileEntity(attachedX, attachedY, attachedZ);
+
+			if (attachedTE instanceof TileEntityPeripheralProxy) return;
+
 			if (attachedTE != null && CABLE_CLASS.isAssignableFrom(attachedTE.getClass())) {
 				ReflectionHelper.call(attachedTE, "networkChanged");
 			}
