@@ -13,11 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
-import openperipheral.adapter.IPropertyCallback;
 import openperipheral.addons.glasses.SurfaceServer.DrawableWrapper;
-import openperipheral.api.CallbackProperty;
-import openperipheral.api.LuaCallable;
-import openperipheral.api.LuaType;
+import openperipheral.api.*;
 
 import org.lwjgl.opengl.GL11;
 

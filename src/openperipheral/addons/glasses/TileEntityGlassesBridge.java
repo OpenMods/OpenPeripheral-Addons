@@ -6,6 +6,7 @@ import java.util.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
 import openperipheral.adapter.AdapterManager;
@@ -110,11 +111,22 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	private boolean isPlayerValid(EntityPlayer player) {
 		if (player == null) return false;
 
+		if (player.isDead && !isPlayerLogged(player)) return false;
+
 		ItemStack glasses = ItemGlasses.getGlassesItem(player);
 		if (glasses == null) return false;
 
 		Long guid = ItemGlasses.extractGuid(glasses);
 		return guid != null && guid == this.guid;
+	}
+
+	private static boolean isPlayerLogged(EntityPlayer player) {
+		@SuppressWarnings("unchecked")
+		List<EntityPlayer> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
+		for (EntityPlayer p : players)
+			if (p.username.equals(player.username)) return true;
+
+		return false;
 	}
 
 	@Override
