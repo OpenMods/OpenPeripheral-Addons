@@ -4,10 +4,10 @@ import java.util.Map;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.ServerChatEvent;
 import openmods.Log;
+import openperipheral.addons.api.TerminalRegisterEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
 
@@ -26,13 +26,10 @@ public class TerminalManagerServer {
 
 		if (!event.message.startsWith("$$")) return;
 
-		ItemStack headSlot = ItemGlasses.getGlassesItem(player);
-		if (headSlot != null) {
-			Long guid = ItemGlasses.extractGuid(headSlot);
-			if (guid != null) {
-				TileEntityGlassesBridge listener = listeners.get(guid);
-				if (listener != null) listener.onChatCommand(event.message.substring(2).trim(), event.username);
-			}
+		Long guid = TerminalUtils.tryGetTerminalGuid(player);
+		if (guid != null) {
+			TileEntityGlassesBridge listener = listeners.get(guid);
+			if (listener != null) listener.onChatCommand(event.message.substring(2).trim(), event.username);
 		}
 
 		event.setCanceled(true);
@@ -70,9 +67,10 @@ public class TerminalManagerServer {
 		return result;
 	}
 
-	public void onGlassesTick(EntityPlayer player, long terminalId) {
-		TileEntityGlassesBridge listener = listeners.get(terminalId);
-		if (listener != null) listener.onGlassesTick(player);
+	@ForgeSubscribe
+	public void onTerminalRegister(TerminalRegisterEvent evt) {
+		TileEntityGlassesBridge listener = listeners.get(evt.terminalId);
+		if (listener != null) listener.registerTerminal(evt.player);
 	}
 
 	public void registerBridge(long terminalId, TileEntityGlassesBridge bridge) {

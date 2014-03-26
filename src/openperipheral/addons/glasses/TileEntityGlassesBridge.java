@@ -4,11 +4,9 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import openmods.tileentity.OpenTileEntity;
-import openmods.utils.ItemUtils;
 import openperipheral.adapter.AdapterManager;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.api.*;
@@ -45,7 +43,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	public TileEntityGlassesBridge() {}
 
-	public void onGlassesTick(EntityPlayer player) {
+	public void registerTerminal(EntityPlayer player) {
 		if (!knownPlayers.containsKey(player.getEntityName())) newPlayers.add(player);
 	}
 
@@ -113,10 +111,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 		if (player.isDead && !isPlayerLogged(player)) return false;
 
-		ItemStack glasses = ItemGlasses.getGlassesItem(player);
-		if (glasses == null) return false;
-
-		Long guid = ItemGlasses.extractGuid(glasses);
+		Long guid = TerminalUtils.tryGetTerminalGuid(player);
 		return guid != null && guid == this.guid;
 	}
 
@@ -160,18 +155,6 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		computers.remove(computer);
 	}
 
-	void linkGlasses(ItemStack stack) {
-		NBTTagCompound tag = ItemUtils.getItemTag(stack);
-
-		NBTTagCompound openPTag = (NBTTagCompound)tag.getTag("openp");
-		if (openPTag == null) {
-			openPTag = new NBTTagCompound();
-			tag.setTag("openp", openPTag);
-		}
-
-		openPTag.setLong("guid", guid);
-	}
-
 	public SurfaceServer getSurface(String username) {
 		if (TerminalUtils.GLOBAL_MARKER.equals(username)) return globalSurface;
 		PlayerInfo info = knownPlayers.get(username);
@@ -183,9 +166,13 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		return ImmutableList.copyOf(knownPlayers.keySet());
 	}
 
-	@LuaCallable(returnTypes = LuaType.STRING, description = "Get the Guid of this bridge")
-	public String getGuid() {
+	@LuaCallable(returnTypes = LuaType.STRING, name = "getGuid", description = "Get the Guid of this bridge")
+	public String getGuidString() {
 		return TerminalUtils.formatTerminalId(guid);
+	}
+
+	public long getGuid() {
+		return guid;
 	}
 
 	@LuaCallable(returnTypes = LuaType.NUMBER, description = "Get the display width of some text")

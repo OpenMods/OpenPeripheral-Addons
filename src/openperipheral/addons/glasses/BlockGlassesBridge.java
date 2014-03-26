@@ -3,10 +3,12 @@ package openperipheral.addons.glasses;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import openperipheral.addons.BlockOP;
 import openperipheral.addons.Config;
+import openperipheral.addons.api.ITerminalItem;
 
 public class BlockGlassesBridge extends BlockOP {
 
@@ -33,8 +35,12 @@ public class BlockGlassesBridge extends BlockOP {
 		if (te == null) return false;
 
 		ItemStack glassesStack = player.getHeldItem();
-		if (glassesStack != null && glassesStack.getItem() instanceof ItemGlasses) {
-			te.linkGlasses(glassesStack);
+		if (glassesStack != null) {
+			Item item = glassesStack.getItem();
+			if (item instanceof ITerminalItem) {
+				((ITerminalItem)item).bindToTerminal(glassesStack, te.getGuid());
+				return true;
+			}
 		}
 
 		return false;

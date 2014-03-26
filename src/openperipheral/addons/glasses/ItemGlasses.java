@@ -11,14 +11,19 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import openmods.utils.ItemUtils;
 import openmods.utils.MiscUtils;
 import openperipheral.addons.Config;
 import openperipheral.addons.OpenPeripheralAddons;
+import openperipheral.addons.api.ITerminalItem;
+import openperipheral.addons.api.TerminalRegisterEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class ItemGlasses extends ItemArmor {
+public class ItemGlasses extends ItemArmor implements ITerminalItem {
+	private static final String OPENP_TAG = "openp";
+
 	public ItemGlasses() {
 		super(Config.itemGlassesId, EnumArmorMaterial.CHAIN, 0, 0);
 		setMaxDamage(0);
@@ -28,11 +33,11 @@ public class ItemGlasses extends ItemArmor {
 		setUnlocalizedName("openperipheral.glasses");
 	}
 
-	public static Long extractGuid(ItemStack stack) {
+	private static Long extractGuid(ItemStack stack) {
 		NBTTagCompound tag = ItemUtils.getItemTag(stack);
-		if (!tag.hasKey("openp")) return null;
+		if (!tag.hasKey(OPENP_TAG)) return null;
 
-		NBTTagCompound openp = tag.getCompoundTag("openp");
+		NBTTagCompound openp = tag.getCompoundTag(OPENP_TAG);
 		return TerminalUtils.extractGuid(openp);
 	}
 
@@ -67,15 +72,26 @@ public class ItemGlasses extends ItemArmor {
 	public void onArmorTickUpdate(World world, EntityPlayer player, ItemStack itemStack) {
 		if (!world.isRemote) {
 			Long guid = extractGuid(itemStack);
-			if (guid != null) TerminalManagerServer.instance.onGlassesTick(player, guid);
+			if (guid != null) MinecraftForge.EVENT_BUS.post(new TerminalRegisterEvent(player, guid));
 		}
 	}
 
-	static ItemStack getGlassesItem(EntityPlayer player) {
-		if (player == null) return null;
-		ItemStack headSlot = player.inventory.armorItemInSlot(3);
-		if (headSlot == null || !(headSlot.getItem() instanceof ItemGlasses)) return null;
-		return headSlot;
+	@Override
+	public Long getTerminalGuid(ItemStack stack) {
+		return extractGuid(stack);
+	}
+
+	@Override
+	public void bindToTerminal(ItemStack stack, long guid) {
+		NBTTagCompound tag = ItemUtils.getItemTag(stack);
+
+		NBTTagCompound openPTag = (NBTTagCompound)tag.getTag(OPENP_TAG);
+		if (openPTag == null) {
+			openPTag = new NBTTagCompound();
+			tag.setTag(OPENP_TAG, openPTag);
+		}
+
+		openPTag.setLong("guid", guid);
 	}
 
 }

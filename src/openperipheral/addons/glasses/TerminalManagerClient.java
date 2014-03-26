@@ -2,7 +2,6 @@ package openperipheral.addons.glasses;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.event.ForgeSubscribe;
@@ -25,14 +24,12 @@ public class TerminalManagerClient {
 	public void onRenderGameOverlay(RenderGameOverlayEvent evt) {
 		if (evt.type == ElementType.HELMET && evt instanceof RenderGameOverlayEvent.Post) {
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-			ItemStack helmet = ItemGlasses.getGlassesItem(player);
-			if (helmet != null) {
-				Long guid = ItemGlasses.extractGuid(helmet);
-				if (guid != null) {
-					tryDrawSurface(guid, TerminalUtils.GLOBAL_MARKER, evt.partialTicks);
-					tryDrawSurface(guid, TerminalUtils.PRIVATE_MARKER, evt.partialTicks);
-				}
+			Long guid = TerminalUtils.tryGetTerminalGuid(player);
+			if (guid != null) {
+				tryDrawSurface(guid, TerminalUtils.GLOBAL_MARKER, evt.partialTicks);
+				tryDrawSurface(guid, TerminalUtils.PRIVATE_MARKER, evt.partialTicks);
 			}
+
 		}
 	}
 
