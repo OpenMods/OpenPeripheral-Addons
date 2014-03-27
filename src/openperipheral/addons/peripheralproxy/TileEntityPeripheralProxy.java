@@ -1,5 +1,7 @@
 package openperipheral.addons.peripheralproxy;
 
+import static openmods.utils.ReflectionHelper.*;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -9,7 +11,7 @@ import net.minecraftforge.common.ForgeDirection;
 import openmods.Log;
 import openmods.api.INeighbourAwareTile;
 import openmods.tileentity.OpenTileEntity;
-import openmods.utils.ReflectionHelper;
+import openmods.utils.ReflectionHelper.SafeClassLoad;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.api.ICustomPeripheralProvider;
 import openperipheral.api.Volatile;
@@ -21,25 +23,23 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 @Volatile
 public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustomPeripheralProvider, INeighbourAwareTile {
 
-	public static final Class<?> CC_CLASS = ReflectionHelper.getClass("dan200.computercraft.ComputerCraft");
-	public static final Class<?> CABLE_CLASS = ReflectionHelper.getClass("dan200.computercraft.shared.peripheral.modem.TileCable");
+	public static final SafeClassLoad CC_CLASS = safeLoad("dan200.computercraft.ComputerCraft");
+	public static final SafeClassLoad CABLE_CLASS = safeLoad("dan200.computercraft.shared.peripheral.modem.TileCable");
 
 	@Override
 	public IPeripheral createPeripheral(int side) {
 		final ForgeDirection rotation = getRotation();
 		if (rotation.getOpposite().ordinal() != side) return null;
 
-		Object peripheral = null;
-
-		peripheral = ReflectionHelper.callStatic(
-				CC_CLASS,
+		IPeripheral peripheral = callStatic(
+				CC_CLASS.get(),
 				"getPeripheralAt",
-				ReflectionHelper.typed(worldObj, World.class),
-				ReflectionHelper.primitive(xCoord + rotation.offsetX),
-				ReflectionHelper.primitive(yCoord + rotation.offsetY),
-				ReflectionHelper.primitive(zCoord + rotation.offsetZ),
-				ReflectionHelper.primitive(0));
-		return (peripheral instanceof IPeripheral)? new WrappedPeripheral((IPeripheral)peripheral) : null;
+				typed(worldObj, World.class),
+				primitive(xCoord + rotation.offsetX),
+				primitive(yCoord + rotation.offsetY),
+				primitive(zCoord + rotation.offsetZ),
+				primitive(0));
+		return (peripheral != null)? new WrappedPeripheral(peripheral) : null;
 	}
 
 	@Override
@@ -67,23 +67,26 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 		int attachedZ = zCoord + modemDir.offsetZ;
 
 		TileEntity attachedModem = worldObj.getBlockTileEntity(attachedX, attachedY, attachedZ);
-		if (attachedModem != null && CABLE_CLASS.isAssignableFrom(attachedModem.getClass())) {
-			try {
-				Field f = ReflectionHelper.getField(CABLE_CLASS, "m_peripheralAccessAllowed");
+
+		try {
+			final Class<?> cableCls = CABLE_CLASS.get();
+			if (attachedModem != null && cableCls.isAssignableFrom(attachedModem.getClass())) {
+
+				Field f = getField(cableCls, "m_peripheralAccessAllowed");
 				f.setAccessible(true);
 				boolean isActive = f.getBoolean(attachedModem);
 
 				if (isActive) {
-					Method m = ReflectionHelper.getMethod(CABLE_CLASS, ArrayUtils.toArray("togglePeripheralAccess"));
+					Method m = getMethod(cableCls, ArrayUtils.toArray("togglePeripheralAccess"));
 					m.setAccessible(true);
 					m.invoke(attachedModem);
 					if (reactivate) m.invoke(attachedModem);
 				}
-
-			} catch (Throwable t) {
-				Log.warn("Failed to update modem %s", attachedModem);
 			}
+		} catch (Throwable t) {
+			Log.warn(t, "Failed to update modem %s", attachedModem);
 		}
+
 		worldObj.notifyBlockOfNeighborChange(
 				attachedX,
 				attachedY,

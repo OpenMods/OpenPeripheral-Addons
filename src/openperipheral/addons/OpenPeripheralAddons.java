@@ -107,10 +107,10 @@ public class OpenPeripheralAddons {
 		OpenPeripheralAPI.register(new AdapterSensor());
 
 		sensorUpgrade = new TurtleUpgradeSensor();
-		ComputerCraftAPI.registerUpgrade(sensorUpgrade);
+		ComputerCraftAPI.registerTurtleUpgrade(sensorUpgrade);
 
 		narcissiticUpgrade = new TurtleUpgradeNarcissistic();
-		ComputerCraftAPI.registerUpgrade(narcissiticUpgrade);
+		ComputerCraftAPI.registerTurtleUpgrade(narcissiticUpgrade);
 
 		EventTypes.registerTypes();
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
