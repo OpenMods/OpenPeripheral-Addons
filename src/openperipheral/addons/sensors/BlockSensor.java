@@ -30,7 +30,6 @@ public class BlockSensor extends BlockOP {
 
 	@Override
 	public void registerIcons(IconRegister iconRegister) {
-		super.registerIcons(iconRegister);
 		turtleIcon = iconRegister.registerIcon("openperipheraladdons:sensorturtle");
 	}
 
