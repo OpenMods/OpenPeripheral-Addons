@@ -10,6 +10,7 @@ import openmods.tileentity.OpenTileEntity;
 import openperipheral.adapter.AdapterManager;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.api.*;
+import openperipheral.api.cc15x.IAttachable;
 
 import com.google.common.collect.*;
 

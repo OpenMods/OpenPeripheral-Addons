@@ -10,7 +10,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import openmods.tileentity.OpenTileEntity;
-import openperipheral.api.IAttachable;
+import openperipheral.api.cc15x.IAttachable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
