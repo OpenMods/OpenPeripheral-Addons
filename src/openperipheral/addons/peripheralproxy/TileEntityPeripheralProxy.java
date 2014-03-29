@@ -11,10 +11,10 @@ import net.minecraftforge.common.ForgeDirection;
 import openmods.Log;
 import openmods.api.INeighbourAwareTile;
 import openmods.tileentity.OpenTileEntity;
-import openmods.utils.ReflectionHelper.SafeClassLoad;
+import openmods.utils.SafeClassLoad;
 import openperipheral.addons.OpenPeripheralAddons;
-import openperipheral.api.ICustomPeripheralProvider;
 import openperipheral.api.Volatile;
+import openperipheral.api.cc16.ICustomPeripheralProvider;
 
 import org.apache.commons.lang3.ArrayUtils;
 
