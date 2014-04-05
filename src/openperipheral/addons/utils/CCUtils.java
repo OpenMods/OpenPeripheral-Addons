@@ -2,6 +2,8 @@ package openperipheral.addons.utils;
 
 import java.util.List;
 
+import openmods.Mods;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -15,11 +17,11 @@ public final class CCUtils {
 	}
 
 	public static ItemStack getExpandedTurtleItemStack() {
-		return GameRegistry.findItemStack("CCTurtle", "CC-TurtleExpanded", 1);
+		return GameRegistry.findItemStack(Mods.COMPUTERCRAFT, "CC-TurtleExpanded", 1);
 	}
 
 	public static ItemStack getAdvancedTurtleItemStack() {
-		return GameRegistry.findItemStack("CCTurtle", "CC-TurtleAdvanced", 1);
+		return GameRegistry.findItemStack(Mods.COMPUTERCRAFT, "CC-TurtleAdvanced", 1);
 	}
 
 	public static void createTurtleItemStack(List<ItemStack> result, boolean isAdvanced, Short left, Short right) {
