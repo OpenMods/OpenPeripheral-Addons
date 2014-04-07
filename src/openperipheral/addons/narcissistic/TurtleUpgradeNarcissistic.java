@@ -33,7 +33,7 @@ public class TurtleUpgradeNarcissistic implements ITurtleUpgrade {
 
 	@Override
 	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
-		return PeripheralHandlers.createAdaptedPeripheralSafe(new InventoryDelegate(turtle.getInventory()));
+		return PeripheralHandlers.createAdaptedPeripheralSafe(new TurtleInventoryDelegate(turtle));
 	}
 
 	@Override
