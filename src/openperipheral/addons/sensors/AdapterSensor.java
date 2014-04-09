@@ -30,13 +30,13 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return AxisAlignedBB.getAABBPool().getAABB(location.xCoord, location.yCoord, location.zCoord, location.xCoord + 1, location.yCoord + 1, location.zCoord + 1).expand(range, range, range);
 	}
 
-	private static List<Integer> listEntities(ISensorEnvironment env, Class<? extends Entity> entityClass) {
+	private static List<Integer> listEntityIds(ISensorEnvironment env, Class<? extends Entity> entityClass) {
 		@SuppressWarnings("unchecked")
-		List<EntityLiving> mobs = env.getWorld().getEntitiesWithinAABB(entityClass, getBoundingBox(env.getLocation(), env.getSensorRange()));
+		List<Entity> entities = env.getWorld().getEntitiesWithinAABB(entityClass, getBoundingBox(env.getLocation(), env.getSensorRange()));
 
 		List<Integer> ids = Lists.newArrayList();
-		for (EntityLiving mob : mobs)
-			ids.add(mob.entityId);
+		for (Entity entity : entities)
+			ids.add(entity.entityId);
 
 		return ids;
 	}
@@ -60,12 +60,12 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get the ids of all the mobs in range")
 	public List<Integer> getMobIds(ISensorEnvironment env) {
-		return listEntities(env, EntityLiving.class);
+		return listEntityIds(env, EntityLiving.class);
 	}
 
 	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get the ids of all the minecarts in range")
 	public List<Integer> getMinecartIds(ISensorEnvironment env) {
-		return listEntities(env, EntityMinecart.class);
+		return listEntityIds(env, EntityMinecart.class);
 	}
 
 	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get full details of a particular player if they're in range")
