@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import openmods.utils.WorldUtils;
 import openperipheral.api.*;
 import openperipheral.util.EntityUtils;
 
@@ -31,11 +32,10 @@ public class AdapterSensor implements IPeripheralAdapter {
 	}
 
 	private static List<Integer> listEntityIds(ISensorEnvironment env, Class<? extends Entity> entityClass) {
-		@SuppressWarnings("unchecked")
-		List<Entity> entities = env.getWorld().getEntitiesWithinAABB(entityClass, getBoundingBox(env.getLocation(), env.getSensorRange()));
-
 		List<Integer> ids = Lists.newArrayList();
-		for (Entity entity : entities)
+
+		final AxisAlignedBB aabb = getBoundingBox(env.getLocation(), env.getSensorRange());
+		for (Entity entity : WorldUtils.getEntitiesWithinAABB(env.getWorld(), entityClass, aabb))
 			ids.add(entity.entityId);
 
 		return ids;

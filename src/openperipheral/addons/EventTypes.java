@@ -1,6 +1,7 @@
 package openperipheral.addons;
 
 import openmods.network.*;
+import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
 
@@ -15,6 +16,19 @@ public enum EventTypes implements IEventPacketType {
 		@Override
 		public PacketDirection getDirection() {
 			return PacketDirection.FROM_CLIENT;
+		}
+
+	},
+	TERMINAL_CLEAR {
+
+		@Override
+		public EventPacket createPacket() {
+			return new TerminalClearEvent();
+		}
+
+		@Override
+		public PacketDirection getDirection() {
+			return PacketDirection.TO_CLIENT;
 		}
 
 	},
