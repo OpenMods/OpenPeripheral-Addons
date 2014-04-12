@@ -8,10 +8,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import openmods.tileentity.OpenTileEntity;
 import openperipheral.adapter.AdapterManager;
+import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.api.*;
 import openperipheral.api.cc16.IAttachable;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 
 import dan200.computercraft.api.lua.ILuaObject;
@@ -75,6 +77,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 			final EntityPlayer player = info.player.get();
 
 			if (!isPlayerValid(player)) {
+				sendCleanPackets(player);
 				it.remove();
 				continue;
 			}
@@ -105,6 +108,11 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		}
 
 		newPlayers.clear();
+	}
+
+	private void sendCleanPackets(EntityPlayer player) {
+		new TerminalClearEvent(guid, false).sendToPlayer(player);
+		new TerminalClearEvent(guid, true).sendToPlayer(player);
 	}
 
 	private boolean isPlayerValid(EntityPlayer player) {
@@ -183,7 +191,9 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
 	public ILuaObject getUserSurface(@Arg(name = "username", description = "The username of the user to get the draw surface for", type = LuaType.STRING) String username) {
-		return AdapterManager.wrapObject(getSurface(username));
+		SurfaceServer playerSurface = getSurface(username);
+		Preconditions.checkNotNull(playerSurface, "Invalid player");
+		return AdapterManager.wrapObject(playerSurface);
 	}
 
 	@Include

@@ -42,7 +42,6 @@ public abstract class TerminalEvent extends EventPacket {
 	}
 
 	public static class TerminalResetEvent extends TerminalEvent {
-
 		public TerminalResetEvent() {
 			super();
 		}
@@ -54,6 +53,20 @@ public abstract class TerminalEvent extends EventPacket {
 		@Override
 		public IEventPacketType getType() {
 			return EventTypes.TERMINAL_RESET;
+		}
+	}
+
+	public static class TerminalClearEvent extends TerminalEvent {
+		public TerminalClearEvent() {}
+
+		public TerminalClearEvent(long terminalId, boolean isPrivate) {
+			this.terminalId = terminalId;
+			this.isPrivate = isPrivate;
+		}
+
+		@Override
+		public IEventPacketType getType() {
+			return EventTypes.TERMINAL_CLEAR;
 		}
 	}
 

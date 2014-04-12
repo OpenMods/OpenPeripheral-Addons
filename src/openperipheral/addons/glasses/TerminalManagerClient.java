@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.event.ForgeSubscribe;
+import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 
 import com.google.common.collect.HashBasedTable;
@@ -33,16 +34,26 @@ public class TerminalManagerClient {
 		}
 	}
 
+	private static String getSurfaceName(TerminalEvent evt) {
+		return evt.isPrivate? TerminalUtils.PRIVATE_MARKER : TerminalUtils.GLOBAL_MARKER;
+	}
+
 	@ForgeSubscribe
 	public void onTerminalData(TerminalDataEvent evt) {
-		String playerName = evt.isPrivate? TerminalUtils.PRIVATE_MARKER : TerminalUtils.GLOBAL_MARKER;
-		SurfaceClient surface = surfaces.get(evt.terminalId, playerName);
+		String surfaceName = getSurfaceName(evt);
+		SurfaceClient surface = surfaces.get(evt.terminalId, surfaceName);
 
 		if (surface == null) {
 			surface = new SurfaceClient(evt.terminalId, evt.isPrivate);
-			surfaces.put(evt.terminalId, playerName, surface);
+			surfaces.put(evt.terminalId, surfaceName, surface);
 		}
 
 		surface.interpretCommandList(evt.commands);
+	}
+
+	@ForgeSubscribe
+	public void onTerminalClear(TerminalClearEvent evt) {
+		String surfaceName = getSurfaceName(evt);
+		surfaces.remove(evt.terminalId, surfaceName);
 	}
 }
