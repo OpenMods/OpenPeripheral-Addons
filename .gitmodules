@@ -1,6 +1,6 @@
-[submodule "openmodslib"]
-	path = openmodslib
+[submodule "OpenModsLib"]
+	path = OpenModsLib
 	url = https://github.com/OpenMods/OpenModsLib.git
-[submodule "core"]
-	path = core
+[submodule "OpenPeripheral"]
+	path = OpenPeripheral
 	url = https://github.com/OpenMods/OpenPeripheral.git
