@@ -1,0 +1,3 @@
+include ":OpenModsLib"
+include ":OpenPeripheral"
+rootProject.name = 'OpenPeripheralAddons'

@@ -5,5 +5,7 @@
 *.war
 *.ear
 
-build/
-download/
+# Gradle
+/.gradle
+/build/
+/run/

@@ -2,7 +2,7 @@
 {
   "modid" : "OpenPeripheral",
   "name" : "OpenPeripheralAddons",
-  "version" : "@VERSION@",
+  "version" : "${version}",
   "url" : "http://www.openperipheral.info",
   "credits" : "Everyone in #ComputerCraft, #OpenMods and #OpenCCSensors, also ChickenBones",
   "authors": [
