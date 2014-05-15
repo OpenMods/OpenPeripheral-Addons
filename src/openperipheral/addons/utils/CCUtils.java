@@ -4,7 +4,11 @@ import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
+import net.minecraft.world.World;
 import cpw.mods.fml.common.registry.GameRegistry;
+import dan200.turtle.api.ITurtleAccess;
 import dan200.turtle.api.ITurtleUpgrade;
 
 public final class CCUtils {
@@ -50,6 +54,15 @@ public final class CCUtils {
 	public static void addUpgradedTurtles(List<ItemStack> result, ITurtleUpgrade upgrade) {
 		addUpgradedTurtles(result, upgrade, false);
 		addUpgradedTurtles(result, upgrade, true);
+	}
+
+	public static boolean isTurtleValid(ITurtleAccess access) {
+		World world = access.getWorld();
+		if (world == null) return false;
+		Vec3 coords = access.getPosition();
+		return world.blockExists(MathHelper.floor_double(coords.xCoord),
+				MathHelper.floor_double(coords.yCoord),
+				MathHelper.floor_double(coords.zCoord));
 	}
 
 }
