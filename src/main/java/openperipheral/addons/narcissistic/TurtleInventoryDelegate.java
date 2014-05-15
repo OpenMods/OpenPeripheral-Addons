@@ -4,6 +4,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import openperipheral.addons.utils.CCUtils;
 import openperipheral.api.IWorldProvider;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 
@@ -89,6 +90,11 @@ public class TurtleInventoryDelegate implements IInventory, IWorldProvider {
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
 		return inventory().isItemValidForSlot(i, itemstack);
+	}
+
+	@Override
+	public boolean isValid() {
+		return CCUtils.isTurtleValid(wrapped);
 	}
 
 }

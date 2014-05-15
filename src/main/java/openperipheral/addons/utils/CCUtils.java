@@ -4,8 +4,11 @@ import java.util.List;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.world.World;
 import openmods.Mods;
 import cpw.mods.fml.common.registry.GameRegistry;
+import dan200.computercraft.api.turtle.ITurtleAccess;
 import dan200.computercraft.api.turtle.ITurtleUpgrade;
 
 public final class CCUtils {
@@ -51,6 +54,13 @@ public final class CCUtils {
 	public static void addUpgradedTurtles(List<ItemStack> result, ITurtleUpgrade upgrade) {
 		addUpgradedTurtles(result, upgrade, false);
 		addUpgradedTurtles(result, upgrade, true);
+	}
+
+	public static boolean isTurtleValid(ITurtleAccess access) {
+		World world = access.getWorld();
+		if (world == null) return false;
+		ChunkCoordinates coords = access.getPosition();
+		return world.blockExists(coords.posX, coords.posY, coords.posZ);
 	}
 
 }

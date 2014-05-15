@@ -4,6 +4,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import openperipheral.addons.Config;
+import openperipheral.util.PeripheralUtils;
 
 public class TileEntitySensor extends TileEntity implements ISensorEnvironment {
 
@@ -40,6 +41,11 @@ public class TileEntitySensor extends TileEntity implements ISensorEnvironment {
 	@Override
 	public int getSensorRange() {
 		return (getWorld().isRaining() && getWorld().isThundering())? Config.sensorRangeInStorm : Config.sensorRange;
+	}
+
+	@Override
+	public boolean isValid() {
+		return PeripheralUtils.isTileEntityValid(this);
 	}
 
 }

@@ -7,6 +7,7 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import openperipheral.adapter.PeripheralHandlers;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
+import openperipheral.addons.utils.CCUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 
@@ -38,6 +39,11 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 		@Override
 		public int getSensorRange() {
 			return 30;
+		}
+
+		@Override
+		public boolean isValid() {
+			return CCUtils.isTurtleValid(turtle);
 		}
 
 	}
