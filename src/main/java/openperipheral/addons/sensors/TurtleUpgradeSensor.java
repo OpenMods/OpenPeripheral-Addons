@@ -7,6 +7,7 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import openperipheral.adapter.PeripheralHandlers;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
+import openperipheral.addons.OpenPeripheralAddons.Icons;
 import openperipheral.addons.utils.CCUtils;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
@@ -80,7 +81,7 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 
 	@Override
 	public Icon getIcon(ITurtleAccess turtle, TurtleSide side) {
-		return Blocks.sensor.turtleIcon;
+		return Icons.sensorTurtle;
 	}
 
 	@Override
