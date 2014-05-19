@@ -5,7 +5,7 @@ import net.minecraft.util.Icon;
 import net.minecraft.util.StatCollector;
 import openperipheral.adapter.PeripheralHandlers;
 import openperipheral.addons.MetasGeneric;
-import openperipheral.addons.OpenPeripheralAddons.Blocks;
+import openperipheral.addons.OpenPeripheralAddons;
 import dan200.computer.api.IHostedPeripheral;
 import dan200.turtle.api.*;
 
@@ -48,7 +48,7 @@ public class TurtleUpgradeNarcissistic implements ITurtleUpgrade {
 
 	@Override
 	public Icon getIcon(ITurtleAccess turtle, TurtleSide side) {
-		return Blocks.sensor.turtleIcon;
+		return OpenPeripheralAddons.Icons.narcissiticTurtle;
 	}
 
 }

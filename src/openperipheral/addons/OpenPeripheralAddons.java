@@ -9,6 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.util.Icon;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -69,6 +70,11 @@ public class OpenPeripheralAddons {
 
 		@RegisterItem(name = "generic")
 		public static ItemOPGeneric generic;
+	}
+
+	public static class Icons {
+		public static Icon sensorTurtle;
+		public static Icon narcissiticTurtle;
 	}
 
 	public static int renderId;

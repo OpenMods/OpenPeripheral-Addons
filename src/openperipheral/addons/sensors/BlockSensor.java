@@ -5,7 +5,6 @@ import java.util.List;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.util.Icon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeDirection;
@@ -15,8 +14,6 @@ import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.addons.utils.CCUtils;
 
 public class BlockSensor extends BlockOP {
-
-	public Icon turtleIcon;
 
 	public BlockSensor() {
 		super(Config.blockSensorId, Material.ground);
@@ -29,10 +26,7 @@ public class BlockSensor extends BlockOP {
 	}
 
 	@Override
-	public void registerIcons(IconRegister iconRegister) {
-		super.registerIcons(iconRegister);
-		turtleIcon = iconRegister.registerIcon("openperipheraladdons:sensorturtle");
-	}
+	public void registerIcons(IconRegister iconRegister) {}
 
 	@Override
 	public int getFlammability(IBlockAccess world, int x, int y, int z, int metadata, ForgeDirection face) {
