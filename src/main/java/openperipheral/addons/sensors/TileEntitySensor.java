@@ -40,7 +40,8 @@ public class TileEntitySensor extends TileEntity implements ISensorEnvironment {
 
 	@Override
 	public int getSensorRange() {
-		return (getWorld().isRaining() && getWorld().isThundering())? Config.sensorRangeInStorm : Config.sensorRange;
+		final World world = getWorld();
+		return (world.isRaining() && world.isThundering())? Config.sensorRangeInStorm : Config.sensorRange;
 	}
 
 	@Override
