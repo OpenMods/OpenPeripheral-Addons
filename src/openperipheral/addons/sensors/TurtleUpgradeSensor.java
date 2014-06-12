@@ -6,6 +6,7 @@ import net.minecraft.util.StatCollector;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import openperipheral.adapter.PeripheralHandlers;
+import openperipheral.addons.Config;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import openperipheral.addons.OpenPeripheralAddons.Icons;
 import openperipheral.addons.utils.CCUtils;
@@ -39,7 +40,8 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 
 		@Override
 		public int getSensorRange() {
-			return 30;
+			final World world = getWorld();
+			return (world.isRaining() && world.isThundering())? Config.sensorRangeInStorm : Config.sensorRange;
 		}
 
 		@Override

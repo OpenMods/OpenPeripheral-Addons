@@ -15,12 +15,15 @@ import openmods.utils.WorldUtils;
 import openperipheral.api.*;
 import openperipheral.util.EntityUtils;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @OnTick
 @Prefixed("target")
 public class AdapterSensor implements IPeripheralAdapter {
+
+	private static final String DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING = "Entity not found";
 
 	@Override
 	public Class<?> getTargetClass() {
@@ -41,9 +44,27 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return ids;
 	}
 
-	private static Map<String, Object> getEntityInfo(ISensorEnvironment sensor, int mobId) {
+	private static Map<String, Object> getEntityInfoById(ISensorEnvironment sensor, int mobId) {
 		Entity mob = sensor.getWorld().getEntityByID(mobId);
-		return mob != null? EntityUtils.entityToMap(mob, sensor.getLocation()) : null;
+		return getEntityInfo(sensor, mob);
+	}
+
+	private static Map<String, Object> getPlayerInfo(ISensorEnvironment sensor, String username) {
+		EntityPlayer player = sensor.getWorld().getPlayerEntityByName(username);
+		return getEntityInfo(sensor, player);
+	}
+
+	protected static Map<String, Object> getEntityInfo(ISensorEnvironment sensor, Entity mob) {
+		Preconditions.checkNotNull(mob, DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
+		final Vec3 location = sensor.getLocation();
+
+		final double dx = location.xCoord - mob.posX;
+		final double dy = location.yCoord - mob.posY;
+		final double dz = location.zCoord - mob.posZ;
+
+		final double range = sensor.getSensorRange();
+		Preconditions.checkArgument(dx * dx + dy * dy + dz * dz < range * range, DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
+		return EntityUtils.entityToMap(mob, location);
 	}
 
 	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get the usernames of all the players in range")
@@ -71,20 +92,19 @@ public class AdapterSensor implements IPeripheralAdapter {
 	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get full details of a particular player if they're in range")
 	public Map<?, ?> getPlayerData(ISensorEnvironment env,
 			@Arg(type = LuaType.STRING, name = "username", description = "The players username") String username) {
-		EntityPlayer player = env.getWorld().getPlayerEntityByName(username);
-		return player != null? EntityUtils.entityToMap(player, env.getLocation()) : null;
+		return getPlayerInfo(env, username);
 	}
 
 	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get full details of a particular mob if it's in range")
 	public Map<String, Object> getMobData(ISensorEnvironment sensor,
 			@Arg(type = LuaType.NUMBER, name = "mobId", description = "The mob id retrieved from getMobIds()") int mobId) {
-		return getEntityInfo(sensor, mobId);
+		return getEntityInfoById(sensor, mobId);
 	}
 
 	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get full details of a particular minecart if it's in range")
 	public Map<?, ?> getMinecartData(ISensorEnvironment sensor,
 			@Arg(type = LuaType.NUMBER, name = "minecartId", description = "The minecart id retrieved from getMobIds()") int minecartId) {
-		return getEntityInfo(sensor, minecartId);
+		return getEntityInfoById(sensor, minecartId);
 	}
 
 	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get a table of information about the surrounding area. Includes whether each block is UNKNOWN, AIR, LIQUID or SOLID")
