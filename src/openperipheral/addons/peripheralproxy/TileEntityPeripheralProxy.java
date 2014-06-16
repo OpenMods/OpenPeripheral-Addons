@@ -18,6 +18,8 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeriph
 	public static final Class<?> CABLE_CLASS = ReflectionHelper.getClass("dan200.computer.shared.TileEntityCable");
 	public static final Class<?> BASECOMPUTER_CLASS = ReflectionHelper.getClass("dan200.computer.shared.BlockComputerBase");
 
+	private int attachedBlockId = -1;
+
 	@Override
 	public IHostedPeripheral providePeripheral(World world) {
 		ForgeDirection rotation = getRotation();
@@ -36,12 +38,19 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements IPeriph
 				ReflectionHelper.primitive(targetY),
 				ReflectionHelper.primitive(targetZ),
 				ReflectionHelper.primitive(0));
-		return (peripheral instanceof IPeripheral)? new WrappedPeripheral((IPeripheral)peripheral, rotation.getOpposite().ordinal()) : null;
+
+		if (peripheral instanceof IPeripheral) {
+			attachedBlockId = worldObj.getBlockId(targetX, targetY, targetZ);
+			return new WrappedPeripheral((IPeripheral)peripheral, rotation.getOpposite().ordinal());
+		} else {
+			attachedBlockId = -1;
+			return null;
+		}
 	}
 
 	@Override
 	public void onNeighbourChanged(int blockId) {
-		if (!worldObj.isRemote) {
+		if (!worldObj.isRemote && (blockId == 0 || blockId == attachedBlockId)) {
 			ForgeDirection rot = getRotation().getOpposite();
 			int attachedX = xCoord + rot.offsetX;
 			int attachedY = yCoord + rot.offsetY;
