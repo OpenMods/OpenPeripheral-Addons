@@ -26,25 +26,37 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 	public static final SafeClassLoad CC_CLASS = safeLoad("dan200.computercraft.ComputerCraft");
 	public static final SafeClassLoad CABLE_CLASS = safeLoad("dan200.computercraft.shared.peripheral.modem.TileCable");
 
+	private int attachedBlockId = -1;
+
 	@Override
 	public IPeripheral createPeripheral(int side) {
 		final ForgeDirection rotation = getRotation();
 		if (rotation.getOpposite().ordinal() != side) return null;
 
+		final int targetX = xCoord + rotation.offsetX;
+		final int targetY = yCoord + rotation.offsetY;
+		final int targetZ = zCoord + rotation.offsetZ;
+
 		IPeripheral peripheral = callStatic(
 				CC_CLASS.get(),
 				"getPeripheralAt",
 				typed(worldObj, World.class),
-				primitive(xCoord + rotation.offsetX),
-				primitive(yCoord + rotation.offsetY),
-				primitive(zCoord + rotation.offsetZ),
+				primitive(targetX),
+				primitive(targetY),
+				primitive(targetZ),
 				primitive(0));
-		return (peripheral != null)? new WrappedPeripheral(peripheral) : null;
+		if (peripheral != null) {
+			attachedBlockId = worldObj.getBlockId(targetX, targetY, targetZ);
+			return new WrappedPeripheral(peripheral);
+		} else {
+			attachedBlockId = -1;
+			return null;
+		}
 	}
 
 	@Override
 	public void onNeighbourChanged(int blockId) {
-		if (!worldObj.isRemote) {
+		if (!worldObj.isRemote && (blockId == 0 || blockId == attachedBlockId)) {
 			ForgeDirection targetDir = getRotation();
 			boolean isConnected = isProxyActive(targetDir);
 
