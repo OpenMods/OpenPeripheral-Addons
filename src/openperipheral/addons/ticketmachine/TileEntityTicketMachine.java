@@ -183,6 +183,7 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements ISidedI
 		if (worldObj.isRemote) return;
 		boolean nowHasTicket = inventory.getStackInSlot(SLOT_OUTPUT) != null;
 		if (nowHasTicket != hasTicket.getValue()) hasTicket.setValue(nowHasTicket);
+		worldObj.markTileEntityChunkModified(xCoord, yCoord, zCoord, this);
 	}
 
 	@Override
