@@ -34,10 +34,14 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return AxisAlignedBB.getAABBPool().getAABB(location.xCoord, location.yCoord, location.zCoord, location.xCoord + 1, location.yCoord + 1, location.zCoord + 1).expand(range, range, range);
 	}
 
+	private static AxisAlignedBB getBoundingBox(ISensorEnvironment env) {
+		return getBoundingBox(env.getLocation(), env.getSensorRange());
+	}
+
 	private static List<Integer> listEntityIds(ISensorEnvironment env, Class<? extends Entity> entityClass) {
 		List<Integer> ids = Lists.newArrayList();
 
-		final AxisAlignedBB aabb = getBoundingBox(env.getLocation(), env.getSensorRange());
+		final AxisAlignedBB aabb = getBoundingBox(env);
 		for (Entity entity : WorldUtils.getEntitiesWithinAABB(env.getWorld(), entityClass, aabb))
 			ids.add(entity.entityId);
 
@@ -56,21 +60,16 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 	protected static Map<String, Object> getEntityInfo(ISensorEnvironment sensor, Entity mob) {
 		Preconditions.checkNotNull(mob, DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
-		final Vec3 location = sensor.getLocation();
+		final Vec3 sensorPos = sensor.getLocation();
 
-		final double dx = location.xCoord - mob.posX;
-		final double dy = location.yCoord - mob.posY;
-		final double dz = location.zCoord - mob.posZ;
-
-		final double range = sensor.getSensorRange();
-		Preconditions.checkArgument(dx * dx + dy * dy + dz * dz < range * range, DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
-		return EntityUtils.entityToMap(mob, location);
+		final AxisAlignedBB aabb = getBoundingBox(sensor);
+		Preconditions.checkArgument(mob.boundingBox.intersectsWith(aabb), DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
+		return EntityUtils.entityToMap(mob, sensorPos);
 	}
 
 	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get the usernames of all the players in range")
 	public List<String> getPlayerNames(ISensorEnvironment env) {
-		@SuppressWarnings("unchecked")
-		List<EntityPlayer> players = env.getWorld().getEntitiesWithinAABB(EntityPlayer.class, getBoundingBox(env.getLocation(), env.getSensorRange()));
+		List<EntityPlayer> players = WorldUtils.getEntitiesWithinAABB(env.getWorld(), EntityPlayer.class, getBoundingBox(env));
 
 		List<String> names = Lists.newArrayList();
 		for (EntityPlayer player : players)
