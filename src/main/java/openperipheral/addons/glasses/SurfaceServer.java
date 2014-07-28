@@ -7,7 +7,6 @@ import java.util.Map;
 import openmods.structured.ElementField;
 import openmods.structured.IStructureContainer;
 import openmods.structured.StructuredDataMaster;
-import openperipheral.adapter.AdapterManager;
 import openperipheral.addons.glasses.SurfaceServer.DrawableWrapper;
 import openperipheral.api.*;
 
@@ -35,7 +34,7 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 		public DrawableWrapper(Drawable target) {
 			this.target = target;
 			target.wrapper = this;
-			luaWrapper = AdapterManager.wrapObject(target);
+			luaWrapper = ApiAccess.getApi(IAdapterFactory.class).wrapObject(target);
 		}
 
 		public void setField(Field field, Object value) {

@@ -7,11 +7,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import openmods.tileentity.OpenTileEntity;
-import openperipheral.adapter.AdapterManager;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.api.*;
-import openperipheral.api.cc16.IAttachable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
@@ -193,7 +191,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	public ILuaObject getUserSurface(@Arg(name = "username", description = "The username of the user to get the draw surface for", type = LuaType.STRING) String username) {
 		SurfaceServer playerSurface = getSurface(username);
 		Preconditions.checkNotNull(playerSurface, "Invalid player");
-		return AdapterManager.wrapObject(playerSurface);
+		return ApiAccess.getApi(IAdapterFactory.class).wrapObject(playerSurface);
 	}
 
 	@Include

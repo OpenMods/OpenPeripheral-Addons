@@ -1,10 +1,10 @@
 package openperipheral.addons.sensors;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
+import openmods.utils.WorldUtils;
 import openperipheral.addons.Config;
-import openperipheral.util.PeripheralUtils;
 
 public class TileEntitySensor extends TileEntity implements ISensorEnvironment {
 
@@ -29,8 +29,8 @@ public class TileEntitySensor extends TileEntity implements ISensorEnvironment {
 	}
 
 	@Override
-	public ChunkCoordinates getLocation() {
-		return new ChunkCoordinates(xCoord, yCoord, zCoord);
+	public Vec3 getLocation() {
+		return Vec3.createVectorHelper(xCoord, yCoord, zCoord);
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class TileEntitySensor extends TileEntity implements ISensorEnvironment {
 
 	@Override
 	public boolean isValid() {
-		return PeripheralUtils.isTileEntityValid(this);
+		return WorldUtils.isTileEntityValid(this);
 	}
 
 }

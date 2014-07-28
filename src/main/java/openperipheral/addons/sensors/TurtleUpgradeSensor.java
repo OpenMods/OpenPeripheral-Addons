@@ -1,15 +1,16 @@
 package openperipheral.addons.sensors;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.util.Icon;
 import net.minecraft.util.StatCollector;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import openperipheral.adapter.PeripheralHandlers;
 import openperipheral.addons.Config;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import openperipheral.addons.OpenPeripheralAddons.Icons;
 import openperipheral.addons.utils.CCUtils;
+import openperipheral.api.ApiAccess;
+import openperipheral.api.IAdapterFactory;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 
@@ -29,8 +30,8 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 		}
 
 		@Override
-		public ChunkCoordinates getLocation() {
-			return turtle.getPosition();
+		public Vec3 getLocation() {
+			return turtle.getVisualPosition(0);
 		}
 
 		@Override
@@ -73,7 +74,7 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 
 	@Override
 	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
-		return PeripheralHandlers.createAdaptedPeripheralSafe(new TurtleSensorEnvironment(turtle));
+		return ApiAccess.getApi(IAdapterFactory.class).createPeripheral(new TurtleSensorEnvironment(turtle));
 	}
 
 	@Override

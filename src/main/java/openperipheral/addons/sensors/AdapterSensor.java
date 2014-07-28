@@ -9,11 +9,11 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import openmods.utils.WorldUtils;
 import openperipheral.api.*;
-import openperipheral.util.EntityUtils;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -30,8 +30,11 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return ISensorEnvironment.class;
 	}
 
-	private static AxisAlignedBB getBoundingBox(ChunkCoordinates location, double range) {
-		return AxisAlignedBB.getAABBPool().getAABB(location.posX, location.posY, location.posZ, location.posX + 1, location.posY + 1, location.posZ + 1).expand(range, range, range);
+	private static AxisAlignedBB getBoundingBox(Vec3 location, double range) {
+		return AxisAlignedBB.getAABBPool().getAABB(
+				location.xCoord, location.yCoord, location.zCoord,
+				location.xCoord + 1, location.yCoord + 1, location.zCoord + 1)
+				.expand(range, range, range);
 	}
 
 	private static AxisAlignedBB getBoundingBox(ISensorEnvironment env) {
@@ -60,12 +63,11 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 	protected static Map<String, Object> getEntityInfo(ISensorEnvironment sensor, Entity mob) {
 		Preconditions.checkNotNull(mob, DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
-		final ChunkCoordinates sensorPos = sensor.getLocation();
-
 		final AxisAlignedBB aabb = getBoundingBox(sensor);
 
 		Preconditions.checkArgument(mob.boundingBox.intersectsWith(aabb), DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
-		return EntityUtils.entityToMap(mob, sensorPos);
+		final Vec3 sensorPos = sensor.getLocation();
+		return ApiAccess.getApi(IEntityMetaProvider.class).getEntityMetadata(mob, sensorPos);
 	}
 
 	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get the usernames of all the players in range")
@@ -113,10 +115,10 @@ public class AdapterSensor implements IPeripheralAdapter {
 		int range = 1 + env.getSensorRange() / 2;
 		World world = env.getWorld();
 		Map<Integer, Map<String, Object>> results = Maps.newHashMap();
-		ChunkCoordinates sensorPos = env.getLocation();
-		int sx = sensorPos.posX;
-		int sy = sensorPos.posY;
-		int sz = sensorPos.posZ;
+		Vec3 sensorPos = env.getLocation();
+		int sx = MathHelper.floor_double(sensorPos.xCoord);
+		int sy = MathHelper.floor_double(sensorPos.yCoord);
+		int sz = MathHelper.floor_double(sensorPos.zCoord);
 
 		final int rangeSq = range * range;
 		int i = 0;

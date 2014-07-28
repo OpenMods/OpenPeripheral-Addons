@@ -28,7 +28,8 @@ import openperipheral.addons.pim.TileEntityPIM;
 import openperipheral.addons.sensors.*;
 import openperipheral.addons.ticketmachine.BlockTicketMachine;
 import openperipheral.addons.ticketmachine.TileEntityTicketMachine;
-import openperipheral.api.OpenPeripheralAPI;
+import openperipheral.api.ApiAccess;
+import openperipheral.api.IAdapterRegistry;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -108,9 +109,10 @@ public class OpenPeripheralAddons {
 
 		Items.generic.initRecipes();
 
-		OpenPeripheralAPI.createAdapter(TileEntityGlassesBridge.class);
-		OpenPeripheralAPI.createAdapter(TileEntityTicketMachine.class);
-		OpenPeripheralAPI.register(new AdapterSensor());
+		IAdapterRegistry adapters = ApiAccess.getApi(IAdapterRegistry.class);
+		adapters.registerInline(TileEntityGlassesBridge.class);
+		adapters.registerInline(TileEntityTicketMachine.class);
+		adapters.register(new AdapterSensor());
 
 		sensorUpgrade = new TurtleUpgradeSensor();
 		ComputerCraftAPI.registerTurtleUpgrade(sensorUpgrade);
