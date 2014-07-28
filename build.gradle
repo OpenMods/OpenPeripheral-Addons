@@ -51,7 +51,6 @@ apply plugin: 'forge'
 
 dependencies {
     compile project(":OpenModsLib") // Load OpenModsLib from submodule
-    compile project(":OpenPeripheral") // Load OpenPeripheralCore from submodule
 }
 
 //================================================
