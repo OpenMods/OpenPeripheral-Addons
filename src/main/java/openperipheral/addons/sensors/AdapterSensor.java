@@ -67,7 +67,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 		Preconditions.checkArgument(mob.boundingBox.intersectsWith(aabb), DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
 		final Vec3 sensorPos = sensor.getLocation();
-		return ApiAccess.getApi(IEntityMetaProvider.class).getEntityMetadata(mob, sensorPos);
+		return ApiAccess.getApi(IEntityMetadataBuilder.class).getEntityMetadata(mob, sensorPos);
 	}
 
 	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get the usernames of all the players in range")
