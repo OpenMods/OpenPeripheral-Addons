@@ -1,7 +1,7 @@
 package openperipheral.addons.ticketmachine;
 
 import openmods.gui.BaseGuiContainer;
-import openmods.gui.component.BaseComponent;
+import openmods.gui.component.BaseComposite;
 import openmods.gui.component.GuiComponentPanel;
 
 public class GuiTicketMachine extends BaseGuiContainer<ContainerTicketMachine> {
@@ -11,7 +11,7 @@ public class GuiTicketMachine extends BaseGuiContainer<ContainerTicketMachine> {
 	}
 
 	@Override
-	protected BaseComponent createRoot() {
+	protected BaseComposite createRoot() {
 		GuiComponentPanel panel = new GuiComponentPanel(0, 0, xSize, ySize, getContainer());
 		panel.setSlotRenderer(2, GuiComponentPanel.bigSlot);
 		return panel;

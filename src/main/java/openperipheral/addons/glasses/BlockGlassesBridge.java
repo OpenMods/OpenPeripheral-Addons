@@ -1,19 +1,18 @@
 package openperipheral.addons.glasses;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import openperipheral.addons.BlockOP;
-import openperipheral.addons.Config;
 import openperipheral.addons.api.ITerminalItem;
 
 public class BlockGlassesBridge extends BlockOP {
 
 	public BlockGlassesBridge() {
-		super(Config.blockGlassesBridgeId, Material.ground);
+		super(Material.ground);
 	}
 
 	@Override
@@ -22,7 +21,7 @@ public class BlockGlassesBridge extends BlockOP {
 	}
 
 	@Override
-	public void registerIcons(IconRegister register) {
+	public void registerBlockIcons(IIconRegister register) {
 		blockIcon = register.registerIcon("openperipheraladdons:bridge");
 	}
 

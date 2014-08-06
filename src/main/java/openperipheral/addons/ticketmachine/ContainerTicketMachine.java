@@ -1,9 +1,9 @@
 package openperipheral.addons.ticketmachine;
 
 import net.minecraft.inventory.IInventory;
-import openmods.container.ContainerInventory;
+import openmods.container.ContainerInventoryProvider;
 
-public class ContainerTicketMachine extends ContainerInventory<TileEntityTicketMachine> {
+public class ContainerTicketMachine extends ContainerInventoryProvider<TileEntityTicketMachine> {
 
 	public ContainerTicketMachine(IInventory playerInventory, TileEntityTicketMachine owner) {
 		super(playerInventory, owner);

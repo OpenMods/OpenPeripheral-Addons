@@ -1,44 +1,33 @@
 package openperipheral.addons.pim;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import openperipheral.addons.BlockOP;
-import openperipheral.addons.Config;
 
 public class BlockPIM extends BlockOP {
 
 	public static class Icons {
-		public static Icon black;
-		public static Icon blue;
+		public static IIcon black;
+		public static IIcon blue;
 	}
 
 	public BlockPIM() {
-		super(Config.blockPIMId, Material.ground);
-		setStepSound(soundMetalFootstep);
+		super(Material.ground);
+		setStepSound(soundTypeMetal);
 		setBlockBounds(0f, 0f, 0f, 1f, 0.3f, 1f);
 	}
 
 	@Override
-	public void registerIcons(IconRegister registry) {
+	public void registerBlockIcons(IIconRegister registry) {
 		Icons.black = registry.registerIcon("openperipheraladdons:pim_black");
 		Icons.blue = registry.registerIcon("openperipheraladdons:pim_blue");
 		blockIcon = Icons.blue;
-	}
-
-	@Override
-	public Icon getBlockTexture(IBlockAccess par1IBlockAccess, int par2, int par3, int par4, int par5) {
-		return getIcon(0, 0);
-	}
-
-	@Override
-	public Icon getIcon(int par1, int par2) {
-		return Icons.blue;
 	}
 
 	@Override
@@ -52,13 +41,13 @@ public class BlockPIM extends BlockOP {
 	}
 
 	@Override
-	public boolean isBlockSolidOnSide(World world, int x, int y, int z, ForgeDirection side) {
+	public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
 		return side == ForgeDirection.DOWN;
 	}
 
 	@Override
 	public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity entity) {
-		world.markBlockForRenderUpdate(x, y, z);
+		world.markBlockForUpdate(x, y, z);
 		if (!world.isRemote && entity instanceof EntityPlayer) {
 			TileEntityPIM pi = getTileEntity(world, x, y, z, TileEntityPIM.class);
 			if (pi != null) pi.trySetPlayer((EntityPlayer)entity);

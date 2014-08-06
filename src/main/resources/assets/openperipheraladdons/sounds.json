@@ -1,0 +1,45 @@
+{
+    "block.ticketmachine": {
+        "category": "block",
+        "sounds": [
+            "ticketmachine"
+        ]
+    },
+    "robot.walk": {
+        "category": "neutral",
+        "sounds": [
+            "robotstepping"
+        ]
+    },
+    "robot.jump": {
+        "category": "neutral",
+        "sounds": [
+            "robotjump"
+        ]
+    },
+    "robot.hurt": {
+        "category": "neutral",
+        "sounds": [
+            "robothurt"
+        ]
+    },
+    "robot.dead": {
+        "category": "neutral",
+        "sounds": [
+            "robotdead1",
+            "robotdead2"
+        ]
+    },
+    "robot.attack": {
+        "category": "neutral",
+        "sounds": [
+            "lazer1"
+        ]
+    },
+    "robot.ready": {
+        "category": "neutral",
+        "sounds": [
+            "robotready"
+        ]
+    }
+}

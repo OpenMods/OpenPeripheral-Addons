@@ -53,13 +53,13 @@ public class TurtleInventoryDelegate implements IInventory, IWorldProvider {
 	}
 
 	@Override
-	public String getInvName() {
-		return inventory().getInvName();
+	public String getInventoryName() {
+		return inventory().getInventoryName();
 	}
 
 	@Override
-	public boolean isInvNameLocalized() {
-		return inventory().isInvNameLocalized();
+	public boolean hasCustomInventoryName() {
+		return inventory().hasCustomInventoryName();
 	}
 
 	@Override
@@ -68,8 +68,8 @@ public class TurtleInventoryDelegate implements IInventory, IWorldProvider {
 	}
 
 	@Override
-	public void onInventoryChanged() {
-		inventory().onInventoryChanged();
+	public void markDirty() {
+		inventory().markDirty();
 	}
 
 	@Override
@@ -78,13 +78,13 @@ public class TurtleInventoryDelegate implements IInventory, IWorldProvider {
 	}
 
 	@Override
-	public void openChest() {
-		inventory().openChest();
+	public void openInventory() {
+		inventory().openInventory();
 	}
 
 	@Override
-	public void closeChest() {
-		inventory().closeChest();
+	public void closeInventory() {
+		inventory().closeInventory();
 	}
 
 	@Override

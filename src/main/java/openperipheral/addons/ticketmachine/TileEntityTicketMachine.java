@@ -3,16 +3,19 @@ package openperipheral.addons.ticketmachine;
 import java.util.Set;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
-import openmods.GenericInventory;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import openmods.api.*;
-import openmods.sync.ISyncableObject;
+import openmods.include.IExtendable;
+import openmods.include.IncludeInterface;
+import openmods.inventory.GenericInventory;
+import openmods.inventory.IInventoryProvider;
 import openmods.sync.SyncableBoolean;
 import openmods.sync.SyncableString;
 import openmods.tileentity.SyncedTileEntity;
@@ -26,7 +29,7 @@ import com.google.common.base.Preconditions;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 @Freeform
-public class TileEntityTicketMachine extends SyncedTileEntity implements ISidedInventory, IInventoryCallback, IPlaceAwareTile, IHasGui, IIconProvider {
+public class TileEntityTicketMachine extends SyncedTileEntity implements IExtendable, IPlaceAwareTile, IHasGui, IIconProvider, IInventoryProvider, IInventoryCallback {
 
 	private static final int SLOT_PAPER = 0;
 	private static final int SLOT_INK = 1;
@@ -34,7 +37,50 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements ISidedI
 
 	private final Item ticketItem;
 
-	protected GenericInventory inventory = new GenericInventory("ticketmachine", false, 3);
+	private static class CustomInventory extends GenericInventory implements ISidedInventory {
+		private CustomInventory() {
+			super("ticketmachine", false, 3);
+		}
+
+		@Override
+		public boolean isItemValidForSlot(int i, ItemStack itemstack) {
+			if (itemstack == null) return false;
+
+			switch (i) {
+				case SLOT_PAPER:
+					return itemstack.getItem() == Items.paper;
+				case SLOT_INK: {
+					Set<ColorMeta> color = ColorUtils.stackToColor(itemstack);
+					return color != null && color.contains(ColorUtils.BLACK);
+				}
+				default:
+					return false;
+			}
+		}
+
+		@Override
+		public int[] getAccessibleSlotsFromSide(int side) {
+			return new int[] { SLOT_INK, SLOT_PAPER, SLOT_OUTPUT };
+		}
+
+		@Override
+		public boolean canInsertItem(int slot, ItemStack stack, int side) {
+			return isItemValidForSlot(slot, stack);
+		}
+
+		@Override
+		public boolean canExtractItem(int slot, ItemStack stack, int side) {
+			return slot == SLOT_OUTPUT;
+		}
+	}
+
+	@IncludeInterface(ISidedInventory.class)
+	protected GenericInventory inventory = new CustomInventory().addCallback(this);
+
+	@Override
+	public IInventory getInventory() {
+		return inventory;
+	}
 
 	protected SyncableBoolean hasTicket;
 	protected SyncableString owner;
@@ -46,81 +92,9 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements ISidedI
 	}
 
 	public TileEntityTicketMachine() {
-		inventory.addCallback(this);
-
 		ItemStack ticketStack = GameRegistry.findItemStack("Railcraft", "routing.ticket", 1);
 		ticketItem = ticketStack != null? ticketStack.getItem() : null;
-	}
-
-	@Override
-	public int getSizeInventory() {
-		return inventory.getSizeInventory();
-	}
-
-	@Override
-	public ItemStack getStackInSlot(int i) {
-		return inventory.getStackInSlot(i);
-	}
-
-	@Override
-	public ItemStack decrStackSize(int i, int j) {
-		return inventory.decrStackSize(i, j);
-	}
-
-	@Override
-	public ItemStack getStackInSlotOnClosing(int i) {
-		return inventory.getStackInSlotOnClosing(i);
-	}
-
-	@Override
-	public void setInventorySlotContents(int i, ItemStack itemstack) {
-		inventory.setInventorySlotContents(i, itemstack);
-	}
-
-	@Override
-	public String getInvName() {
-		return inventory.getInvName();
-	}
-
-	@Override
-	public boolean isInvNameLocalized() {
-		return inventory.isInvNameLocalized();
-	}
-
-	@Override
-	public int getInventoryStackLimit() {
-		return inventory.getInventoryStackLimit();
-	}
-
-	@Override
-	public boolean isUseableByPlayer(EntityPlayer entityplayer) {
-		return inventory.isUseableByPlayer(entityplayer);
-	}
-
-	@Override
-	public void openChest() {
-		inventory.openChest();
-	}
-
-	@Override
-	public void closeChest() {
-		inventory.closeChest();
-	}
-
-	@Override
-	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
-		if (itemstack == null) return false;
-
-		switch (i) {
-			case SLOT_PAPER:
-				return itemstack.getItem() == Item.paper;
-			case SLOT_INK: {
-				ColorMeta color = ColorUtils.stackToColor(itemstack);
-				return color != null && color.vanillaId == ColorUtils.BLACK;
-			}
-			default:
-				return false;
-		}
+		syncMap.addUpdateListener(createRenderUpdateListener());
 	}
 
 	@OnTick
@@ -131,10 +105,10 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements ISidedI
 		else Preconditions.checkArgument(amount > 0 && amount <= 64, "Amount must be between 1 and 64");
 
 		ItemStack paperStack = inventory.getStackInSlot(SLOT_PAPER);
-		Preconditions.checkState(isItemValidForSlot(SLOT_PAPER, paperStack) && paperStack.stackSize >= amount, "Not enough paper");
+		Preconditions.checkState(inventory.isItemValidForSlot(SLOT_PAPER, paperStack) && paperStack.stackSize >= amount, "Not enough paper");
 
 		ItemStack inkStack = inventory.getStackInSlot(SLOT_INK);
-		Preconditions.checkState(isItemValidForSlot(SLOT_INK, inkStack) && inkStack.stackSize >= amount, "Not enough ink");
+		Preconditions.checkState(inventory.isItemValidForSlot(SLOT_INK, inkStack) && inkStack.stackSize >= amount, "Not enough ink");
 
 		ItemStack output = inventory.getStackInSlot(SLOT_OUTPUT);
 
@@ -144,13 +118,13 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements ISidedI
 		tag.setString("dest", destination);
 
 		if (output == null) {
-			setInventorySlotContents(SLOT_OUTPUT, newTicket);
+			inventory.setInventorySlotContents(SLOT_OUTPUT, newTicket);
 		} else if (ItemStack.areItemStackTagsEqual(output, newTicket) && output.isItemEqual(newTicket) && output.stackSize + amount <= output.getMaxStackSize()) {
 			output.stackSize += amount;
 		} else throw new IllegalArgumentException("No place in output slot");
 
-		decrStackSize(SLOT_PAPER, amount);
-		decrStackSize(SLOT_INK, amount);
+		inventory.decrStackSize(SLOT_PAPER, amount);
+		inventory.decrStackSize(SLOT_INK, amount);
 
 		worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "openperipheraladdons:ticketmachine", 0.3F, 0.6F);
 		sync();
@@ -164,40 +138,20 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements ISidedI
 	}
 
 	@Override
-	public int[] getAccessibleSlotsFromSide(int side) {
-		return new int[] { SLOT_INK, SLOT_PAPER, SLOT_OUTPUT };
-	}
-
-	@Override
-	public boolean canInsertItem(int slot, ItemStack stack, int side) {
-		return isItemValidForSlot(slot, stack);
-	}
-
-	@Override
-	public boolean canExtractItem(int slot, ItemStack stack, int side) {
-		return slot == SLOT_OUTPUT;
-	}
-
-	@Override
 	public void onInventoryChanged(IInventory inventory, int slotNumber) {
 		if (worldObj.isRemote) return;
 		boolean nowHasTicket = inventory.getStackInSlot(SLOT_OUTPUT) != null;
-		if (nowHasTicket != hasTicket.getValue()) hasTicket.setValue(nowHasTicket);
+		if (nowHasTicket != hasTicket.getValue()) hasTicket.set(nowHasTicket);
 		markUpdated();
 	}
 
 	@Override
-	public void onSynced(Set<ISyncableObject> changes) {
-		worldObj.markBlockForRenderUpdate(xCoord, yCoord, zCoord);
-	}
-
-	@Override
 	public void onBlockPlacedBy(EntityPlayer player, ForgeDirection side, ItemStack stack, float hitX, float hitY, float hitZ) {
-		owner.setValue(player.username);
+		owner.setValue(player.getCommandSenderName());
 	}
 
 	@Override
-	public Icon getIcon(ForgeDirection rotatedDir) {
+	public IIcon getIcon(ForgeDirection rotatedDir) {
 		if (rotatedDir == ForgeDirection.SOUTH) return hasTicket.getValue()? BlockTicketMachine.iconFrontTicket : BlockTicketMachine.iconFrontEmpty;
 		return null;
 	}
@@ -228,5 +182,4 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements ISidedI
 		super.readFromNBT(tag);
 		inventory.readFromNBT(tag);
 	}
-
 }

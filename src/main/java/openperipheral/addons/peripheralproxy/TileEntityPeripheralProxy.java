@@ -5,9 +5,10 @@ import static openmods.utils.ReflectionHelper.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import openmods.Log;
 import openmods.api.INeighbourAwareTile;
 import openmods.tileentity.OpenTileEntity;
@@ -26,7 +27,7 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 	public static final SafeClassLoad CC_CLASS = safeLoad("dan200.computercraft.ComputerCraft");
 	public static final SafeClassLoad CABLE_CLASS = safeLoad("dan200.computercraft.shared.peripheral.modem.TileCable");
 
-	private int attachedBlockId = -1;
+	private Block attachedBlock;
 
 	@Override
 	public IPeripheral createPeripheral(int side) {
@@ -46,17 +47,17 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 				primitive(targetZ),
 				primitive(0));
 		if (peripheral != null) {
-			attachedBlockId = worldObj.getBlockId(targetX, targetY, targetZ);
+			attachedBlock = worldObj.getBlock(targetX, targetY, targetZ);
 			return new WrappedPeripheral(peripheral);
 		} else {
-			attachedBlockId = -1;
+			attachedBlock = null;
 			return null;
 		}
 	}
 
 	@Override
-	public void onNeighbourChanged(int blockId) {
-		if (!worldObj.isRemote && (blockId == 0 || blockId == attachedBlockId)) {
+	public void onNeighbourChanged(Block block) {
+		if (!worldObj.isRemote && (block == null || block == attachedBlock)) {
 			ForgeDirection targetDir = getRotation();
 			boolean isConnected = isProxyActive(targetDir);
 
@@ -70,7 +71,7 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 		int targetY = yCoord + targetDir.offsetY;
 		int targetZ = zCoord + targetDir.offsetZ;
 
-		return worldObj.getBlockTileEntity(targetX, targetY, targetZ) != null;
+		return worldObj.getTileEntity(targetX, targetY, targetZ) != null;
 	}
 
 	private void updateModem(ForgeDirection modemDir, boolean reactivate) {
@@ -78,7 +79,7 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 		int attachedY = yCoord + modemDir.offsetY;
 		int attachedZ = zCoord + modemDir.offsetZ;
 
-		TileEntity attachedModem = worldObj.getBlockTileEntity(attachedX, attachedY, attachedZ);
+		TileEntity attachedModem = worldObj.getTileEntity(attachedX, attachedY, attachedZ);
 
 		try {
 			final Class<?> cableCls = CABLE_CLASS.get();
@@ -103,7 +104,7 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 				attachedX,
 				attachedY,
 				attachedZ,
-				OpenPeripheralAddons.Blocks.peripheralProxy.blockID
+				OpenPeripheralAddons.Blocks.peripheralProxy
 				);
 	}
 

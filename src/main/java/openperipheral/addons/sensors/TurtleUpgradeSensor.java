@@ -1,8 +1,7 @@
 package openperipheral.addons.sensors;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import openperipheral.addons.Config;
@@ -58,8 +57,8 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 	}
 
 	@Override
-	public String getAdjective() {
-		return StatCollector.translateToLocal("openperipheral.turtle.sensor.adjective");
+	public String getUnlocalisedAdjective() {
+		return "openperipheral.turtle.sensor.adjective";
 	}
 
 	@Override
@@ -83,7 +82,7 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 	}
 
 	@Override
-	public Icon getIcon(ITurtleAccess turtle, TurtleSide side) {
+	public IIcon getIcon(ITurtleAccess turtle, TurtleSide side) {
 		return Icons.sensorTurtle;
 	}
 

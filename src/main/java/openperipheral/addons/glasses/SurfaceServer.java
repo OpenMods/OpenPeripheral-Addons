@@ -84,11 +84,7 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 		}
 	}
 
-	public final String playerName;
-
-	public SurfaceServer(String playerName) {
-		this.playerName = playerName;
-	}
+	public SurfaceServer() {}
 
 	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Get object by id")
 	public synchronized ILuaObject getById(
@@ -166,7 +162,7 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 	public ILuaObject addIcon(
 			@Arg(name = "x", description = "The x position from the top left", type = LuaType.NUMBER) short x,
 			@Arg(name = "y", description = "The y position from the top left", type = LuaType.NUMBER) short y,
-			@Arg(name = "id", description = "The id of the item to draw", type = LuaType.NUMBER) short id,
+			@Arg(name = "id", description = "The id of the item to draw", type = LuaType.STRING) String id,
 			@Arg(name = "meta", description = "The meta of the item to draw", type = LuaType.NUMBER) short meta
 			) {
 		return addDrawable(new Drawable.ItemIcon(x, y, id, meta));

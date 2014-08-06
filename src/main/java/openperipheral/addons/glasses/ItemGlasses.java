@@ -2,10 +2,10 @@ package openperipheral.addons.glasses;
 
 import java.util.List;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumArmorMaterial;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -14,7 +14,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import openmods.utils.ItemUtils;
 import openmods.utils.MiscUtils;
-import openperipheral.addons.Config;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.addons.api.ITerminalItem;
 import openperipheral.addons.api.TerminalRegisterEvent;
@@ -25,7 +24,7 @@ public class ItemGlasses extends ItemArmor implements ITerminalItem {
 	private static final String OPENP_TAG = "openp";
 
 	public ItemGlasses() {
-		super(Config.itemGlassesId, EnumArmorMaterial.CHAIN, 0, 0);
+		super(ArmorMaterial.CHAIN, 0, 0);
 		setMaxDamage(0);
 		setMaxStackSize(1);
 		setHasSubtypes(true);
@@ -50,7 +49,7 @@ public class ItemGlasses extends ItemArmor implements ITerminalItem {
 	}
 
 	@Override
-	public String getArmorTexture(ItemStack stack, Entity entity, int slot, int layer) {
+	public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type) {
 		switch (MiscUtils.getHoliday()) {
 			case 1:
 				return "openperipheraladdons:textures/models/glasses_valentines.png";
@@ -64,15 +63,15 @@ public class ItemGlasses extends ItemArmor implements ITerminalItem {
 	}
 
 	@Override
-	public void registerIcons(IconRegister register) {
+	public void registerIcons(IIconRegister register) {
 		itemIcon = register.registerIcon("openperipheraladdons:glasses");
 	}
 
 	@Override
-	public void onArmorTickUpdate(World world, EntityPlayer player, ItemStack itemStack) {
-		if (!world.isRemote) {
+	public void onArmorTick(World world, EntityPlayer player, ItemStack itemStack) {
+		if (player instanceof EntityPlayerMP) {
 			Long guid = extractGuid(itemStack);
-			if (guid != null) MinecraftForge.EVENT_BUS.post(new TerminalRegisterEvent(player, guid));
+			if (guid != null) MinecraftForge.EVENT_BUS.post(new TerminalRegisterEvent((EntityPlayerMP)player, guid));
 		}
 	}
 

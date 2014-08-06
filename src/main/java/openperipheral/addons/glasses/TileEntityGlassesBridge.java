@@ -3,7 +3,7 @@ package openperipheral.addons.glasses;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import openmods.tileentity.OpenTileEntity;
@@ -12,7 +12,10 @@ import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.api.*;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.mojang.authlib.GameProfile;
 
 import dan200.computercraft.api.lua.ILuaObject;
 import dan200.computercraft.api.peripheral.IComputerAccess;
@@ -25,27 +28,30 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	private static final String EVENT_PLAYER_JOIN = "registered_player_join";
 
 	private static class PlayerInfo {
-		public final WeakReference<EntityPlayer> player;
+		public final GameProfile profile;
+		public final WeakReference<EntityPlayerMP> player;
 		public SurfaceServer surface;
 
-		public PlayerInfo(TileEntityGlassesBridge parent, EntityPlayer player) {
-			this.player = new WeakReference<EntityPlayer>(player);
-			this.surface = new SurfaceServer(player.getEntityName());
+		public PlayerInfo(TileEntityGlassesBridge parent, EntityPlayerMP player) {
+			this.player = new WeakReference<EntityPlayerMP>(player);
+			this.profile = player.getGameProfile();
+			this.surface = new SurfaceServer();
 		}
 	}
 
-	private final Map<String, PlayerInfo> knownPlayers = Maps.newHashMap();
-	private final Set<EntityPlayer> newPlayers = Sets.newSetFromMap(new WeakHashMap<EntityPlayer, Boolean>());
+	private final Map<UUID, PlayerInfo> knownPlayersByUUID = Maps.newHashMap();
+	private final Map<String, PlayerInfo> knownPlayersByName = Maps.newHashMap();
+	private final Set<EntityPlayerMP> newPlayers = Sets.newSetFromMap(new WeakHashMap<EntityPlayerMP, Boolean>());
 
 	private List<IComputerAccess> computers = Lists.newArrayList();
 
-	public SurfaceServer globalSurface = new SurfaceServer(TerminalUtils.GLOBAL_MARKER);
+	public SurfaceServer globalSurface = new SurfaceServer();
 	private long guid = TerminalUtils.generateGuid();
 
 	public TileEntityGlassesBridge() {}
 
-	public void registerTerminal(EntityPlayer player) {
-		if (!knownPlayers.containsKey(player.getEntityName())) newPlayers.add(player);
+	public void registerTerminal(EntityPlayerMP player) {
+		if (!knownPlayersByUUID.containsKey(player.getGameProfile().getId())) newPlayers.add(player);
 	}
 
 	public void onChatCommand(String command, String username) {
@@ -69,10 +75,10 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 		final boolean globalUpdate = globalSurface.hasUpdates();
 
-		Iterator<PlayerInfo> it = knownPlayers.values().iterator();
+		Iterator<PlayerInfo> it = knownPlayersByUUID.values().iterator();
 		while (it.hasNext()) {
 			final PlayerInfo info = it.next();
-			final EntityPlayer player = info.player.get();
+			final EntityPlayerMP player = info.player.get();
 
 			if (!isPlayerValid(player)) {
 				sendCleanPackets(player);
@@ -94,26 +100,29 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 		TerminalDataEvent globalFull = null;
 
-		for (EntityPlayer newPlayer : newPlayers) {
+		for (EntityPlayerMP newPlayer : newPlayers) {
 			if (isPlayerValid(newPlayer)) {
 				if (globalFull == null) globalFull = TerminalManagerServer.createFullDataEvent(globalSurface, guid, false);
 				globalFull.sendToPlayer(newPlayer);
 
-				final String playerName = newPlayer.getEntityName();
-				knownPlayers.put(playerName, new PlayerInfo(this, newPlayer));
-				onPlayerJoin(playerName);
+				final PlayerInfo playerInfo = new PlayerInfo(this, newPlayer);
+				final GameProfile gameProfile = newPlayer.getGameProfile();
+
+				knownPlayersByUUID.put(gameProfile.getId(), playerInfo);
+				knownPlayersByName.put(gameProfile.getName(), playerInfo);
+				onPlayerJoin(gameProfile);
 			}
 		}
 
 		newPlayers.clear();
 	}
 
-	private void sendCleanPackets(EntityPlayer player) {
+	private void sendCleanPackets(EntityPlayerMP player) {
 		new TerminalClearEvent(guid, false).sendToPlayer(player);
 		new TerminalClearEvent(guid, true).sendToPlayer(player);
 	}
 
-	private boolean isPlayerValid(EntityPlayer player) {
+	private boolean isPlayerValid(EntityPlayerMP player) {
 		if (player == null) return false;
 
 		if (player.isDead && !isPlayerLogged(player)) return false;
@@ -122,11 +131,13 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		return guid != null && guid == this.guid;
 	}
 
-	private static boolean isPlayerLogged(EntityPlayer player) {
+	private static boolean isPlayerLogged(EntityPlayerMP player) {
+		final GameProfile gameProfile = player.getGameProfile();
 		@SuppressWarnings("unchecked")
-		List<EntityPlayer> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
-		for (EntityPlayer p : players)
-			if (p.username.equals(player.username)) return true;
+		List<EntityPlayerMP> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
+		for (EntityPlayerMP p : players) {
+			if (p.getGameProfile().equals(gameProfile)) return true;
+		}
 
 		return false;
 	}
@@ -144,9 +155,9 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		if (guid != null) this.guid = guid;
 	}
 
-	public void onPlayerJoin(String playerName) {
+	public void onPlayerJoin(GameProfile player) {
 		for (IComputerAccess computer : computers) {
-			computer.queueEvent(EVENT_PLAYER_JOIN, new Object[] { playerName });
+			computer.queueEvent(EVENT_PLAYER_JOIN, new Object[] { player.getName(), player.getId() });
 		}
 	}
 
@@ -164,13 +175,23 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	public SurfaceServer getSurface(String username) {
 		if (TerminalUtils.GLOBAL_MARKER.equals(username)) return globalSurface;
-		PlayerInfo info = knownPlayers.get(username);
+		PlayerInfo info = knownPlayersByName.get(username);
+		return info != null? info.surface : null;
+	}
+
+	public SurfaceServer getSurface(UUID uuid) {
+		if (TerminalUtils.GLOBAL_SURFACE_UUID.equals(uuid)) return globalSurface;
+		PlayerInfo info = knownPlayersByUUID.get(uuid);
 		return info != null? info.surface : null;
 	}
 
 	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get the names of all the users linked up to this bridge")
-	public List<String> getUsers() {
-		return ImmutableList.copyOf(knownPlayers.keySet());
+	public List<GameProfile> getUsers() {
+		List<GameProfile> result = Lists.newArrayList();
+		for (PlayerInfo info : knownPlayersByName.values())
+			result.add(info.profile);
+
+		return result;
 	}
 
 	@LuaCallable(returnTypes = LuaType.STRING, name = "getGuid", description = "Get the Guid of this bridge")
@@ -188,8 +209,16 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
-	public ILuaObject getUserSurface(@Arg(name = "username", description = "The username of the user to get the draw surface for", type = LuaType.STRING) String username) {
+	public ILuaObject getSurfaceByName(@Arg(name = "username", description = "The username of the user to get the draw surface for", type = LuaType.STRING) String username) {
 		SurfaceServer playerSurface = getSurface(username);
+		Preconditions.checkNotNull(playerSurface, "Invalid player");
+		return ApiAccess.getApi(IAdapterFactory.class).wrapObject(playerSurface);
+	}
+
+	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
+	public ILuaObject getSurfaceByUUID(@Arg(name = "uuid", description = "The uuid of the user to get the draw surface for", type = LuaType.STRING) String username) {
+		UUID uuid = UUID.fromString(username);
+		SurfaceServer playerSurface = getSurface(uuid);
 		Preconditions.checkNotNull(playerSurface, "Invalid player");
 		return ApiAccess.getApi(IAdapterFactory.class).wrapObject(playerSurface);
 	}

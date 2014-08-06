@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import openperipheral.addons.glasses.SurfaceServer.DrawableWrapper;
@@ -19,8 +19,10 @@ import openperipheral.api.*;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -245,21 +247,14 @@ public abstract class Drawable implements IPropertyCallback {
 		public float scale = 1;
 
 		@CallbackProperty
-		public int itemId;
+		public String itemId;
 
 		@CallbackProperty
 		public int meta;
 
-		private static final ThreadLocal<ItemStack> TMP_STACK = new ThreadLocal<ItemStack>() {
-			@Override
-			protected ItemStack initialValue() {
-				return new ItemStack(0, 1, 0);
-			}
-		};
-
 		private ItemIcon() {}
 
-		public ItemIcon(short x, short y, int itemId, int meta) {
+		public ItemIcon(short x, short y, String itemId, int meta) {
 			super(x, y);
 			this.itemId = itemId;
 			this.meta = meta;
@@ -274,18 +269,14 @@ public abstract class Drawable implements IPropertyCallback {
 		@Override
 		@SideOnly(Side.CLIENT)
 		protected void drawContents(float partialTicks) {
-			ItemStack drawStack = TMP_STACK.get();
-			drawStack.itemID = itemId;
+			if (Strings.isNullOrEmpty(itemId)) return;
+			String[] itemSplit = itemId.split(":");
+			if (itemSplit.length != 2) return;
 
-			Item item;
-			try {
-				item = drawStack.getItem();
-			} catch (ArrayIndexOutOfBoundsException e) {
-				return;
-			}
-
+			Item item = GameRegistry.findItem(itemSplit[0], itemSplit[1]);
 			if (item == null) return;
-			drawStack.setItemDamage(meta);
+
+			ItemStack drawStack = new ItemStack(item, 1, meta);
 			GL11.glScalef(scale, scale, scale);
 			getRenderItem().renderItemAndEffectIntoGUI(null, Minecraft.getMinecraft().getTextureManager(), drawStack, 0, 0);
 			GL11.glDisable(GL11.GL_LIGHTING);
@@ -327,7 +318,7 @@ public abstract class Drawable implements IPropertyCallback {
 
 			if (drawLiquid == null) return;
 
-			Icon fluidIcon = drawLiquid.getFlowingIcon();
+			IIcon fluidIcon = drawLiquid.getFlowingIcon();
 			if (fluidIcon == null) return;
 
 			final int iconWidth = fluidIcon.getIconWidth();

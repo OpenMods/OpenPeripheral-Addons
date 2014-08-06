@@ -1,28 +1,27 @@
 package openperipheral.addons.peripheralproxy;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
-import net.minecraft.util.Icon;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.util.IIcon;
+import net.minecraftforge.common.util.ForgeDirection;
 import openperipheral.addons.BlockOP;
-import openperipheral.addons.Config;
 
 public class BlockPeripheralProxy extends BlockOP {
 
 	public static class Icons {
-		public static Icon top;
-		public static Icon bottom;
-		public static Icon side;
+		public static IIcon top;
+		public static IIcon bottom;
+		public static IIcon side;
 	}
 
 	public BlockPeripheralProxy() {
-		super(Config.blockPeripheralProxyId, Material.ground);
+		super(Material.ground);
 		setRotationMode(BlockRotationMode.SIX_DIRECTIONS);
 		setPlacementMode(BlockPlacementMode.ENTITY_ANGLE);
 	}
 
 	@Override
-	public void registerIcons(IconRegister registry) {
+	public void registerBlockIcons(IIconRegister registry) {
 		Icons.top = registry.registerIcon("openperipheraladdons:proxy_top");
 		Icons.bottom = registry.registerIcon("openperipheraladdons:proxy_bottom");
 		Icons.side = registry.registerIcon("openperipheraladdons:proxy_side");

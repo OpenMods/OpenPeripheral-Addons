@@ -1,7 +1,7 @@
 package openperipheral.addons.glasses;
 
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import openmods.Log;
 import openmods.utils.render.FontSizeChecker;
 
@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
 
 public final class GlassesRenderingUtils {
 
-	public static void drawTexturedQuad(double x, double y, Icon icon, float width, float height, float uMax, float vMax, float alpha) {
+	public static void drawTexturedQuad(double x, double y, IIcon icon, float width, float height, float uMax, float vMax, float alpha) {
 		GL11.glPushMatrix();
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);

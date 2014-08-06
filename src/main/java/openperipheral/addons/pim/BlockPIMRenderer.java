@@ -3,9 +3,9 @@ package openperipheral.addons.pim;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import openmods.renderer.IBlockRenderer;
 import openmods.utils.render.RenderUtils;
 
@@ -15,7 +15,7 @@ public class BlockPIMRenderer implements IBlockRenderer<BlockPIM> {
 
 	private static void renderTop(Tessellator tes, boolean pressed, double x, double y, double z) {
 		if (pressed) y -= 0.08;
-		final Icon icon = BlockPIM.Icons.black;
+		final IIcon icon = BlockPIM.Icons.black;
 
 		tes.setColorOpaque(255, 255, 255);
 
@@ -88,7 +88,7 @@ public class BlockPIMRenderer implements IBlockRenderer<BlockPIM> {
 	}
 
 	protected boolean hasPlayer(IBlockAccess world, int x, int y, int z) {
-		TileEntity pim = world.getBlockTileEntity(x, y, z);
+		TileEntity pim = world.getTileEntity(x, y, z);
 		return (pim instanceof TileEntityPIM) && ((TileEntityPIM)pim).hasPlayer();
 	}
 }

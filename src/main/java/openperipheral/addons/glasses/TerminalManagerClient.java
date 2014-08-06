@@ -4,12 +4,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.event.ForgeSubscribe;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class TerminalManagerClient {
 
@@ -21,7 +22,7 @@ public class TerminalManagerClient {
 			drawable.draw(partialTicks);
 	}
 
-	@ForgeSubscribe
+	@SubscribeEvent
 	public void onRenderGameOverlay(RenderGameOverlayEvent evt) {
 		if (evt.type == ElementType.HELMET && evt instanceof RenderGameOverlayEvent.Post) {
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
@@ -38,7 +39,7 @@ public class TerminalManagerClient {
 		return evt.isPrivate? TerminalUtils.PRIVATE_MARKER : TerminalUtils.GLOBAL_MARKER;
 	}
 
-	@ForgeSubscribe
+	@SubscribeEvent
 	public void onTerminalData(TerminalDataEvent evt) {
 		String surfaceName = getSurfaceName(evt);
 		SurfaceClient surface = surfaces.get(evt.terminalId, surfaceName);
@@ -51,7 +52,7 @@ public class TerminalManagerClient {
 		surface.interpretCommandList(evt.commands);
 	}
 
-	@ForgeSubscribe
+	@SubscribeEvent
 	public void onTerminalClear(TerminalClearEvent evt) {
 		String surfaceName = getSurfaceName(evt);
 		surfaces.remove(evt.terminalId, surfaceName);

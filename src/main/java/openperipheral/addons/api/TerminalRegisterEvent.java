@@ -1,14 +1,14 @@
 package openperipheral.addons.api;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.event.Event;
+import net.minecraft.entity.player.EntityPlayerMP;
+import cpw.mods.fml.common.eventhandler.Event;
 
 public class TerminalRegisterEvent extends Event {
 
-	public final EntityPlayer player;
+	public final EntityPlayerMP player;
 	public final long terminalId;
 
-	public TerminalRegisterEvent(EntityPlayer player, long terminalId) {
+	public TerminalRegisterEvent(EntityPlayerMP player, long terminalId) {
 		this.player = player;
 		this.terminalId = terminalId;
 	}

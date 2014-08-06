@@ -5,12 +5,12 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
-import openmods.network.EventPacket;
-import openmods.network.IEventPacketType;
+import openmods.network.event.EventDirection;
+import openmods.network.event.NetworkEvent;
+import openmods.network.event.NetworkEventMeta;
 import openmods.structured.Command.CommandList;
-import openperipheral.addons.EventTypes;
 
-public abstract class TerminalEvent extends EventPacket {
+public abstract class TerminalEvent extends NetworkEvent {
 
 	public long terminalId;
 	public boolean isPrivate;
@@ -36,11 +36,11 @@ public abstract class TerminalEvent extends EventPacket {
 
 	@Override
 	protected void appendLogInfo(List<String> info) {
-		super.appendLogInfo(info);
 		info.add(TerminalUtils.formatTerminalId(terminalId));
 		info.add(isPrivate? "private" : "public");
 	}
 
+	@NetworkEventMeta(direction = EventDirection.C2S)
 	public static class TerminalResetEvent extends TerminalEvent {
 		public TerminalResetEvent() {
 			super();
@@ -49,13 +49,9 @@ public abstract class TerminalEvent extends EventPacket {
 		public TerminalResetEvent(long terminalId, boolean isPrivate) {
 			super(terminalId, isPrivate);
 		}
-
-		@Override
-		public IEventPacketType getType() {
-			return EventTypes.TERMINAL_RESET;
-		}
 	}
 
+	@NetworkEventMeta(direction = EventDirection.S2C)
 	public static class TerminalClearEvent extends TerminalEvent {
 		public TerminalClearEvent() {}
 
@@ -63,13 +59,9 @@ public abstract class TerminalEvent extends EventPacket {
 			this.terminalId = terminalId;
 			this.isPrivate = isPrivate;
 		}
-
-		@Override
-		public IEventPacketType getType() {
-			return EventTypes.TERMINAL_CLEAR;
-		}
 	}
 
+	@NetworkEventMeta(direction = EventDirection.S2C, chunked = true, compressed = true)
 	public static class TerminalDataEvent extends TerminalEvent {
 		public final CommandList commands = new CommandList();
 
@@ -79,11 +71,6 @@ public abstract class TerminalEvent extends EventPacket {
 
 		public TerminalDataEvent(long terminalId, boolean isPrivate) {
 			super(terminalId, isPrivate);
-		}
-
-		@Override
-		public IEventPacketType getType() {
-			return EventTypes.TERMINAL_DATA;
 		}
 
 		@Override

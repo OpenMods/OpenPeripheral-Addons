@@ -14,6 +14,8 @@ import openperipheral.api.IAttachable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import com.mojang.authlib.GameProfile;
+
 import dan200.computercraft.api.peripheral.IComputerAccess;
 
 public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttachable {
@@ -56,13 +58,13 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttach
 	}
 
 	@Override
-	public String getInvName() {
+	public String getInventoryName() {
 		EntityPlayer player = getPlayer();
-		return player != null? player.username : "pim";
+		return player != null? player.getCommandSenderName() : "pim";
 	}
 
 	@Override
-	public boolean isInvNameLocalized() {
+	public boolean hasCustomInventoryName() {
 		return false;
 	}
 
@@ -78,10 +80,10 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttach
 	}
 
 	@Override
-	public void openChest() {}
+	public void openInventory() {}
 
 	@Override
-	public void closeChest() {}
+	public void closeInventory() {}
 
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
@@ -108,7 +110,8 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttach
 		worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, p == null? 0 : 1, 3);
 		if (p != null) {
 			player = new WeakReference<EntityPlayer>(p);
-			fireEvent("player_on", p.username);
+			GameProfile profile = p.getGameProfile();
+			fireEvent("player_on", profile.getName(), profile.getId());
 		} else {
 			player = null;
 			fireEvent("player_off");

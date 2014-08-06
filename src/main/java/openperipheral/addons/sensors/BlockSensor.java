@@ -3,11 +3,11 @@ package openperipheral.addons.sensors;
 import java.util.List;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.common.ForgeDirection;
+import net.minecraftforge.common.util.ForgeDirection;
 import openperipheral.addons.BlockOP;
 import openperipheral.addons.Config;
 import openperipheral.addons.OpenPeripheralAddons;
@@ -16,7 +16,7 @@ import openperipheral.addons.utils.CCUtils;
 public class BlockSensor extends BlockOP {
 
 	public BlockSensor() {
-		super(Config.blockSensorId, Material.ground);
+		super(Material.iron);
 		setHardness(0.5F);
 	}
 
@@ -26,12 +26,7 @@ public class BlockSensor extends BlockOP {
 	}
 
 	@Override
-	public void registerIcons(IconRegister iconRegister) {}
-
-	@Override
-	public int getFlammability(IBlockAccess world, int x, int y, int z, int metadata, ForgeDirection face) {
-		return 0;
-	}
+	public void registerBlockIcons(IIconRegister iconRegister) {}
 
 	@Override
 	public boolean renderAsNormalBlock() {
@@ -39,7 +34,7 @@ public class BlockSensor extends BlockOP {
 	}
 
 	@Override
-	public boolean isBlockSolidOnSide(World world, int x, int y, int z, ForgeDirection side) {
+	public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
 		return side == ForgeDirection.DOWN;
 	}
 
@@ -54,24 +49,14 @@ public class BlockSensor extends BlockOP {
 	}
 
 	@Override
-	public boolean canBeReplacedByLeaves(World world, int x, int y, int z) {
-		return false;
-	}
-
-	@Override
-	public boolean isFlammable(IBlockAccess world, int x, int y, int z, int metadata, ForgeDirection face) {
-		return false;
-	}
-
-	@Override
 	public boolean shouldRenderBlock() {
 		return false;
 	}
 
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public void getSubBlocks(int id, CreativeTabs tab, List result) {
-		super.getSubBlocks(id, tab, result);
+	public void getSubBlocks(Item item, CreativeTabs tab, List result) {
+		super.getSubBlocks(item, tab, result);
 		if (Config.addTurtlesToCreative) CCUtils.addUpgradedTurtles(result, OpenPeripheralAddons.sensorUpgrade);
 	}
 

@@ -2,6 +2,7 @@ package openperipheral.addons.sensors;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -18,6 +19,7 @@ import openperipheral.api.*;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mojang.authlib.GameProfile;
 
 @OnTick
 @Prefixed("target")
@@ -31,7 +33,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 	}
 
 	private static AxisAlignedBB getBoundingBox(Vec3 location, double range) {
-		return AxisAlignedBB.getAABBPool().getAABB(
+		return AxisAlignedBB.getBoundingBox(
 				location.xCoord, location.yCoord, location.zCoord,
 				location.xCoord + 1, location.yCoord + 1, location.zCoord + 1)
 				.expand(range, range, range);
@@ -46,7 +48,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 		final AxisAlignedBB aabb = getBoundingBox(env);
 		for (Entity entity : WorldUtils.getEntitiesWithinAABB(env.getWorld(), entityClass, aabb))
-			ids.add(entity.entityId);
+			ids.add(entity.getEntityId());
 
 		return ids;
 	}
@@ -61,6 +63,11 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return getEntityInfo(sensor, player);
 	}
 
+	private static Map<String, Object> getPlayerInfo(ISensorEnvironment sensor, UUID uuid) {
+		EntityPlayer player = sensor.getWorld().func_152378_a(uuid);
+		return getEntityInfo(sensor, player);
+	}
+
 	protected static Map<String, Object> getEntityInfo(ISensorEnvironment sensor, Entity mob) {
 		Preconditions.checkNotNull(mob, DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
 		final AxisAlignedBB aabb = getBoundingBox(sensor);
@@ -71,12 +78,12 @@ public class AdapterSensor implements IPeripheralAdapter {
 	}
 
 	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get the usernames of all the players in range")
-	public List<String> getPlayerNames(ISensorEnvironment env) {
+	public List<GameProfile> getPlayers(ISensorEnvironment env) {
 		List<EntityPlayer> players = WorldUtils.getEntitiesWithinAABB(env.getWorld(), EntityPlayer.class, getBoundingBox(env));
 
-		List<String> names = Lists.newArrayList();
+		List<GameProfile> names = Lists.newArrayList();
 		for (EntityPlayer player : players)
-			names.add(player.username);
+			names.add(player.getGameProfile());
 
 		return names;
 	}
@@ -92,9 +99,16 @@ public class AdapterSensor implements IPeripheralAdapter {
 	}
 
 	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get full details of a particular player if they're in range")
-	public Map<?, ?> getPlayerData(ISensorEnvironment env,
+	public Map<?, ?> getPlayerByName(ISensorEnvironment env,
 			@Arg(type = LuaType.STRING, name = "username", description = "The players username") String username) {
 		return getPlayerInfo(env, username);
+	}
+
+	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get full details of a particular player if they're in range")
+	public Map<?, ?> getPlayerByUUID(ISensorEnvironment env,
+			@Arg(type = LuaType.STRING, name = "uuid", description = "The players uuid") String uuid) {
+		UUID parsedUUID = UUID.fromString(uuid);
+		return getPlayerInfo(env, parsedUUID);
 	}
 
 	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get full details of a particular mob if it's in range")
@@ -132,13 +146,12 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 					final int distSq = x * x + y * y + z * z;
 					if (distSq == 0 || distSq > rangeSq) continue;
-					int id = world.getBlockId(bx, by, bz);
-					Block block = Block.blocksList[id];
+					Block block = world.getBlock(bx, by, bz);
 
 					String type;
 					if (block == null || world.isAirBlock(bx, by, bz)) type = "AIR";
-					else if (block.blockMaterial.isLiquid()) type = "LIQUID";
-					else if (block.blockMaterial.isSolid()) type = "SOLID";
+					else if (block.getMaterial().isLiquid()) type = "LIQUID";
+					else if (block.getMaterial().isSolid()) type = "SOLID";
 					else type = "UNKNOWN";
 
 					Map<String, Object> tmp = Maps.newHashMap();

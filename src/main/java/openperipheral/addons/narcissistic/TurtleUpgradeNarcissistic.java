@@ -1,8 +1,7 @@
 package openperipheral.addons.narcissistic;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.IIcon;
 import openperipheral.addons.MetasGeneric;
 import openperipheral.addons.OpenPeripheralAddons.Icons;
 import openperipheral.api.ApiAccess;
@@ -18,8 +17,8 @@ public class TurtleUpgradeNarcissistic implements ITurtleUpgrade {
 	}
 
 	@Override
-	public String getAdjective() {
-		return StatCollector.translateToLocal("openperipheral.turtle.narcissistic.adjective");
+	public String getUnlocalisedAdjective() {
+		return "openperipheral.turtle.narcissistic.adjective";
 	}
 
 	@Override
@@ -43,7 +42,7 @@ public class TurtleUpgradeNarcissistic implements ITurtleUpgrade {
 	}
 
 	@Override
-	public Icon getIcon(ITurtleAccess turtle, TurtleSide side) {
+	public IIcon getIcon(ITurtleAccess turtle, TurtleSide side) {
 		return Icons.narcissiticTurtle;
 	}
 

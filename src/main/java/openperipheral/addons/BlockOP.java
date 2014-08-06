@@ -5,8 +5,8 @@ import openmods.block.OpenBlock;
 
 public abstract class BlockOP extends OpenBlock {
 
-	public BlockOP(int id, Material material) {
-		super(id, material);
+	public BlockOP(Material material) {
+		super(material);
 		setCreativeTab(OpenPeripheralAddons.tabOpenPeripheralAddons);
 	}
 
