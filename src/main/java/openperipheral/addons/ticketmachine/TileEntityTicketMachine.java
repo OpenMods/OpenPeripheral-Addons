@@ -51,7 +51,7 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IExtend
 					return itemstack.getItem() == Items.paper;
 				case SLOT_INK: {
 					Set<ColorMeta> color = ColorUtils.stackToColor(itemstack);
-					return color != null && color.contains(ColorUtils.BLACK);
+					return color != null && color.contains(ColorMeta.BLACK);
 				}
 				default:
 					return false;
