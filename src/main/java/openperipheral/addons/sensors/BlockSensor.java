@@ -18,6 +18,7 @@ public class BlockSensor extends BlockOP {
 	public BlockSensor() {
 		super(Material.iron);
 		setHardness(0.5F);
+		setRenderMode(RenderMode.TESR_ONLY);
 	}
 
 	@Override
@@ -26,7 +27,9 @@ public class BlockSensor extends BlockOP {
 	}
 
 	@Override
-	public void registerBlockIcons(IIconRegister iconRegister) {}
+	public void registerBlockIcons(IIconRegister registry) {
+		this.blockIcon = registry.registerIcon("openperipheraladdons:sensor");
+	}
 
 	@Override
 	public boolean renderAsNormalBlock() {
@@ -46,11 +49,6 @@ public class BlockSensor extends BlockOP {
 	@Override
 	public int getRenderType() {
 		return OpenPeripheralAddons.renderId;
-	}
-
-	@Override
-	public boolean shouldRenderBlock() {
-		return false;
 	}
 
 	@Override

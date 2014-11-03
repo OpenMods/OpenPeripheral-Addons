@@ -4,6 +4,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
+import openmods.block.BlockRotationMode;
 import openperipheral.addons.BlockOP;
 
 public class BlockPeripheralProxy extends BlockOP {
@@ -18,6 +19,7 @@ public class BlockPeripheralProxy extends BlockOP {
 		super(Material.ground);
 		setRotationMode(BlockRotationMode.SIX_DIRECTIONS);
 		setPlacementMode(BlockPlacementMode.ENTITY_ANGLE);
+		setRenderMode(RenderMode.BLOCK_ONLY);
 	}
 
 	@Override
@@ -33,10 +35,4 @@ public class BlockPeripheralProxy extends BlockOP {
 		setTexture(ForgeDirection.SOUTH, Icons.side);
 		setDefaultTexture(Icons.side);
 	}
-
-	@Override
-	public boolean shouldRenderBlock() {
-		return true;
-	}
-
 }

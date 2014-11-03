@@ -21,6 +21,7 @@ public class BlockPIM extends BlockOP {
 		super(Material.ground);
 		setStepSound(soundTypeMetal);
 		setBlockBounds(0f, 0f, 0f, 1f, 0.3f, 1f);
+		setRenderMode(RenderMode.BLOCK_ONLY);
 	}
 
 	@Override
@@ -28,11 +29,6 @@ public class BlockPIM extends BlockOP {
 		Icons.black = registry.registerIcon("openperipheraladdons:pim_black");
 		Icons.blue = registry.registerIcon("openperipheraladdons:pim_blue");
 		blockIcon = Icons.blue;
-	}
-
-	@Override
-	public boolean shouldRenderBlock() {
-		return true;
 	}
 
 	@Override

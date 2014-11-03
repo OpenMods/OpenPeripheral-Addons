@@ -4,6 +4,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
+import openmods.block.BlockRotationMode;
 import openperipheral.addons.BlockOP;
 
 public class BlockTicketMachine extends BlockOP {
@@ -14,11 +15,7 @@ public class BlockTicketMachine extends BlockOP {
 	public BlockTicketMachine() {
 		super(Material.iron);
 		setRotationMode(BlockRotationMode.FOUR_DIRECTIONS);
-	}
-
-	@Override
-	public boolean shouldRenderBlock() {
-		return true;
+		setRenderMode(RenderMode.BLOCK_ONLY);
 	}
 
 	@Override

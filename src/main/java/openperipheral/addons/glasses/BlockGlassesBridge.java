@@ -13,11 +13,7 @@ public class BlockGlassesBridge extends BlockOP {
 
 	public BlockGlassesBridge() {
 		super(Material.ground);
-	}
-
-	@Override
-	public boolean shouldRenderBlock() {
-		return true;
+		setRenderMode(RenderMode.BLOCK_ONLY);
 	}
 
 	@Override
