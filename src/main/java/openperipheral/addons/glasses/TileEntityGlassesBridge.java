@@ -185,6 +185,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		return info != null? info.surface : null;
 	}
 
+	@Asynchronous
 	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get the names of all the users linked up to this bridge")
 	public List<GameProfile> getUsers() {
 		List<GameProfile> result = Lists.newArrayList();
@@ -194,6 +195,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		return result;
 	}
 
+	@Asynchronous
 	@LuaCallable(returnTypes = LuaType.STRING, name = "getGuid", description = "Get the Guid of this bridge")
 	public String getGuidString() {
 		return TerminalUtils.formatTerminalId(guid);
@@ -203,11 +205,13 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		return guid;
 	}
 
+	@Asynchronous
 	@LuaCallable(returnTypes = LuaType.NUMBER, description = "Get the display width of some text")
 	public int getStringWidth(@Arg(name = "text", description = "The text you want to measure", type = LuaType.STRING) String text) {
 		return GlassesRenderingUtils.getStringWidth(text);
 	}
 
+	@Asynchronous
 	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
 	public ILuaObject getSurfaceByName(@Arg(name = "username", description = "The username of the user to get the draw surface for", type = LuaType.STRING) String username) {
 		SurfaceServer playerSurface = getSurface(username);
@@ -215,6 +219,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		return ApiAccess.getApi(IAdapterFactory.class).wrapObject(playerSurface);
 	}
 
+	@Asynchronous
 	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
 	public ILuaObject getSurfaceByUUID(@Arg(name = "uuid", description = "The uuid of the user to get the draw surface for", type = LuaType.STRING) String username) {
 		UUID uuid = UUID.fromString(username);

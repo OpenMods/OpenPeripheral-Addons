@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 
-@OnTick
 @Prefixed("target")
 public class AdapterSensor implements IPeripheralAdapter {
 

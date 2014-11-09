@@ -16,6 +16,7 @@ import com.google.common.collect.Maps;
 
 import dan200.computercraft.api.lua.ILuaObject;
 
+@Asynchronous
 @Freeform
 public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, ElementField> {
 
