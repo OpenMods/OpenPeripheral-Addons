@@ -87,9 +87,9 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 
 	public SurfaceServer() {}
 
-	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Get object by id")
+	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Get object by id")
 	public synchronized ILuaObject getById(
-			@Arg(name = "id", description = "Id of drawed object", type = LuaType.NUMBER) int id
+			@Arg(name = "id", description = "Id of drawed object") int id
 			) {
 		DrawableWrapper wrapper = containers.get(id - 1);
 		return wrapper != null? wrapper.luaWrapper : null;
@@ -102,12 +102,12 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 		removeAll();
 	}
 
-	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get the Ids of all the objects on the screen")
+	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get the Ids of all the objects on the screen")
 	public synchronized Integer[] getAllIds() {
 		return containers.keySet().toArray(new Integer[containers.size()]);
 	}
 
-	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get all objects on the screen")
+	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get all objects on the screen")
 	public synchronized Map<Integer, ILuaObject> getAllObjects() {
 		Map<Integer, ILuaObject> result = Maps.newHashMap();
 		for (Map.Entry<Integer, DrawableWrapper> e : containers.entrySet())
@@ -122,60 +122,60 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 		return wrapper.luaWrapper;
 	}
 
-	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Add a new text object to the screen")
+	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Add a new text object to the screen")
 	public ILuaObject addText(
-			@Arg(name = "x", description = "The x position from the top left", type = LuaType.NUMBER) short x,
-			@Arg(name = "y", description = "The y position from the top left", type = LuaType.NUMBER) short y,
-			@Arg(name = "text", description = "The text to display", type = LuaType.STRING) String text,
-			@Optionals @Arg(name = "color", description = "The text color", type = LuaType.NUMBER) Integer color
+			@Arg(name = "x", description = "The x position from the top left") short x,
+			@Arg(name = "y", description = "The y position from the top left") short y,
+			@Arg(name = "text", description = "The text to display") String text,
+			@Optionals @Arg(name = "color", description = "The text color") Integer color
 			) {
 		return addDrawable(new Drawable.Text(x, y, text, firstNonNull(color, 0xFFFFFF)));
 	}
 
-	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Add a new box to the screen")
+	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Add a new box to the screen")
 	public ILuaObject addBox(
-			@Arg(name = "x", description = "The x position from the top left", type = LuaType.NUMBER) short x,
-			@Arg(name = "y", description = "The y position from the top left", type = LuaType.NUMBER) short y,
-			@Arg(name = "width", description = "The width of the box", type = LuaType.NUMBER) short width,
-			@Arg(name = "height", description = "The height of the box", type = LuaType.NUMBER) short height,
-			@Optionals @Arg(name = "color", description = "The color of the box", type = LuaType.NUMBER) Integer color,
-			@Arg(name = "opacity", description = "The opacity of the box (from 0 to 1)", type = LuaType.NUMBER) Float opacity
+			@Arg(name = "x", description = "The x position from the top left") short x,
+			@Arg(name = "y", description = "The y position from the top left") short y,
+			@Arg(name = "width", description = "The width of the box") short width,
+			@Arg(name = "height", description = "The height of the box") short height,
+			@Optionals @Arg(name = "color", description = "The color of the box") Integer color,
+			@Arg(name = "opacity", description = "The opacity of the box (from 0 to 1)") Float opacity
 			) {
 		return addDrawable(new Drawable.SolidBox(x, y, width, height, firstNonNull(color, 0xFFFFFF), firstNonNull(opacity, 1.0f)));
 	}
 
-	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Add a new gradient box to the screen")
+	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Add a new gradient box to the screen")
 	public ILuaObject addGradientBox(
-			@Arg(name = "x", description = "The x position from the top left", type = LuaType.NUMBER) short x,
-			@Arg(name = "y", description = "The y position from the top left", type = LuaType.NUMBER) short y,
-			@Arg(name = "width", description = "The width of the box", type = LuaType.NUMBER) short width,
-			@Arg(name = "height", description = "The height of the box", type = LuaType.NUMBER) short height,
-			@Arg(name = "color", description = "The color of the box", type = LuaType.NUMBER) int color,
-			@Arg(name = "opacity", description = "The opacity of the box (from 0 to 1)", type = LuaType.NUMBER) float alpha,
-			@Arg(name = "color", description = "The color of the other side of the box", type = LuaType.NUMBER) int color2,
-			@Arg(name = "opacity", description = "The opacity of the other side of the box (from 0 to 1)", type = LuaType.NUMBER) float alpha2,
-			@Arg(name = "gradient", description = "The gradient direction (1 for horizontal, 2 for vertical)", type = LuaType.NUMBER) int gradient
+			@Arg(name = "x", description = "The x position from the top left") short x,
+			@Arg(name = "y", description = "The y position from the top left") short y,
+			@Arg(name = "width", description = "The width of the box") short width,
+			@Arg(name = "height", description = "The height of the box") short height,
+			@Arg(name = "color", description = "The color of the box") int color,
+			@Arg(name = "opacity", description = "The opacity of the box (from 0 to 1)") float alpha,
+			@Arg(name = "color", description = "The color of the other side of the box") int color2,
+			@Arg(name = "opacity", description = "The opacity of the other side of the box (from 0 to 1)") float alpha2,
+			@Arg(name = "gradient", description = "The gradient direction (1 for horizontal, 2 for vertical)") int gradient
 			) {
 		return addDrawable(new Drawable.GradientBox(x, y, width, height, color, alpha, color2, alpha2, gradient));
 	}
 
-	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Add an icon of an item to the screen")
+	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Add an icon of an item to the screen")
 	public ILuaObject addIcon(
-			@Arg(name = "x", description = "The x position from the top left", type = LuaType.NUMBER) short x,
-			@Arg(name = "y", description = "The y position from the top left", type = LuaType.NUMBER) short y,
-			@Arg(name = "id", description = "The id of the item to draw", type = LuaType.STRING) String id,
-			@Arg(name = "meta", description = "The meta of the item to draw", type = LuaType.NUMBER) short meta
+			@Arg(name = "x", description = "The x position from the top left") short x,
+			@Arg(name = "y", description = "The y position from the top left") short y,
+			@Arg(name = "id", description = "The id of the item to draw") String id,
+			@Arg(name = "meta", description = "The meta of the item to draw") short meta
 			) {
 		return addDrawable(new Drawable.ItemIcon(x, y, id, meta));
 	}
 
-	@LuaCallable(returnTypes = LuaType.OBJECT, description = "Add a box textured like a liquid to the screen")
+	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Add a box textured like a liquid to the screen")
 	public ILuaObject addLiquid(
-			@Arg(name = "x", description = "The x position from the top left", type = LuaType.NUMBER) short x,
-			@Arg(name = "y", description = "The y position from the top left", type = LuaType.NUMBER) short y,
-			@Arg(name = "width", description = "The width of the liquid box", type = LuaType.NUMBER) short width,
-			@Arg(name = "height", description = "The height of the liquid box", type = LuaType.NUMBER) short height,
-			@Arg(name = "string", description = "The name of the fluid to render", type = LuaType.STRING) String id
+			@Arg(name = "x", description = "The x position from the top left") short x,
+			@Arg(name = "y", description = "The y position from the top left") short y,
+			@Arg(name = "width", description = "The width of the liquid box") short width,
+			@Arg(name = "height", description = "The height of the liquid box") short height,
+			@Arg(name = "string", description = "The name of the fluid to render") String id
 			) {
 		return addDrawable(new Drawable.LiquidIcon(x, y, width, height, id));
 	}

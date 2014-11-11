@@ -97,9 +97,9 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IExtend
 		syncMap.addUpdateListener(createRenderUpdateListener());
 	}
 
-	@LuaCallable(returnTypes = LuaType.BOOLEAN, description = "Create a new ticket to the specified destination")
-	public boolean createTicket(@Arg(name = "destination", description = "The destination for the ticket", type = LuaType.STRING) String destination,
-			@Arg(name = "amount", type = LuaType.NUMBER) @Optionals Integer amount) {
+	@LuaCallable(returnTypes = LuaReturnType.BOOLEAN, description = "Create a new ticket to the specified destination")
+	public boolean createTicket(@Arg(name = "destination", description = "The destination for the ticket") String destination,
+			@Arg(name = "amount") @Optionals Integer amount) {
 		if (amount == null) amount = 1;
 		else Preconditions.checkArgument(amount > 0 && amount <= 64, "Amount must be between 1 and 64");
 
@@ -132,7 +132,7 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IExtend
 	}
 
 	@Asynchronous
-	@LuaCallable(returnTypes = LuaType.STRING, description = "Returns owner of this machine")
+	@LuaCallable(returnTypes = LuaReturnType.STRING, description = "Returns owner of this machine")
 	public String getOwner() {
 		return owner.getValue();
 	}

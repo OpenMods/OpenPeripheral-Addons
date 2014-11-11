@@ -402,7 +402,7 @@ public abstract class Drawable implements IPropertyCallback {
 		return type.create();
 	}
 
-	@LuaCallable(returnTypes = LuaType.STRING, name = "getType", description = "Get object type")
+	@LuaCallable(returnTypes = LuaReturnType.STRING, name = "getType", description = "Get object type")
 	public String getTypeName() {
 		return getType().name().toLowerCase();
 	}
@@ -414,7 +414,7 @@ public abstract class Drawable implements IPropertyCallback {
 		wrapper = null;
 	}
 
-	@LuaCallable(returnTypes = LuaType.NUMBER, name = "getId")
+	@LuaCallable(returnTypes = LuaReturnType.NUMBER, name = "getId")
 	public int getId() {
 		Preconditions.checkNotNull(wrapper, "Object is deleted");
 		return wrapper.containerId + 1;

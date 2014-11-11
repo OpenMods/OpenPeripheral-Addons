@@ -73,10 +73,10 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 		Preconditions.checkArgument(mob.boundingBox.intersectsWith(aabb), DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
 		final Vec3 sensorPos = sensor.getLocation();
-		return ApiAccess.getApi(IEntityMetadataBuilder.class).getEntityMetadata(mob, sensorPos);
+		return ApiAccess.getApi(IEntityMetaBuilder.class).getEntityMetadata(mob, sensorPos);
 	}
 
-	@LuaCallable(returnTypes = LuaType.TABLE, description = "Get the usernames of all the players in range")
+	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get the usernames of all the players in range")
 	public List<GameProfile> getPlayers(ISensorEnvironment env) {
 		List<EntityPlayer> players = WorldUtils.getEntitiesWithinAABB(env.getWorld(), EntityPlayer.class, getBoundingBox(env));
 
@@ -87,42 +87,42 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return names;
 	}
 
-	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get the ids of all the mobs in range")
+	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get the ids of all the mobs in range")
 	public List<Integer> getMobIds(ISensorEnvironment env) {
 		return listEntityIds(env, EntityLiving.class);
 	}
 
-	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get the ids of all the minecarts in range")
+	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get the ids of all the minecarts in range")
 	public List<Integer> getMinecartIds(ISensorEnvironment env) {
 		return listEntityIds(env, EntityMinecart.class);
 	}
 
-	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get full details of a particular player if they're in range")
+	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get full details of a particular player if they're in range")
 	public Map<?, ?> getPlayerByName(ISensorEnvironment env,
-			@Arg(type = LuaType.STRING, name = "username", description = "The players username") String username) {
+			@Arg(name = "username", description = "The players username") String username) {
 		return getPlayerInfo(env, username);
 	}
 
-	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get full details of a particular player if they're in range")
+	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get full details of a particular player if they're in range")
 	public Map<?, ?> getPlayerByUUID(ISensorEnvironment env,
-			@Arg(type = LuaType.STRING, name = "uuid", description = "The players uuid") String uuid) {
+			@Arg(name = "uuid", description = "The players uuid") String uuid) {
 		UUID parsedUUID = UUID.fromString(uuid);
 		return getPlayerInfo(env, parsedUUID);
 	}
 
-	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get full details of a particular mob if it's in range")
+	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get full details of a particular mob if it's in range")
 	public Map<String, Object> getMobData(ISensorEnvironment sensor,
-			@Arg(type = LuaType.NUMBER, name = "mobId", description = "The mob id retrieved from getMobIds()") int mobId) {
+			@Arg(name = "mobId", description = "The mob id retrieved from getMobIds()") int mobId) {
 		return getEntityInfoById(sensor, mobId);
 	}
 
-	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get full details of a particular minecart if it's in range")
+	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get full details of a particular minecart if it's in range")
 	public Map<?, ?> getMinecartData(ISensorEnvironment sensor,
-			@Arg(type = LuaType.NUMBER, name = "minecartId", description = "The minecart id retrieved from getMobIds()") int minecartId) {
+			@Arg(name = "minecartId", description = "The minecart id retrieved from getMobIds()") int minecartId) {
 		return getEntityInfoById(sensor, minecartId);
 	}
 
-	@LuaCallable(returnTypes = { LuaType.TABLE }, description = "Get a table of information about the surrounding area. Includes whether each block is UNKNOWN, AIR, LIQUID or SOLID")
+	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get a table of information about the surrounding area. Includes whether each block is UNKNOWN, AIR, LIQUID or SOLID")
 	public Map<Integer, Map<String, Object>> sonicScan(ISensorEnvironment env) {
 
 		int range = 1 + env.getSensorRange() / 2;
