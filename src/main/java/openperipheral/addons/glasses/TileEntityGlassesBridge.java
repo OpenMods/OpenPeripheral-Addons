@@ -21,6 +21,7 @@ import dan200.computercraft.api.lua.ILuaObject;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 
 @Freeform
+@PeripheralTypeId("openperipheral_ticketmachine")
 public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable {
 
 	private static final String EVENT_CHAT_MESSAGE = "chat_command";

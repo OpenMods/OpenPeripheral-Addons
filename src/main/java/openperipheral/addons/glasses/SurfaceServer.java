@@ -16,8 +16,9 @@ import com.google.common.collect.Maps;
 
 import dan200.computercraft.api.lua.ILuaObject;
 
-@Asynchronous
 @Freeform
+@Asynchronous
+@ObjectTypeId("glasses_surface")
 public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, ElementField> {
 
 	// I know this one is in guava, but I'm getting name class on Objects

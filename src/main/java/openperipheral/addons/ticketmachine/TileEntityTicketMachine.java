@@ -29,6 +29,7 @@ import com.google.common.base.Preconditions;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 @Freeform
+@PeripheralTypeId("openperipheral_ticketmachine")
 public class TileEntityTicketMachine extends SyncedTileEntity implements IExtendable, IPlaceAwareTile, IHasGui, IIconProvider, IInventoryProvider, IInventoryCallback {
 
 	private static final int SLOT_PAPER = 0;

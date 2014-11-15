@@ -1,6 +1,7 @@
 package openperipheral.addons.peripheralproxy;
 
 import dan200.computercraft.api.lua.ILuaContext;
+import dan200.computercraft.api.lua.LuaException;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 import dan200.computercraft.api.peripheral.IPeripheral;
 
@@ -23,7 +24,7 @@ public class WrappedPeripheral implements IPeripheral {
 	}
 
 	@Override
-	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws Exception {
+	public Object[] callMethod(IComputerAccess computer, ILuaContext context, int method, Object[] arguments) throws LuaException, InterruptedException {
 		return (peripheral != null)? peripheral.callMethod(computer, context, method, arguments) : null;
 	}
 

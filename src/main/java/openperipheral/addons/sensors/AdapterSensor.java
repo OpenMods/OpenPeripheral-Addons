@@ -30,6 +30,11 @@ public class AdapterSensor implements IPeripheralAdapter {
 	public Class<?> getTargetClass() {
 		return ISensorEnvironment.class;
 	}
+	
+	@Override
+	public String getSourceId() {
+		return "openperipheral_sensor";
+	}
 
 	private static AxisAlignedBB getBoundingBox(Vec3 location, double range) {
 		return AxisAlignedBB.getBoundingBox(
