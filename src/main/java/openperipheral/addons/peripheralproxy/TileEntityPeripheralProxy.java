@@ -1,6 +1,6 @@
 package openperipheral.addons.peripheralproxy;
 
-import static openmods.utils.ReflectionHelper.*;
+import static openmods.reflection.ReflectionHelper.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -11,8 +11,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import openmods.Log;
 import openmods.api.INeighbourAwareTile;
+import openmods.reflection.SafeClassLoad;
 import openmods.tileentity.OpenTileEntity;
-import openmods.utils.SafeClassLoad;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.api.ICustomPeripheralProvider;
 import openperipheral.api.Volatile;

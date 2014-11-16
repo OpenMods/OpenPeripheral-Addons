@@ -30,7 +30,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 	public Class<?> getTargetClass() {
 		return ISensorEnvironment.class;
 	}
-	
+
 	@Override
 	public String getSourceId() {
 		return "openperipheral_sensor";
