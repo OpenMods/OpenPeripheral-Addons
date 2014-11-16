@@ -24,8 +24,8 @@ import dan200.computercraft.api.peripheral.IPeripheral;
 @Volatile
 public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustomPeripheralProvider, INeighbourAwareTile {
 
-	public static final SafeClassLoad CC_CLASS = safeLoad("dan200.computercraft.ComputerCraft");
-	public static final SafeClassLoad CABLE_CLASS = safeLoad("dan200.computercraft.shared.peripheral.modem.TileCable");
+	public static final SafeClassLoad CC_CLASS = new SafeClassLoad("dan200.computercraft.ComputerCraft");
+	public static final SafeClassLoad CABLE_CLASS = new SafeClassLoad("dan200.computercraft.shared.peripheral.modem.TileCable");
 
 	private Block attachedBlock;
 
