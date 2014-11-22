@@ -1,31 +1,43 @@
 package openperipheral.addons.peripheralproxy;
 
-import static openmods.reflection.ReflectionHelper.*;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import openmods.Log;
 import openmods.api.INeighbourAwareTile;
-import openmods.reflection.SafeClassLoad;
+import openmods.reflection.*;
+import openmods.reflection.MethodAccess.Function0;
+import openmods.reflection.MethodAccess.Function5;
 import openmods.tileentity.OpenTileEntity;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.api.ICustomPeripheralProvider;
 import openperipheral.api.Volatile;
 
-import org.apache.commons.lang3.ArrayUtils;
+import com.google.common.base.Preconditions;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 
 @Volatile
 public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustomPeripheralProvider, INeighbourAwareTile {
 
-	public static final SafeClassLoad CC_CLASS = new SafeClassLoad("dan200.computercraft.ComputerCraft");
-	public static final SafeClassLoad CABLE_CLASS = new SafeClassLoad("dan200.computercraft.shared.peripheral.modem.TileCable");
+	private static class Access {
+		public final Class<?> ccClass = ReflectionHelper.getClass("dan200.computercraft.ComputerCraft");
+		public final Class<?> cableClass = ReflectionHelper.getClass("dan200.computercraft.shared.peripheral.modem.TileCable");
+
+		public final FieldAccess<Boolean> isModemConnected = FieldAccess.create(cableClass, "m_peripheralAccessAllowed");
+		public final Function0<Void> togglePeripheral = MethodAccess.create(void.class, cableClass, "togglePeripheralAccess");
+		public final Function5<IPeripheral, World, Integer, Integer, Integer, Integer> getPeripheralAt =
+				MethodAccess.create(IPeripheral.class, ccClass, World.class, int.class, int.class, int.class, int.class, "getPeripheralAt");
+
+	}
+
+	public static void initAccess() {
+		// just dummy method to load and verify access
+		Preconditions.checkNotNull(access);
+	}
+
+	private final static Access access = new Access();
 
 	private Block attachedBlock;
 
@@ -38,14 +50,7 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 		final int targetY = yCoord + rotation.offsetY;
 		final int targetZ = zCoord + rotation.offsetZ;
 
-		IPeripheral peripheral = callStatic(
-				CC_CLASS.get(),
-				"getPeripheralAt",
-				typed(worldObj, World.class),
-				primitive(targetX),
-				primitive(targetY),
-				primitive(targetZ),
-				primitive(0));
+		IPeripheral peripheral = access.getPeripheralAt.call(null, worldObj, targetX, targetY, targetZ, 0);
 		if (peripheral != null) {
 			attachedBlock = worldObj.getBlock(targetX, targetY, targetZ);
 			return new WrappedPeripheral(peripheral);
@@ -82,18 +87,12 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 		TileEntity attachedModem = worldObj.getTileEntity(attachedX, attachedY, attachedZ);
 
 		try {
-			final Class<?> cableCls = CABLE_CLASS.get();
-			if (attachedModem != null && cableCls.isAssignableFrom(attachedModem.getClass())) {
-
-				Field f = getField(cableCls, "m_peripheralAccessAllowed");
-				f.setAccessible(true);
-				boolean isActive = f.getBoolean(attachedModem);
+			if (attachedModem != null && access.cableClass.isAssignableFrom(attachedModem.getClass())) {
+				boolean isActive = access.isModemConnected.get(attachedModem);
 
 				if (isActive) {
-					Method m = getMethod(cableCls, ArrayUtils.toArray("togglePeripheralAccess"));
-					m.setAccessible(true);
-					m.invoke(attachedModem);
-					if (reactivate) m.invoke(attachedModem);
+					access.togglePeripheral.call(attachedModem);
+					if (reactivate) access.togglePeripheral.call(attachedModem);
 				}
 			}
 		} catch (Throwable t) {
@@ -107,5 +106,4 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 				OpenPeripheralAddons.Blocks.peripheralProxy
 				);
 	}
-
 }

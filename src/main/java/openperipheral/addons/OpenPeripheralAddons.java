@@ -130,6 +130,8 @@ public class OpenPeripheralAddons {
 		gameConfig.registerBlocks(OpenPeripheralAddons.Blocks.class);
 		gameConfig.registerItems(OpenPeripheralAddons.Items.class);
 
+		if (OpenPeripheralAddons.Blocks.peripheralProxy != null) TileEntityPeripheralProxy.initAccess();
+
 		Config.register();
 
 		NetworkEventManager.INSTANCE
