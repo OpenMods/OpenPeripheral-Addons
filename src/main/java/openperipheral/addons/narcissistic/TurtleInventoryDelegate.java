@@ -5,10 +5,10 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import openperipheral.addons.utils.CCUtils;
-import openperipheral.api.IWorldProvider;
+import openperipheral.api.IWorldPosProvider;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 
-public class TurtleInventoryDelegate implements IInventory, IWorldProvider {
+public class TurtleInventoryDelegate implements IInventory, IWorldPosProvider {
 
 	// looks like we need that to separate from actual stuff CC throws at us
 
@@ -95,6 +95,21 @@ public class TurtleInventoryDelegate implements IInventory, IWorldProvider {
 	@Override
 	public boolean isValid() {
 		return CCUtils.isTurtleValid(wrapped);
+	}
+
+	@Override
+	public int getX() {
+		return wrapped.getPosition().posX;
+	}
+
+	@Override
+	public int getY() {
+		return wrapped.getPosition().posY;
+	}
+
+	@Override
+	public int getZ() {
+		return wrapped.getPosition().posZ;
 	}
 
 }
