@@ -20,7 +20,7 @@ import com.mojang.authlib.GameProfile;
 import dan200.computercraft.api.lua.ILuaObject;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 
-@PeripheralTypeId("openperipheral_ticketmachine")
+@PeripheralTypeId("openperipheral_bridge")
 public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable {
 
 	private static final String EVENT_CHAT_MESSAGE = "chat_command";
