@@ -12,7 +12,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 import openmods.api.*;
-import openmods.include.IExtendable;
 import openmods.include.IncludeInterface;
 import openmods.inventory.GenericInventory;
 import openmods.inventory.IInventoryProvider;
@@ -29,7 +28,7 @@ import com.google.common.base.Preconditions;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 @PeripheralTypeId("openperipheral_ticketmachine")
-public class TileEntityTicketMachine extends SyncedTileEntity implements IExtendable, IPlaceAwareTile, IHasGui, IIconProvider, IInventoryProvider, IInventoryCallback {
+public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceAwareTile, IHasGui, IIconProvider, IInventoryProvider, IInventoryCallback {
 
 	private static final int SLOT_PAPER = 0;
 	private static final int SLOT_INK = 1;
