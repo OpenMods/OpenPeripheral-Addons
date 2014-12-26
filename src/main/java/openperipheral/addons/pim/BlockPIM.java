@@ -51,7 +51,8 @@ public class BlockPIM extends BlockOP {
 	}
 
 	@Override
-	protected boolean hasTileEntityDrops() {
+	public boolean shouldDropFromTeAfterBreak() {
 		return false;
 	}
+
 }
