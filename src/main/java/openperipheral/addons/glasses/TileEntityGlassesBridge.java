@@ -71,10 +71,6 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		super.updateEntity();
 		if (worldObj.isRemote || globalSurface == null) return;
 
-		TerminalDataEvent globalChange = null;
-
-		final boolean globalUpdate = globalSurface.hasUpdates();
-
 		Iterator<PlayerInfo> it = knownPlayersByUUID.values().iterator();
 		while (it.hasNext()) {
 			final PlayerInfo info = it.next();
@@ -83,28 +79,11 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 			if (!isPlayerValid(player)) {
 				sendCleanPackets(player);
 				it.remove();
-				continue;
-			}
-
-			if (globalUpdate) {
-				if (globalChange == null) globalChange = TerminalManagerServer.createUpdateDataEvent(globalSurface, guid, false);
-				globalChange.sendToPlayer(player);
-			}
-
-			final SurfaceServer privateSurface = info.surface;
-			if (privateSurface != null && privateSurface.hasUpdates()) {
-				TerminalDataEvent privateData = TerminalManagerServer.createUpdateDataEvent(privateSurface, guid, true);
-				privateData.sendToPlayer(player);
 			}
 		}
 
-		TerminalDataEvent globalFull = null;
-
 		for (EntityPlayerMP newPlayer : newPlayers) {
 			if (isPlayerValid(newPlayer)) {
-				if (globalFull == null) globalFull = TerminalManagerServer.createFullDataEvent(globalSurface, guid, false);
-				globalFull.sendToPlayer(newPlayer);
-
 				final PlayerInfo playerInfo = new PlayerInfo(this, newPlayer);
 				final GameProfile gameProfile = newPlayer.getGameProfile();
 
@@ -113,8 +92,6 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 				onPlayerJoin(gameProfile);
 			}
 		}
-
-		newPlayers.clear();
 	}
 
 	private void sendCleanPackets(EntityPlayerMP player) {
@@ -183,6 +160,49 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		if (TerminalUtils.GLOBAL_SURFACE_UUID.equals(uuid)) return globalSurface;
 		PlayerInfo info = knownPlayersByUUID.get(uuid);
 		return info != null? info.surface : null;
+	}
+
+	// never, ever make this asynchronous
+	@LuaCallable(description = "Send updates to client. Without it changes won't be visible", name = "sync")
+	public void syncContents() {
+		TerminalDataEvent globalChange = null;
+
+		final boolean sendGlobalUpdate = globalSurface.hasUpdates();
+
+		synchronized (globalSurface) {
+			for (PlayerInfo info : knownPlayersByUUID.values()) {
+				final EntityPlayerMP player = info.player.get();
+
+				if (!isPlayerValid(player)) continue;
+
+				if (sendGlobalUpdate) {
+					if (globalChange == null) globalChange = TerminalManagerServer.createUpdateDataEvent(globalSurface, guid, false);
+					globalChange.sendToPlayer(player);
+				}
+
+				final SurfaceServer privateSurface = info.surface;
+
+				if (privateSurface != null) {
+					synchronized (privateSurface) {
+						if (privateSurface.hasUpdates()) {
+							TerminalDataEvent privateData = TerminalManagerServer.createUpdateDataEvent(privateSurface, guid, true);
+							privateData.sendToPlayer(player);
+						}
+					}
+				}
+			}
+
+			TerminalDataEvent globalFull = null;
+
+			for (EntityPlayerMP newPlayer : newPlayers) {
+				if (isPlayerValid(newPlayer)) {
+					if (globalFull == null) globalFull = TerminalManagerServer.createFullDataEvent(globalSurface, guid, false);
+					globalFull.sendToPlayer(newPlayer);
+				}
+			}
+
+		}
+		newPlayers.clear();
 	}
 
 	@Asynchronous
