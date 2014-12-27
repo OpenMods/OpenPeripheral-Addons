@@ -49,8 +49,10 @@ import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import dan200.computercraft.api.ComputerCraftAPI;
 
-@Mod(modid = "OpenPeripheral", name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$];required-after:ComputerCraft@[1.64,];required-after:OpenPeripheralCore")
+@Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$];required-after:ComputerCraft@[1.64,];required-after:OpenPeripheralCore")
 public class OpenPeripheralAddons {
+
+	public static final String MODID = "OpenPeripheral";
 
 	public static class Blocks implements BlockInstances {
 		@RegisterBlock(name = "glassesbridge", tileEntity = TileEntityGlassesBridge.class)
@@ -86,7 +88,7 @@ public class OpenPeripheralAddons {
 
 	public static int renderId;
 
-	@Instance(value = "OpenPeripheral")
+	@Instance(MODID)
 	public static OpenPeripheralAddons instance;
 
 	@SidedProxy(clientSide = "openperipheral.addons.proxy.ClientProxy", serverSide = "openperipheral.addons.proxy.ServerProxy")
