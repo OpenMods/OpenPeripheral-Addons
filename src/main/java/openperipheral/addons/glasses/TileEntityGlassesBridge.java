@@ -6,6 +6,7 @@ import java.util.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import openmods.include.IncludeInterface;
 import openmods.tileentity.OpenTileEntity;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
@@ -45,8 +46,10 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	private List<IComputerAccess> computers = Lists.newArrayList();
 
-	public SurfaceServer globalSurface = new SurfaceServer();
 	private long guid = TerminalUtils.generateGuid();
+
+	@IncludeInterface(IDrawableContainer.class)
+	private SurfaceServer globalSurface = new SurfaceServer();
 
 	public TileEntityGlassesBridge() {}
 
@@ -246,10 +249,5 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		SurfaceServer playerSurface = getSurface(uuid);
 		Preconditions.checkNotNull(playerSurface, "Invalid player");
 		return ApiAccess.getApi(IAdapterFactory.class).wrapObject(playerSurface);
-	}
-
-	@Include
-	public SurfaceServer getGlobalSurface() {
-		return globalSurface;
 	}
 }
