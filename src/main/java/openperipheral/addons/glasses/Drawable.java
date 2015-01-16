@@ -96,6 +96,7 @@ public abstract class Drawable implements IPropertyCallback {
 
 	protected abstract Type getType();
 
+	@LuaObject
 	public static class SolidBox extends Drawable {
 		@CallbackProperty
 		public short width;
@@ -150,6 +151,7 @@ public abstract class Drawable implements IPropertyCallback {
 
 	}
 
+	@LuaObject
 	public static class GradientBox extends Drawable {
 		@CallbackProperty
 		public short width;
@@ -239,6 +241,7 @@ public abstract class Drawable implements IPropertyCallback {
 
 	}
 
+	@LuaObject
 	public static class ItemIcon extends Drawable {
 		@SideOnly(Side.CLIENT)
 		private RenderItem renderItem;
@@ -289,6 +292,7 @@ public abstract class Drawable implements IPropertyCallback {
 
 	}
 
+	@LuaObject
 	public static class LiquidIcon extends Drawable {
 		@CallbackProperty
 		public short width;
@@ -358,6 +362,7 @@ public abstract class Drawable implements IPropertyCallback {
 
 	}
 
+	@LuaObject
 	public static class Text extends Drawable {
 		@CallbackProperty
 		public String text;

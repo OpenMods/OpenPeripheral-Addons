@@ -8,29 +8,28 @@ import openmods.structured.ElementField;
 import openmods.structured.IStructureContainer;
 import openmods.structured.StructuredDataMaster;
 import openperipheral.addons.glasses.SurfaceServer.DrawableWrapper;
-import openperipheral.api.*;
+import openperipheral.api.CallbackProperty;
+import openperipheral.api.LuaObject;
+import openperipheral.api.ObjectTypeId;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import dan200.computercraft.api.lua.ILuaObject;
-
+@LuaObject
 @ObjectTypeId("glasses_surface")
 public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, ElementField> implements IDrawableContainer {
 
 	public class DrawableWrapper implements IStructureContainer<ElementField> {
 		public int containerId;
 		public final Drawable target;
-		public final ILuaObject luaWrapper;
 
 		public final Map<Field, ElementField> fields = Maps.newHashMap();
 
 		public DrawableWrapper(Drawable target) {
 			this.target = target;
 			target.wrapper = this;
-			luaWrapper = ApiAccess.getApi(IAdapterFactory.class).wrapObject(target);
 		}
 
 		public void setField(Field field, Object value) {
@@ -83,9 +82,9 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 	public SurfaceServer() {}
 
 	@Override
-	public synchronized ILuaObject getById(int id) {
+	public synchronized Drawable getById(int id) {
 		DrawableWrapper wrapper = containers.get(id - 1);
-		return wrapper != null? wrapper.luaWrapper : null;
+		return wrapper != null? wrapper.target : null;
 	}
 
 	@Override
@@ -101,42 +100,42 @@ public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, Element
 	}
 
 	@Override
-	public synchronized Map<Integer, ILuaObject> getAllObjects() {
-		Map<Integer, ILuaObject> result = Maps.newHashMap();
+	public synchronized Map<Integer, Drawable> getAllObjects() {
+		Map<Integer, Drawable> result = Maps.newHashMap();
 		for (Map.Entry<Integer, DrawableWrapper> e : containers.entrySet())
-			result.put(e.getKey(), e.getValue().luaWrapper);
+			result.put(e.getKey(), e.getValue().target);
 		return result;
 	}
 
-	private synchronized ILuaObject addDrawable(Drawable drawable) {
+	private synchronized Drawable addDrawable(Drawable drawable) {
 		DrawableWrapper wrapper = new DrawableWrapper(drawable);
 		int id = addContainer(wrapper);
 		wrapper.containerId = id;
-		return wrapper.luaWrapper;
+		return wrapper.target;
 	}
 
 	@Override
-	public ILuaObject addText(short x, short y, String text, Integer color) {
+	public Drawable addText(short x, short y, String text, Integer color) {
 		return addDrawable(new Drawable.Text(x, y, text, Objects.firstNonNull(color, 0xFFFFFF)));
 	}
 
 	@Override
-	public ILuaObject addBox(short x, short y, short width, short height, Integer color, Float opacity) {
+	public Drawable addBox(short x, short y, short width, short height, Integer color, Float opacity) {
 		return addDrawable(new Drawable.SolidBox(x, y, width, height, Objects.firstNonNull(color, 0xFFFFFF), Objects.firstNonNull(opacity, 1.0f)));
 	}
 
 	@Override
-	public ILuaObject addGradientBox(short x, short y, short width, short height, int color, float alpha, int color2, float alpha2, int gradient) {
+	public Drawable addGradientBox(short x, short y, short width, short height, int color, float alpha, int color2, float alpha2, int gradient) {
 		return addDrawable(new Drawable.GradientBox(x, y, width, height, color, alpha, color2, alpha2, gradient));
 	}
 
 	@Override
-	public ILuaObject addIcon(short x, short y, String id, short meta) {
+	public Drawable addIcon(short x, short y, String id, short meta) {
 		return addDrawable(new Drawable.ItemIcon(x, y, id, meta));
 	}
 
 	@Override
-	public ILuaObject addLiquid(short x, short y, short width, short height, String id) {
+	public Drawable addLiquid(short x, short y, short width, short height, String id) {
 		return addDrawable(new Drawable.LiquidIcon(x, y, width, height, id));
 	}
 

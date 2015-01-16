@@ -18,7 +18,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 
-import dan200.computercraft.api.lua.ILuaObject;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 
 @PeripheralTypeId("openperipheral_bridge")
@@ -236,18 +235,18 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	@Asynchronous
 	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
-	public ILuaObject getSurfaceByName(@Arg(name = "username", description = "The username of the user to get the draw surface for") String username) {
+	public IDrawableContainer getSurfaceByName(@Arg(name = "username", description = "The username of the user to get the draw surface for") String username) {
 		SurfaceServer playerSurface = getSurface(username);
 		Preconditions.checkNotNull(playerSurface, "Invalid player");
-		return ApiAccess.getApi(IAdapterFactory.class).wrapObject(playerSurface);
+		return playerSurface;
 	}
 
 	@Asynchronous
 	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
-	public ILuaObject getSurfaceByUUID(@Arg(name = "uuid", description = "The uuid of the user to get the draw surface for") String username) {
+	public IDrawableContainer getSurfaceByUUID(@Arg(name = "uuid", description = "The uuid of the user to get the draw surface for") String username) {
 		UUID uuid = UUID.fromString(username);
 		SurfaceServer playerSurface = getSurface(uuid);
 		Preconditions.checkNotNull(playerSurface, "Invalid player");
-		return ApiAccess.getApi(IAdapterFactory.class).wrapObject(playerSurface);
+		return playerSurface;
 	}
 }
