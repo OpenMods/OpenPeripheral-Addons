@@ -53,7 +53,18 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	public TileEntityGlassesBridge() {}
 
 	public void registerTerminal(EntityPlayerMP player) {
-		if (!knownPlayersByUUID.containsKey(player.getGameProfile().getId())) newPlayers.add(player);
+		if (!knownPlayersByUUID.containsKey(player.getGameProfile().getId())) {
+			boolean added = newPlayers.add(player);
+
+			if (added) {
+				final PlayerInfo playerInfo = new PlayerInfo(this, player);
+				final GameProfile gameProfile = player.getGameProfile();
+
+				knownPlayersByUUID.put(gameProfile.getId(), playerInfo);
+				knownPlayersByName.put(gameProfile.getName(), playerInfo);
+				onPlayerJoin(gameProfile);
+			}
+		}
 	}
 
 	public void onChatCommand(String command, String username) {
@@ -81,17 +92,6 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 			if (!isPlayerValid(player)) {
 				sendCleanPackets(player);
 				it.remove();
-			}
-		}
-
-		for (EntityPlayerMP newPlayer : newPlayers) {
-			if (isPlayerValid(newPlayer)) {
-				final PlayerInfo playerInfo = new PlayerInfo(this, newPlayer);
-				final GameProfile gameProfile = newPlayer.getGameProfile();
-
-				knownPlayersByUUID.put(gameProfile.getId(), playerInfo);
-				knownPlayersByName.put(gameProfile.getName(), playerInfo);
-				onPlayerJoin(gameProfile);
 			}
 		}
 	}
