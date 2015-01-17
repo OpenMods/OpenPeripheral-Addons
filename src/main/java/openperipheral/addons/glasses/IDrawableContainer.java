@@ -5,7 +5,7 @@ import java.util.Map;
 import openperipheral.api.*;
 
 @Asynchronous
-@PeripheralTypeId("drawable_container")
+@AdapterSourceName("glasses_container")
 public interface IDrawableContainer {
 
 	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Get object by id")

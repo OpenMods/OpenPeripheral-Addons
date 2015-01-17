@@ -8,9 +8,9 @@ import openmods.structured.ElementField;
 import openmods.structured.IStructureContainer;
 import openmods.structured.StructuredDataMaster;
 import openperipheral.addons.glasses.SurfaceServer.DrawableWrapper;
+import openperipheral.api.AdapterSourceName;
 import openperipheral.api.CallbackProperty;
 import openperipheral.api.LuaObject;
-import openperipheral.api.ObjectTypeId;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
@@ -18,7 +18,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @LuaObject
-@ObjectTypeId("glasses_surface")
+@AdapterSourceName("glasses_surface")
 public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, ElementField> implements IDrawableContainer {
 
 	public class DrawableWrapper implements IStructureContainer<ElementField> {

@@ -26,6 +26,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+@AdapterSourceName("glasses_drawable")
 public abstract class Drawable implements IPropertyCallback {
 
 	private enum Type {
@@ -97,6 +98,7 @@ public abstract class Drawable implements IPropertyCallback {
 	protected abstract Type getType();
 
 	@LuaObject
+	@AdapterSourceName("glasses_box")
 	public static class SolidBox extends Drawable {
 		@CallbackProperty
 		public short width;
@@ -152,6 +154,7 @@ public abstract class Drawable implements IPropertyCallback {
 	}
 
 	@LuaObject
+	@AdapterSourceName("glasses_gradient")
 	public static class GradientBox extends Drawable {
 		@CallbackProperty
 		public short width;
@@ -242,6 +245,7 @@ public abstract class Drawable implements IPropertyCallback {
 	}
 
 	@LuaObject
+	@AdapterSourceName("glasses_icon")
 	public static class ItemIcon extends Drawable {
 		@SideOnly(Side.CLIENT)
 		private RenderItem renderItem;
@@ -293,6 +297,7 @@ public abstract class Drawable implements IPropertyCallback {
 	}
 
 	@LuaObject
+	@AdapterSourceName("glasses_liquid")
 	public static class LiquidIcon extends Drawable {
 		@CallbackProperty
 		public short width;
@@ -363,6 +368,7 @@ public abstract class Drawable implements IPropertyCallback {
 	}
 
 	@LuaObject
+	@AdapterSourceName("glasses_text")
 	public static class Text extends Drawable {
 		@CallbackProperty
 		public String text;
