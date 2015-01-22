@@ -103,10 +103,10 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 		else Preconditions.checkArgument(amount > 0 && amount <= 64, "Amount must be between 1 and 64");
 
 		ItemStack paperStack = inventory.getStackInSlot(SLOT_PAPER);
-		Preconditions.checkState(inventory.isItemValidForSlot(SLOT_PAPER, paperStack) && paperStack.stackSize >= amount, "Not enough paper");
+		Preconditions.checkArgument(inventory.isItemValidForSlot(SLOT_PAPER, paperStack) && paperStack.stackSize >= amount, "Not enough paper");
 
 		ItemStack inkStack = inventory.getStackInSlot(SLOT_INK);
-		Preconditions.checkState(inventory.isItemValidForSlot(SLOT_INK, inkStack) && inkStack.stackSize >= amount, "Not enough ink");
+		Preconditions.checkArgument(inventory.isItemValidForSlot(SLOT_INK, inkStack) && inkStack.stackSize >= amount, "Not enough ink");
 
 		ItemStack output = inventory.getStackInSlot(SLOT_OUTPUT);
 
