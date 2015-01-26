@@ -1,6 +1,8 @@
 package openperipheral.addons.glasses;
 
 import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -13,13 +15,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
-import openperipheral.addons.glasses.SurfaceServer.DrawableWrapper;
+import openmods.structured.ElementField;
+import openmods.structured.IStructureContainer;
 import openperipheral.api.*;
 
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
@@ -27,7 +32,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @AdapterSourceName("glasses_drawable")
-public abstract class Drawable implements IPropertyCallback {
+public abstract class Drawable implements IPropertyCallback, IStructureContainer<ElementField> {
 
 	private enum Type {
 		GRADIENT {
@@ -66,7 +71,13 @@ public abstract class Drawable implements IPropertyCallback {
 		public static final Type[] TYPES = values();
 	}
 
-	DrawableWrapper wrapper;
+	private boolean deleted;
+
+	private int containerId;
+
+	private SurfaceServer owner;
+
+	private final Map<Field, ElementField> fields = Maps.newHashMap();
 
 	@CallbackProperty
 	public short x;
@@ -95,7 +106,7 @@ public abstract class Drawable implements IPropertyCallback {
 	@SideOnly(Side.CLIENT)
 	protected abstract void drawContents(float partialTicks);
 
-	protected abstract Type getType();
+	protected abstract Type getTypeEnum();
 
 	@LuaObject
 	@AdapterSourceName("glasses_box")
@@ -147,7 +158,7 @@ public abstract class Drawable implements IPropertyCallback {
 		}
 
 		@Override
-		public Type getType() {
+		public Type getTypeEnum() {
 			return Type.BOX;
 		}
 
@@ -238,7 +249,7 @@ public abstract class Drawable implements IPropertyCallback {
 		}
 
 		@Override
-		public Type getType() {
+		public Type getTypeEnum() {
 			return Type.GRADIENT;
 		}
 
@@ -290,7 +301,7 @@ public abstract class Drawable implements IPropertyCallback {
 		}
 
 		@Override
-		public Type getType() {
+		public Type getTypeEnum() {
 			return Type.ITEM;
 		}
 
@@ -361,7 +372,7 @@ public abstract class Drawable implements IPropertyCallback {
 		}
 
 		@Override
-		public Type getType() {
+		public Type getTypeEnum() {
 			return Type.LIQUID;
 		}
 
@@ -399,13 +410,14 @@ public abstract class Drawable implements IPropertyCallback {
 		}
 
 		@Override
-		public Type getType() {
+		public Type getTypeEnum() {
 			return Type.TEXT;
 		}
 	}
 
-	public int getTypeId() {
-		return getType().ordinal();
+	@Override
+	public int getType() {
+		return getTypeEnum().ordinal();
 	}
 
 	public static Drawable createFromTypeId(int containerId, int typeId) {
@@ -415,31 +427,73 @@ public abstract class Drawable implements IPropertyCallback {
 
 	@LuaCallable(returnTypes = LuaReturnType.STRING, name = "getType", description = "Get object type")
 	public String getTypeName() {
-		return getType().name().toLowerCase();
+		return getTypeEnum().name().toLowerCase();
 	}
 
 	@LuaCallable
 	public void delete() {
-		Preconditions.checkNotNull(wrapper, "Object is already deleted");
-		wrapper.delete();
-		wrapper = null;
+		Preconditions.checkState(!deleted, "Object is already deleted");
+		Preconditions.checkState(owner != null, "Invalid side");
+		owner.removeContainer(containerId);
+		deleted = true;
 	}
 
 	@LuaCallable(returnTypes = LuaReturnType.NUMBER, name = "getId")
 	public int getId() {
-		Preconditions.checkNotNull(wrapper, "Object is deleted");
-		return wrapper.containerId + 1;
+		Preconditions.checkState(!deleted, "Object is already deleted");
+		return containerId + 1;
 	}
 
 	@Override
 	public void setField(Field field, Object value) {
-		Preconditions.checkNotNull(wrapper, "Object is deleted");
-		wrapper.setField(field, value);
+		Preconditions.checkState(!deleted, "Object is already deleted");
+		Preconditions.checkState(owner != null, "Invalid side");
+
+		ElementField fieldWrapper = fields.get(field);
+		Preconditions.checkState(fieldWrapper != null, "LOGIC FAIL. BLAME MOD DEVS");
+		owner.markElementModified(fieldWrapper.elementId);
+		fieldWrapper.set(value);
 	}
 
 	@Override
 	public Object getField(Field field) {
-		Preconditions.checkNotNull(wrapper, "Object is deleted");
-		return wrapper.getField(field);
+		Preconditions.checkState(!deleted, "Object is already deleted");
+
+		ElementField fieldWrapper = fields.get(field);
+		Preconditions.checkState(fieldWrapper != null, "LOGIC FAIL. BLAME MOD DEVS");
+		return fieldWrapper.get();
+	}
+
+	@Override
+	public List<ElementField> createElements() {
+		List<ElementField> result = Lists.newArrayList();
+		for (Field field : getClass().getFields()) {
+			field.setAccessible(true);
+			if (!field.isAnnotationPresent(CallbackProperty.class)) continue;
+
+			ElementField fieldWrapper = new ElementField(this, field);
+			result.add(fieldWrapper);
+			fields.put(field, fieldWrapper);
+		}
+
+		return result;
+	}
+
+	@Override
+	public void onElementAdded(ElementField element, int index) {
+		element.elementId = index;
+	}
+
+	public void setDeleted() {
+		this.deleted = true;
+	}
+
+	public void setOwner(SurfaceServer owner) {
+		this.owner = owner;
+	}
+
+	public void onAdded(SurfaceServer owner, int containerId) {
+		this.containerId = containerId;
+		this.owner = owner;
 	}
 }

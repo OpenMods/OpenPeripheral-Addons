@@ -1,117 +1,48 @@
 package openperipheral.addons.glasses;
 
-import java.lang.reflect.Field;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import openmods.structured.ElementField;
-import openmods.structured.IStructureContainer;
 import openmods.structured.StructuredDataMaster;
-import openperipheral.addons.glasses.SurfaceServer.DrawableWrapper;
 import openperipheral.api.AdapterSourceName;
-import openperipheral.api.CallbackProperty;
 import openperipheral.api.LuaObject;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 @LuaObject
 @AdapterSourceName("glasses_surface")
-public class SurfaceServer extends StructuredDataMaster<DrawableWrapper, ElementField> implements IDrawableContainer {
-
-	public class DrawableWrapper implements IStructureContainer<ElementField> {
-		public int containerId;
-		public final Drawable target;
-
-		public final Map<Field, ElementField> fields = Maps.newHashMap();
-
-		public DrawableWrapper(Drawable target) {
-			this.target = target;
-			target.wrapper = this;
-		}
-
-		public void setField(Field field, Object value) {
-			ElementField fieldWrapper = fields.get(field);
-			Preconditions.checkNotNull(fieldWrapper, "LOGIC FAIL. BLAME MOD DEVS");
-			markElementModified(fieldWrapper.elementId);
-			fieldWrapper.set(value);
-		}
-
-		public Object getField(Field field) {
-			ElementField fieldWrapper = fields.get(field);
-			Preconditions.checkNotNull(fieldWrapper, "LOGIC FAIL. BLAME MOD DEVS");
-			return fieldWrapper.get();
-		}
-
-		public void delete() {
-			removeContainer(containerId);
-		}
-
-		public void clear() {
-			target.wrapper = null;
-		}
-
-		@Override
-		public int getType() {
-			return target.getTypeId();
-		}
-
-		@Override
-		public List<ElementField> createElements() {
-			List<ElementField> result = Lists.newArrayList();
-			for (Field field : target.getClass().getFields()) {
-				field.setAccessible(true);
-				if (!field.isAnnotationPresent(CallbackProperty.class)) continue;
-
-				ElementField fieldWrapper = new ElementField(target, field);
-				result.add(fieldWrapper);
-				fields.put(field, fieldWrapper);
-			}
-
-			return result;
-		}
-
-		@Override
-		public void onElementAdded(ElementField element, int index) {
-			element.elementId = index;
-		}
-	}
+public class SurfaceServer extends StructuredDataMaster<Drawable, ElementField> implements IDrawableContainer {
 
 	public SurfaceServer() {}
 
 	@Override
 	public synchronized Drawable getById(int id) {
-		DrawableWrapper wrapper = containers.get(id - 1);
-		return wrapper != null? wrapper.target : null;
+		return containers.get(id - 1);
 	}
 
 	@Override
 	public synchronized void clear() {
-		for (DrawableWrapper wrapper : containers.values())
-			wrapper.clear();
+		for (Drawable drawable : containers.values())
+			drawable.setDeleted();
 		removeAll();
 	}
 
 	@Override
-	public synchronized Integer[] getAllIds() {
-		return containers.keySet().toArray(new Integer[containers.size()]);
+	public synchronized Set<Integer> getAllIds() {
+		return Collections.unmodifiableSet(containers.keySet());
 	}
 
 	@Override
 	public synchronized Map<Integer, Drawable> getAllObjects() {
-		Map<Integer, Drawable> result = Maps.newHashMap();
-		for (Map.Entry<Integer, DrawableWrapper> e : containers.entrySet())
-			result.put(e.getKey(), e.getValue().target);
-		return result;
+		return Collections.unmodifiableMap(containers);
 	}
 
 	private synchronized Drawable addDrawable(Drawable drawable) {
-		DrawableWrapper wrapper = new DrawableWrapper(drawable);
-		int id = addContainer(wrapper);
-		wrapper.containerId = id;
-		return wrapper.target;
+		int id = addContainer(drawable);
+		drawable.onAdded(this, id);
+		return drawable;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package openperipheral.addons.glasses;
 
 import java.util.Map;
+import java.util.Set;
 
 import openperipheral.api.*;
 
@@ -17,7 +18,7 @@ public interface IDrawableContainer {
 	public void clear();
 
 	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get the Ids of all the objects on the screen")
-	public Integer[] getAllIds();
+	public Set<Integer> getAllIds();
 
 	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get all objects on the screen")
 	public Map<Integer, Drawable> getAllObjects();

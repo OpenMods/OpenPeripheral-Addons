@@ -23,7 +23,7 @@ public class SurfaceClient extends StructuredDataSlave<DrawableWrapper, ElementF
 
 		@Override
 		public int getType() {
-			return target.getTypeId();
+			return target.getType();
 		}
 
 		@Override
