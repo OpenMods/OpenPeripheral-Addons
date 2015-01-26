@@ -3,11 +3,17 @@ package openperipheral.addons.glasses;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.common.util.ForgeDirection;
+import openmods.api.ICustomHarvestDrops;
+import openmods.api.IPlaceAwareTile;
 import openmods.include.IncludeInterface;
 import openmods.tileentity.OpenTileEntity;
+import openmods.utils.ItemUtils;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.api.*;
@@ -21,7 +27,9 @@ import com.mojang.authlib.GameProfile;
 import dan200.computercraft.api.peripheral.IComputerAccess;
 
 @PeripheralTypeId("openperipheral_bridge")
-public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable {
+public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable, IPlaceAwareTile, ICustomHarvestDrops {
+
+	public static final String TAG_GUID = "guid";
 
 	private static final String EVENT_CHAT_MESSAGE = "chat_command";
 
@@ -45,7 +53,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	private List<IComputerAccess> computers = Lists.newArrayList();
 
-	private long guid = TerminalUtils.generateGuid();
+	private long guid;
 
 	@IncludeInterface(IDrawableContainer.class)
 	private SurfaceServer globalSurface = new SurfaceServer();
@@ -124,7 +132,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
-		tag.setLong("guid", guid);
+		tag.setLong(TAG_GUID, guid);
 	}
 
 	@Override
@@ -132,6 +140,27 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		super.readFromNBT(tag);
 		Long guid = TerminalUtils.extractGuid(tag);
 		if (guid != null) this.guid = guid;
+	}
+
+	@Override
+	public void onBlockPlacedBy(EntityPlayer player, ForgeDirection side, ItemStack stack, float hitX, float hitY, float hitZ) {
+		NBTTagCompound tag = stack.getTagCompound();
+
+		if (tag != null && tag.hasKey(TAG_GUID)) guid = tag.getLong(TAG_GUID);
+		else guid = TerminalUtils.generateGuid();
+	}
+
+	@Override
+	public void addHarvestDrops(EntityPlayer player, List<ItemStack> drops) {
+		ItemStack result = new ItemStack(getBlockType());
+		NBTTagCompound tag = ItemUtils.getItemTag(result);
+		tag.setLong(TAG_GUID, guid);
+		drops.add(result);
+	}
+
+	@Override
+	public boolean suppressNormalHarvestDrops() {
+		return true;
 	}
 
 	public void onPlayerJoin(GameProfile player) {

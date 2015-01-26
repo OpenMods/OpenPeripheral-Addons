@@ -55,7 +55,7 @@ public class OpenPeripheralAddons {
 	public static final String MODID = "OpenPeripheral";
 
 	public static class Blocks implements BlockInstances {
-		@RegisterBlock(name = "glassesbridge", tileEntity = TileEntityGlassesBridge.class)
+		@RegisterBlock(name = "glassesbridge", tileEntity = TileEntityGlassesBridge.class, itemBlock = ItemGlassesBridge.class)
 		public static BlockGlassesBridge glassesBridge;
 
 		@RegisterBlock(name = "peripheralproxy", tileEntity = TileEntityPeripheralProxy.class)
