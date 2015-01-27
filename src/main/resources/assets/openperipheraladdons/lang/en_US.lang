@@ -3,6 +3,7 @@ tile.openperipheral.peripheralproxy.name=Peripheral Proxy
 tile.openperipheral.playerinventory.name=PIM
 tile.openperipheral.ticketmachine.name=Ticket Machine
 tile.openperipheral.sensor.name=Sensor
+tile.openperipheral.selector.name=Item Selector
 tile.openperipheral.robot.name=Robot Controller
 
 item.openperipheraladdons.duckantenna.name=Duck Antenna
@@ -63,6 +64,7 @@ item.openperipheral.robot.name=OpenMech: Warrior
 itemGroup.tabOpenPeripheralAddons=OpenPeripheral 
 
 openperipheral.gui.ticketmachine=Ticket Machine
+openperipheral.gui.selector=Item Selector
 openperipheral.turtle.sensor.adjective=Sensor
 openperipheral.turtle.narcissistic.adjective=Narcissistic
 
