@@ -31,6 +31,8 @@ import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.peripheralproxy.TileEntityPeripheralProxy;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.pim.TileEntityPIM;
+import openperipheral.addons.selector.BlockSelector;
+import openperipheral.addons.selector.TileEntitySelector;
 import openperipheral.addons.sensors.*;
 import openperipheral.addons.ticketmachine.BlockTicketMachine;
 import openperipheral.addons.ticketmachine.TileEntityTicketMachine;
@@ -69,6 +71,9 @@ public class OpenPeripheralAddons {
 
 		@RegisterBlock(name = "ticketmachine", tileEntity = TileEntityTicketMachine.class)
 		public static BlockTicketMachine ticketMachine;
+
+		@RegisterBlock(name = "selector", tileEntity = TileEntitySelector.class)
+		public static BlockSelector selector;
 	}
 
 	public static class Items implements ItemInstances {
@@ -147,6 +152,7 @@ public class OpenPeripheralAddons {
 		IAdapterRegistry adapters = ApiAccess.getApi(IAdapterRegistry.class);
 		adapters.registerInline(TileEntityGlassesBridge.class);
 		adapters.registerInline(TileEntityTicketMachine.class);
+		adapters.registerInline(TileEntitySelector.class);
 		adapters.register(new AdapterSensor());
 
 		sensorUpgrade = new TurtleUpgradeSensor();
