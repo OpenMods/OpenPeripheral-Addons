@@ -33,11 +33,9 @@ import openmods.api.IHasGui;
 import openmods.api.IInventoryCallback;
 import openmods.include.IncludeInterface;
 import openmods.inventory.GenericInventory;
-import openmods.inventory.IFakeSlotListener;
 import openmods.inventory.IInventoryProvider;
 import openmods.sync.ISyncListener;
 import openmods.sync.ISyncableObject;
-import openmods.sync.SyncableInventory;
 import openmods.tileentity.SyncedTileEntity;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.addons.ticketmachine.ContainerTicketMachine;
@@ -55,7 +53,7 @@ import openperipheral.api.Optionals;
 import openperipheral.api.PeripheralTypeId;
 
 @PeripheralTypeId("openperipheral_selector")
-public class TileEntitySelector extends SyncedTileEntity implements IActivateAwareTile, IAttachable, ICustomHarvestDrops, IFakeSlotListener, IHasGui, IInventoryProvider {
+public class TileEntitySelector extends SyncedTileEntity implements IActivateAwareTile, IAttachable, ICustomHarvestDrops, IHasGui, IInventoryProvider {
 	private Set<IComputerAccess> computers = Collections.newSetFromMap(new WeakHashMap<IComputerAccess, Boolean>());
 
 	// We need a "Fake" inventory which cannot be modified except by server
@@ -346,16 +344,4 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 		// We don't want anything to drop on its own
 		return true;
 	}
-
-	@Override
-	public void onFakeSlotChange(int slot, ItemStack stack) {
-		if(stack != null) {
-			stack.stackSize = 1;
-		}
-		inventory.setInventorySlotContents(slot, stack);
-		inventory.markDirty();
-		markDirty();
-		sync();
-	}
-
 }

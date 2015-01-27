@@ -24,7 +24,8 @@ public class ContainerSelector extends ContainerInventoryProvider<TileEntitySele
 			for (int x = 0; x < width; x++, slotId++) {
 				addSlotToContainer(new FakeSlot(inventory, slotId,
 						xOffset + x * 18,
-						yOffset + y * 18));
+						yOffset + y * 18,
+						false));
 			}
 		}
 	}
