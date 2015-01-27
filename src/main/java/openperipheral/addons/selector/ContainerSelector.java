@@ -2,9 +2,7 @@ package openperipheral.addons.selector;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import openmods.Log;
 import openmods.container.ContainerInventoryProvider;
 import openmods.container.FakeSlot;
 
@@ -18,6 +16,7 @@ public class ContainerSelector extends ContainerInventoryProvider<TileEntitySele
 
 	// This is basically the same as addInventoryGrid from the parent class,
 	// but using FakeSlots instead of normal slots.
+	@Override
 	protected void addInventoryGrid(int xOffset, int yOffset, int width) {
 		int height = (int)Math.ceil((double)inventorySize / width);
 		for (int y = 0, slotId = 0; y < height; y++) {

@@ -1,20 +1,12 @@
 package openperipheral.addons.selector;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import openmods.api.IIconProvider;
 import openmods.block.BlockRotationMode;
-import openmods.block.OpenBlock.BlockPlacementMode;
-import openmods.block.OpenBlock.RenderMode;
 import openperipheral.addons.BlockOP;
-import openperipheral.addons.peripheralproxy.BlockPeripheralProxy.Icons;
 
 public class BlockSelector extends BlockOP {
 	public static class Icons {

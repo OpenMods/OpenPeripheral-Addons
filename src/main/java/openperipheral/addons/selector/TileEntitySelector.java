@@ -1,56 +1,26 @@
 package openperipheral.addons.selector;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
+
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.ForgeDirection;
+import openmods.api.IActivateAwareTile;
+import openmods.api.ICustomHarvestDrops;
+import openmods.api.IHasGui;
+import openmods.inventory.IInventoryProvider;
+import openmods.tileentity.SyncedTileEntity;
+import openperipheral.addons.OpenPeripheralAddons;
+import openperipheral.api.*;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Preconditions;
 
 import dan200.computercraft.api.peripheral.IComputerAccess;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
-import openmods.Log;
-import openmods.api.IActivateAwareTile;
-import openmods.api.ICustomHarvestDrops;
-import openmods.api.IHasGui;
-import openmods.api.IInventoryCallback;
-import openmods.include.IncludeInterface;
-import openmods.inventory.GenericInventory;
-import openmods.inventory.IInventoryProvider;
-import openmods.sync.ISyncListener;
-import openmods.sync.ISyncableObject;
-import openmods.tileentity.SyncedTileEntity;
-import openperipheral.addons.OpenPeripheralAddons;
-import openperipheral.addons.ticketmachine.ContainerTicketMachine;
-import openperipheral.api.ApiAccess;
-import openperipheral.api.Arg;
-import openperipheral.api.Asynchronous;
-import openperipheral.api.Constants;
-import openperipheral.api.Env;
-import openperipheral.api.IAttachable;
-import openperipheral.api.ITypeConvertersRegistry;
-import openperipheral.api.LuaArgType;
-import openperipheral.api.LuaCallable;
-import openperipheral.api.LuaReturnType;
-import openperipheral.api.Optionals;
-import openperipheral.api.PeripheralTypeId;
 
 @PeripheralTypeId("openperipheral_selector")
 public class TileEntitySelector extends SyncedTileEntity implements IActivateAwareTile, IAttachable, ICustomHarvestDrops, IHasGui, IInventoryProvider {
@@ -217,6 +187,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 		return true;
 	}
 
+	@SuppressWarnings("unchecked")
 	@LuaCallable(description = "Get the item currently being displayed in a specific slot", returnTypes = LuaReturnType.TABLE)
 	public Map<String, Object> getItemDetail(
 			@Env(Constants.ARG_CONVERTER) ITypeConvertersRegistry converter,
