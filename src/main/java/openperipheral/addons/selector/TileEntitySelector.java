@@ -56,6 +56,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 		// Clients need to get notified to re-render the blocks when the
 		// inventory changed.
 		syncMap.addUpdateListener(createRenderUpdateListener());
+		registerInventoryCallback(inventory);
 	}
 
 	@Override
@@ -187,68 +188,46 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	@LuaCallable(description = "Get the item currently being displayed in a specific slot", returnTypes = LuaReturnType.TABLE)
-	public Map<String, Object> getItemDetail(
-			@Env(Constants.ARG_CONVERTER) ITypeConvertersRegistry converter,
+	public ItemStack getSlot(
 			@Arg(name = "slot", description = "The slot you want to get details about") int slot) {
 
 		Preconditions.checkArgument(slot >= 1 && slot <= 9, "slot must be between 1 and 9");
-		return (Map<String, Object>)converter.toLua(getInventory().getStackInSlot(slot - 1));
+		return getInventory().getStackInSlot(slot - 1);
 	}
 
-	@LuaCallable(description = "Set the items being displayed")
+	@LuaCallable(description = "Set the item being displayed on a specific slot")
 	public void setSlots(
 			@Env(Constants.ARG_CONVERTER) ITypeConvertersRegistry converter,
-			@Arg(name = "items", description = "A table containing itemstacks", type = LuaArgType.TABLE) Map<Double, Map<String, Object>> list) {
+			@Arg(name = "items", description = "A table containing itemstacks", type = LuaArgType.TABLE) Map<Double, Object> stacks) {
 
-		// I've read that I should not be shy to call sync(), so this loop does
-		// it 9 times in total - once for each slot.
-		for (int index = 1; index <= 9; index++) {
-			Double key = new Double(index);
-			if (list.containsKey(key)) {
-				Map<String, Object> rawStack = list.get(key);
-				setSlot(converter, index, rawStack);
-			} else {
-				setSlot(converter, index, null);
-			}
+		for (int slot = 1; slot <= 9; slot++) {
+			final Object value = stacks.get(Double.valueOf(slot));
+			ItemStack stack = (ItemStack)converter.fromLua(value, ItemStack.class);
+			Preconditions.checkArgument(value == null || stack != null, "Can't convert %s to item stack", value);
+			if (stack != null) stack.stackSize = 1;
+
+			inventory.setInventorySlotContents(slot - 1, stack);
 		}
+
+		inventory.markDirty();
+		sync();
 	}
 
 	@LuaCallable(description = "Set the item being displayed on a specific slot")
 	public void setSlot(
-			@Env(Constants.ARG_CONVERTER) ITypeConvertersRegistry converter,
 			@Arg(name = "slot", description = "The slot you want to modify") int slot,
-			@Optionals @Arg(name = "item", description = "The item you want to display. nil to set empty.", type = LuaArgType.TABLE) Map<String, Object> rawStack) {
+			@Optionals @Arg(name = "item", description = "The item you want to display. nil to set empty.", type = LuaArgType.TABLE) ItemStack stack) {
 
 		Preconditions.checkArgument(slot >= 1 && slot <= 9, "slot must be between 1 and 9");
 		slot -= 1;
 
-		if (rawStack == null) {
-			// No stack specified -> empty the slot
-			inventory.setInventorySlotContents(slot, null);
-		} else {
-			// Lua passed a table, check whether it's an item stack
-			ItemStack stack = (ItemStack)converter.fromLua(rawStack, ItemStack.class);
-			Preconditions.checkArgument(stack != null, "Not a valid item stack");
+		if (stack != null) stack.stackSize = 1;
 
-			// Since this is a fake stack to begin with we can safely modify it
-			// without creating a copy first.
-			stack.stackSize = 1;
+		inventory.setInventorySlotContents(slot, stack);
 
-			// And place it in the inventory slot
-			inventory.setInventorySlotContents(slot, stack);
-		}
-
-		// Make sure the inventory is being saved next time the world is being
-		// saved
 		inventory.markDirty();
-		markDirty();
-
-		// Inform clients about the change in the inventory
 		sync();
-
-		return;
 	}
 
 	private void fireEvent(String eventName, Object... args) {
