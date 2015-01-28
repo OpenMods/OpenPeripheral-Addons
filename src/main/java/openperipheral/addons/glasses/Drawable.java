@@ -1,11 +1,15 @@
 package openperipheral.addons.glasses;
 
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -17,6 +21,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import openmods.structured.ElementField;
 import openmods.structured.IStructureContainer;
+import openmods.structured.IStructureElement;
 import openperipheral.api.*;
 
 import org.lwjgl.opengl.GL11;
@@ -32,7 +37,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @AdapterSourceName("glasses_drawable")
-public abstract class Drawable implements IPropertyCallback, IStructureContainer<ElementField> {
+public abstract class Drawable implements IPropertyCallback, IStructureContainer<IStructureElement> {
 
 	private enum Type {
 		GRADIENT {
@@ -71,6 +76,121 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 		public static final Type[] TYPES = values();
 	}
 
+	public static enum VerticalAlignment {
+		TOP,
+		MIDDLE,
+		BOTTOM;
+
+		public static final VerticalAlignment[] VALUES = values();
+	}
+
+	public static enum HorizontalAlignment {
+		LEFT,
+		MIDDLE,
+		RIGHT;
+
+		public static final HorizontalAlignment[] VALUES = values();
+	}
+
+	private static class Alignment implements IStructureElement {
+		private static final int MASK = 0x3;
+
+		private int id;
+
+		public VerticalAlignment screenVerticalAnchor = VerticalAlignment.TOP;
+		public HorizontalAlignment screenHorizontalAnchor = HorizontalAlignment.LEFT;
+
+		public VerticalAlignment objectVerticalAnchor = VerticalAlignment.TOP;
+		public HorizontalAlignment objectHorizontalAnchor = HorizontalAlignment.LEFT;
+
+		@Override
+		public void readFromStream(DataInput input) throws IOException {
+			byte value = input.readByte();
+			screenVerticalAnchor = VerticalAlignment.VALUES[(value >> 0) & MASK];
+			screenHorizontalAnchor = HorizontalAlignment.VALUES[(value >> 2) & MASK];
+
+			objectVerticalAnchor = VerticalAlignment.VALUES[(value >> 4) & MASK];
+			objectHorizontalAnchor = HorizontalAlignment.VALUES[(value >> 6) & MASK];
+		}
+
+		@Override
+		public void writeToStream(DataOutput output) throws IOException {
+			byte value = (byte)((screenVerticalAnchor.ordinal() << 0) |
+					(screenHorizontalAnchor.ordinal() << 2) |
+					(objectVerticalAnchor.ordinal() << 4) |
+					(objectHorizontalAnchor.ordinal() << 6));
+			output.writeByte(value);
+		}
+
+		@Override
+		public int getId() {
+			return id;
+		}
+
+		@Override
+		public void setId(int id) {
+			this.id = id;
+		}
+
+		protected int getScreenAnchorX(ScaledResolution resolution, Drawable drawable) {
+			switch (screenHorizontalAnchor) {
+				case MIDDLE:
+					return resolution.getScaledWidth() / 2;
+				case RIGHT:
+					return resolution.getScaledWidth();
+				case LEFT:
+				default:
+					return 0;
+
+			}
+		}
+
+		protected int getObjectAnchorX(Drawable drawable) {
+			switch (objectHorizontalAnchor) {
+				case MIDDLE:
+					return -drawable.getWidth() / 2;
+				case RIGHT:
+					return -drawable.getWidth();
+				case LEFT:
+				default:
+					return 0;
+
+			}
+		}
+
+		public int getX(ScaledResolution resolution, Drawable drawable) {
+			return drawable.x + getScreenAnchorX(resolution, drawable) + getObjectAnchorX(drawable);
+		}
+
+		public int getScreenAnchorY(ScaledResolution resolution, Drawable drawable) {
+			switch (screenVerticalAnchor) {
+				case BOTTOM:
+					return resolution.getScaledHeight();
+				case MIDDLE:
+					return resolution.getScaledHeight() / 2;
+				default:
+				case TOP:
+					return 0;
+			}
+		}
+
+		public int getObjectAnchorY(Drawable drawable) {
+			switch (objectVerticalAnchor) {
+				case BOTTOM:
+					return -drawable.getHeight();
+				case MIDDLE:
+					return -drawable.getHeight() / 2;
+				default:
+				case TOP:
+					return 0;
+			}
+		}
+
+		public int getY(ScaledResolution resolution, Drawable drawable) {
+			return drawable.y + getScreenAnchorY(resolution, drawable) + getObjectAnchorY(drawable);
+		}
+	}
+
 	private boolean deleted;
 
 	private int containerId;
@@ -78,6 +198,8 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 	private SurfaceServer owner;
 
 	private final Map<Field, ElementField> fields = Maps.newHashMap();
+
+	private final Alignment alignment = new Alignment();
 
 	@CallbackProperty
 	public short x;
@@ -96,8 +218,12 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 	}
 
 	@SideOnly(Side.CLIENT)
-	public void draw(float partialTicks) {
+	public void draw(ScaledResolution resolution, float partialTicks) {
 		GL11.glPushMatrix();
+
+		final int x = alignment.getX(resolution, this);
+		final int y = alignment.getY(resolution, this);
+
 		GL11.glTranslated(x, y, z);
 		drawContents(partialTicks);
 		GL11.glPopMatrix();
@@ -107,6 +233,10 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 	protected abstract void drawContents(float partialTicks);
 
 	protected abstract Type getTypeEnum();
+
+	protected abstract int getWidth();
+
+	protected abstract int getHeight();
 
 	@LuaObject
 	@AdapterSourceName("glasses_box")
@@ -160,6 +290,16 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 		@Override
 		public Type getTypeEnum() {
 			return Type.BOX;
+		}
+
+		@Override
+		protected int getWidth() {
+			return width;
+		}
+
+		@Override
+		protected int getHeight() {
+			return height;
 		}
 
 	}
@@ -253,6 +393,16 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 			return Type.GRADIENT;
 		}
 
+		@Override
+		protected int getWidth() {
+			return width;
+		}
+
+		@Override
+		protected int getHeight() {
+			return height;
+		}
+
 	}
 
 	@LuaObject
@@ -303,6 +453,16 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 		@Override
 		public Type getTypeEnum() {
 			return Type.ITEM;
+		}
+
+		@Override
+		protected int getWidth() {
+			return Math.round(16 * scale);
+		}
+
+		@Override
+		protected int getHeight() {
+			return Math.round(16 * scale);
 		}
 
 	}
@@ -376,6 +536,16 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 			return Type.LIQUID;
 		}
 
+		@Override
+		protected int getWidth() {
+			return width;
+		}
+
+		@Override
+		protected int getHeight() {
+			return height;
+		}
+
 	}
 
 	@LuaObject
@@ -413,6 +583,17 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 		public Type getTypeEnum() {
 			return Type.TEXT;
 		}
+
+		@Override
+		protected int getWidth() {
+			FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+			return Math.round(fontRenderer.getStringWidth(text) * scale);
+		}
+
+		@Override
+		protected int getHeight() {
+			return Math.round(8 * scale);
+		}
 	}
 
 	@Override
@@ -444,6 +625,24 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 		return containerId + 1;
 	}
 
+	public VerticalAlignment getScreenVerticalAnchor() {
+		return alignment.screenVerticalAnchor;
+	}
+
+	@LuaCallable
+	public void setScreenAnchor(@Arg(name = "horizontal") HorizontalAlignment horizontal, @Arg(name = "vertical") VerticalAlignment vertical) {
+		alignment.screenVerticalAnchor = vertical;
+		alignment.screenHorizontalAnchor = horizontal;
+		owner.markElementModified(alignment);
+	}
+
+	@LuaCallable
+	public void setObjectAnchor(@Arg(name = "horizontal") HorizontalAlignment horizontal, @Arg(name = "vertical") VerticalAlignment vertical) {
+		alignment.objectVerticalAnchor = vertical;
+		alignment.objectHorizontalAnchor = horizontal;
+		owner.markElementModified(alignment);
+	}
+
 	@Override
 	public void setField(Field field, Object value) {
 		Preconditions.checkState(!deleted, "Object is already deleted");
@@ -451,7 +650,7 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 
 		ElementField fieldWrapper = fields.get(field);
 		Preconditions.checkState(fieldWrapper != null, "LOGIC FAIL. BLAME MOD DEVS");
-		owner.markElementModified(fieldWrapper.elementId);
+		owner.markElementModified(fieldWrapper);
 		fieldWrapper.set(value);
 	}
 
@@ -465,8 +664,8 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 	}
 
 	@Override
-	public List<ElementField> createElements() {
-		List<ElementField> result = Lists.newArrayList();
+	public List<IStructureElement> createElements() {
+		List<IStructureElement> result = Lists.newArrayList();
 		for (Field field : getClass().getFields()) {
 			field.setAccessible(true);
 			if (!field.isAnnotationPresent(CallbackProperty.class)) continue;
@@ -476,12 +675,8 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 			fields.put(field, fieldWrapper);
 		}
 
+		result.add(alignment);
 		return result;
-	}
-
-	@Override
-	public void onElementAdded(ElementField element, int index) {
-		element.elementId = index;
 	}
 
 	public void setDeleted() {
@@ -491,6 +686,9 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 	public void setOwner(SurfaceServer owner) {
 		this.owner = owner;
 	}
+
+	@Override
+	public void onElementAdded(IStructureElement element, int index) {}
 
 	public void onAdded(SurfaceServer owner, int containerId) {
 		this.containerId = containerId;

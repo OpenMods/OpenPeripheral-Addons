@@ -1,6 +1,7 @@
 package openperipheral.addons.glasses;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
@@ -16,10 +17,12 @@ public class TerminalManagerClient {
 
 	private final Table<Long, String, SurfaceClient> surfaces = HashBasedTable.create();
 
-	private void tryDrawSurface(long guid, String player, float partialTicks) {
+	private void tryDrawSurface(long guid, String player, float partialTicks, ScaledResolution resolution) {
 		SurfaceClient surface = surfaces.get(guid, player);
-		if (surface != null) for (Drawable drawable : surface)
-			drawable.draw(partialTicks);
+		if (surface != null) {
+			for (Drawable drawable : surface)
+				drawable.draw(resolution, partialTicks);
+		}
 	}
 
 	@SubscribeEvent
@@ -28,8 +31,8 @@ public class TerminalManagerClient {
 			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 			Long guid = TerminalUtils.tryGetTerminalGuid(player);
 			if (guid != null) {
-				tryDrawSurface(guid, TerminalUtils.GLOBAL_MARKER, evt.partialTicks);
-				tryDrawSurface(guid, TerminalUtils.PRIVATE_MARKER, evt.partialTicks);
+				tryDrawSurface(guid, TerminalUtils.GLOBAL_MARKER, evt.partialTicks, evt.resolution);
+				tryDrawSurface(guid, TerminalUtils.PRIVATE_MARKER, evt.partialTicks, evt.resolution);
 			}
 
 		}

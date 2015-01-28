@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import openmods.structured.ElementField;
+import openmods.structured.IStructureElement;
 import openmods.structured.StructuredDataMaster;
 import openperipheral.api.AdapterSourceName;
 import openperipheral.api.LuaObject;
@@ -13,7 +13,7 @@ import com.google.common.base.Objects;
 
 @LuaObject
 @AdapterSourceName("glasses_surface")
-public class SurfaceServer extends StructuredDataMaster<Drawable, ElementField> implements IDrawableContainer {
+public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElement> implements IDrawableContainer {
 
 	public SurfaceServer() {}
 
