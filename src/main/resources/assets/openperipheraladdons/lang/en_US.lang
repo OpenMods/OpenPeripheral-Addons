@@ -8,6 +8,7 @@ tile.openperipheral.robot.name=Robot Controller
 
 item.openperipheraladdons.duckantenna.name=Duck Antenna
 
+item.openperipheral.keyboard.name=Wireless Keyboard
 item.openperipheral.glasses.name=Terminal Glasses
 item.openperipheral.remote.name=Remote
 item.openperipheral.capacitor.name=Capacitor

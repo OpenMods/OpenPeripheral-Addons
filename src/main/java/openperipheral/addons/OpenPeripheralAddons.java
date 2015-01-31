@@ -1,18 +1,12 @@
 package openperipheral.addons;
 
 import java.io.File;
-import java.util.List;
 
-import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.oredict.ShapedOreRecipe;
 import openmods.Mods;
 import openmods.OpenMods;
 import openmods.api.IProxy;
@@ -23,6 +17,12 @@ import openmods.config.game.ConfigurableFeatureManager.CustomFeatureRule;
 import openmods.config.properties.ConfigProcessing;
 import openmods.network.event.NetworkEventManager;
 import openperipheral.addons.glasses.*;
+import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
+import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesKeyEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesMouseEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSignalCaptureEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
@@ -46,9 +46,10 @@ import com.google.common.base.Preconditions;
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.event.*;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.registry.GameRegistry;
 import dan200.computercraft.api.ComputerCraftAPI;
 
 @Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$];required-after:ComputerCraft@[1.64,];required-after:OpenPeripheralCore")
@@ -79,6 +80,9 @@ public class OpenPeripheralAddons {
 	public static class Items implements ItemInstances {
 		@RegisterItem(name = "glasses")
 		public static ItemGlasses glasses;
+
+		@RegisterItem(name = "keyboard")
+		public static ItemKeyboard keyboard;
 
 		@RegisterItem(name = "generic")
 		public static ItemOPGeneric generic;
@@ -145,7 +149,13 @@ public class OpenPeripheralAddons {
 				.startRegistration()
 				.register(TerminalResetEvent.class)
 				.register(TerminalClearEvent.class)
-				.register(TerminalDataEvent.class);
+				.register(TerminalDataEvent.class)
+				.register(GlassesSignalCaptureEvent.class)
+				.register(GlassesStopCaptureEvent.class)
+				.register(GlassesMouseEvent.class)
+				.register(GlassesComponentMouseEvent.class)
+				.register(GlassesKeyEvent.class)
+				.register(GlassesChangeBackground.class);
 
 		Items.generic.initRecipes();
 
@@ -178,24 +188,5 @@ public class OpenPeripheralAddons {
 	public void init(FMLInitializationEvent evt) {
 		proxy.init();
 		proxy.registerRenderInformation();
-	}
-
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent evt) {
-
-		Block blockPeripheral = GameRegistry.findBlock(Mods.COMPUTERCRAFT, "CC-Peripheral");
-		Block blockCable = GameRegistry.findBlock(Mods.COMPUTERCRAFT, "CC-Cable");
-
-		final ItemStack cable = new ItemStack(blockCable, 1, 0);
-		final ItemStack wiredModem = new ItemStack(blockCable, 1, 1);
-		final ItemStack wirelessModem = new ItemStack(blockPeripheral, 1, 1);
-		final ItemStack advancedMonitor = new ItemStack(blockPeripheral, 1, 4);
-
-		@SuppressWarnings("unchecked")
-		final List<IRecipe> recipeList = CraftingManager.getInstance().getRecipeList();
-
-		recipeList.add(new ShapedOreRecipe(Blocks.glassesBridge, "lwl", "wrw", "lwl", 'w', wiredModem, 'r', net.minecraft.init.Blocks.redstone_block, 'l', wirelessModem));
-		recipeList.add(new ShapedOreRecipe(Items.glasses, "mcm", 'm', advancedMonitor, 'c', cable));
-
 	}
 }

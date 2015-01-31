@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.ServerChatEvent;
 import openmods.Log;
 import openperipheral.addons.api.TerminalRegisterEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesClientEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
 
@@ -31,7 +32,7 @@ public class TerminalManagerServer {
 		Long guid = TerminalUtils.tryGetTerminalGuid(player);
 		if (guid != null) {
 			TileEntityGlassesBridge listener = listeners.get(guid);
-			if (listener != null) listener.onChatCommand(event.message.substring(2).trim(), event.username);
+			if (listener != null) listener.onChatCommand(event.message.substring(2).trim(), player);
 		}
 
 		event.setCanceled(true);
@@ -73,6 +74,12 @@ public class TerminalManagerServer {
 	public void onTerminalRegister(TerminalRegisterEvent evt) {
 		TileEntityGlassesBridge listener = listeners.get(evt.terminalId);
 		if (listener != null) listener.registerTerminal(evt.player);
+	}
+
+	@SubscribeEvent
+	public void onGlassesEvent(GlassesClientEvent evt) {
+		TileEntityGlassesBridge listener = listeners.get(evt.guid);
+		if (listener != null) listener.handleUserEvent(evt);
 	}
 
 	public void registerBridge(long terminalId, TileEntityGlassesBridge bridge) {

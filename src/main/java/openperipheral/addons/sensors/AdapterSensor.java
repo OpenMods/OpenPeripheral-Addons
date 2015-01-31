@@ -109,9 +109,8 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get full details of a particular player if they're in range")
 	public Map<?, ?> getPlayerByUUID(ISensorEnvironment env,
-			@Arg(name = "uuid", description = "The players uuid") String uuid) {
-		UUID parsedUUID = UUID.fromString(uuid);
-		return getPlayerInfo(env, parsedUUID);
+			@Arg(name = "uuid", description = "The players uuid") UUID uuid) {
+		return getPlayerInfo(env, uuid);
 	}
 
 	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get full details of a particular mob if it's in range")

@@ -30,7 +30,7 @@ public class ClientProxy implements IProxy {
 
 	@Override
 	public void preInit() {
-		MinecraftForge.EVENT_BUS.register(new TerminalManagerClient());
+		MinecraftForge.EVENT_BUS.register(TerminalManagerClient.instance);
 		MinecraftForge.EVENT_BUS.register(new IconLoader());
 	}
 

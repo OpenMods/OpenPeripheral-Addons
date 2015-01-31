@@ -14,6 +14,9 @@ import openmods.api.IPlaceAwareTile;
 import openmods.include.IncludeInterface;
 import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
+import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
+import openperipheral.addons.glasses.GlassesEvent.GlassesClientEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.api.*;
@@ -31,9 +34,11 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	public static final String TAG_GUID = "guid";
 
-	private static final String EVENT_CHAT_MESSAGE = "chat_command";
+	private static final String EVENT_CHAT_MESSAGE = "glasses_chat_command";
 
-	private static final String EVENT_PLAYER_JOIN = "registered_player_join";
+	private static final String EVENT_PLAYER_ATTACH = "glasses_attach";
+
+	private static final String EVENT_PLAYER_DETACH = "glasses_detach";
 
 	private static class PlayerInfo {
 		public final GameProfile profile;
@@ -44,6 +49,36 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 			this.player = new WeakReference<EntityPlayerMP>(player);
 			this.profile = player.getGameProfile();
 			this.surface = new SurfaceServer();
+		}
+	}
+
+	@LuaObject
+	@AdapterSourceName("glasses-capture")
+	public class CaptureControl {
+		private final WeakReference<EntityPlayerMP> player;
+
+		public CaptureControl(WeakReference<EntityPlayerMP> player) {
+			this.player = player;
+		}
+
+		protected EntityPlayer getPlayer() {
+			EntityPlayer player = this.player.get();
+			if (player == null) throw new IllegalStateException("Object is no longer valid");
+			return player;
+		}
+
+		@LuaCallable(description = "Stops capture for player")
+		public void stopCapturing() {
+			EntityPlayer player = getPlayer();
+			new GlassesStopCaptureEvent(guid).sendToPlayer(player);
+		}
+
+		@LuaCallable(description = "Stest background on capture mode screen")
+		public void setBackground(@Arg(name = "background") int background,
+				@Optionals @Arg(name = "alpha") Integer alpha) {
+			EntityPlayer player = getPlayer();
+			final int a = alpha != null? (alpha << 24) : 0x2A000000;
+			new GlassesChangeBackground(guid, background & 0x00FFFFFF | a).sendToPlayer(player);
 		}
 	}
 
@@ -70,15 +105,34 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 				knownPlayersByUUID.put(gameProfile.getId(), playerInfo);
 				knownPlayersByName.put(gameProfile.getName(), playerInfo);
-				onPlayerJoin(gameProfile);
+				queueEvent(EVENT_PLAYER_ATTACH, player);
 			}
 		}
 	}
 
-	public void onChatCommand(String command, String username) {
-		for (IComputerAccess computer : computers) {
-			computer.queueEvent(EVENT_CHAT_MESSAGE, new Object[] { command, username, guid, computer.getAttachmentName() });
+	private void queueEvent(String event, EntityPlayer user, Object... extra) {
+		final GameProfile gameProfile = user.getGameProfile();
+
+		final Object[] template = new Object[3 + extra.length];
+		template[1] = gameProfile.getName();
+		final UUID id = gameProfile.getId();
+		template[2] = id != null? id.toString() : null;
+
+		for (int i = 0; i < extra.length; i++) {
+			// looks like CC has some problems with stuff like Character
+			final Object v = extra[i];
+			template[i + 2] = v != null? v.toString() : null;
 		}
+
+		for (IComputerAccess computer : computers) {
+			Object[] args = Arrays.copyOf(template, template.length);
+			args[0] = computer.getAttachmentName();
+			computer.queueEvent(event, args);
+		}
+	}
+
+	public void onChatCommand(String command, EntityPlayer player) {
+		queueEvent(EVENT_CHAT_MESSAGE, player, command);
 	}
 
 	@Override
@@ -98,6 +152,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 			final EntityPlayerMP player = info.player.get();
 
 			if (!isPlayerValid(player)) {
+				queueEvent(EVENT_PLAYER_DETACH, player);
 				sendCleanPackets(player);
 				it.remove();
 			}
@@ -163,12 +218,6 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		return true;
 	}
 
-	public void onPlayerJoin(GameProfile player) {
-		for (IComputerAccess computer : computers) {
-			computer.queueEvent(EVENT_PLAYER_JOIN, new Object[] { player.getName(), player.getId() });
-		}
-	}
-
 	@Override
 	public void addComputer(IComputerAccess computer) {
 		if (!computers.contains(computer)) {
@@ -179,6 +228,10 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	@Override
 	public void removeComputer(IComputerAccess computer) {
 		computers.remove(computer);
+	}
+
+	public void handleUserEvent(GlassesClientEvent evt) {
+		queueEvent(evt.getEventName(), evt.sender, evt.getEventArgs());
 	}
 
 	public SurfaceServer getSurface(String username) {
@@ -272,10 +325,16 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	@Asynchronous
 	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
-	public IDrawableContainer getSurfaceByUUID(@Arg(name = "uuid", description = "The uuid of the user to get the draw surface for") String username) {
-		UUID uuid = UUID.fromString(username);
+	public IDrawableContainer getSurfaceByUUID(@Arg(name = "uuid", description = "The uuid of the user to get the draw surface for") UUID uuid) {
 		SurfaceServer playerSurface = getSurface(uuid);
 		Preconditions.checkNotNull(playerSurface, "Invalid player");
 		return playerSurface;
+	}
+
+	@Asynchronous
+	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Returns object used for controlling player capture mode")
+	public CaptureControl getCaptureControl(@Arg(name = "uuid") UUID uuid) {
+		PlayerInfo info = knownPlayersByUUID.get(uuid);
+		return info != null? new CaptureControl(info.player) : null;
 	}
 }
