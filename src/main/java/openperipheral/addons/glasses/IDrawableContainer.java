@@ -3,6 +3,7 @@ package openperipheral.addons.glasses;
 import java.util.Map;
 import java.util.Set;
 
+import openperipheral.addons.glasses.drawable.Drawable;
 import openperipheral.api.*;
 
 @Asynchronous

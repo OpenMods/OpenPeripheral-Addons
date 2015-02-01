@@ -121,7 +121,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		for (int i = 0; i < extra.length; i++) {
 			// looks like CC has some problems with stuff like Character
 			final Object v = extra[i];
-			template[i + 2] = v != null? v.toString() : null;
+			template[i + 3] = v != null? v.toString() : null;
 		}
 
 		for (IComputerAccess computer : computers) {

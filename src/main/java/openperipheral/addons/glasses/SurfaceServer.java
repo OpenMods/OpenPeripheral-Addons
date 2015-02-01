@@ -6,6 +6,7 @@ import java.util.Set;
 
 import openmods.structured.IStructureElement;
 import openmods.structured.StructuredDataMaster;
+import openperipheral.addons.glasses.drawable.*;
 import openperipheral.api.AdapterSourceName;
 import openperipheral.api.LuaObject;
 
@@ -47,27 +48,27 @@ public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElem
 
 	@Override
 	public Drawable addText(short x, short y, String text, Integer color) {
-		return addDrawable(new Drawable.Text(x, y, text, Objects.firstNonNull(color, 0xFFFFFF)));
+		return addDrawable(new Text(x, y, text, Objects.firstNonNull(color, 0xFFFFFF)));
 	}
 
 	@Override
 	public Drawable addBox(short x, short y, short width, short height, Integer color, Float opacity) {
-		return addDrawable(new Drawable.SolidBox(x, y, width, height, Objects.firstNonNull(color, 0xFFFFFF), Objects.firstNonNull(opacity, 1.0f)));
+		return addDrawable(new SolidBox(x, y, width, height, Objects.firstNonNull(color, 0xFFFFFF), Objects.firstNonNull(opacity, 1.0f)));
 	}
 
 	@Override
 	public Drawable addGradientBox(short x, short y, short width, short height, int color, float alpha, int color2, float alpha2, int gradient) {
-		return addDrawable(new Drawable.GradientBox(x, y, width, height, color, alpha, color2, alpha2, gradient));
+		return addDrawable(new GradientBox(x, y, width, height, color, alpha, color2, alpha2, gradient));
 	}
 
 	@Override
 	public Drawable addIcon(short x, short y, String id, short meta) {
-		return addDrawable(new Drawable.ItemIcon(x, y, id, meta));
+		return addDrawable(new ItemIcon(x, y, id, meta));
 	}
 
 	@Override
 	public Drawable addLiquid(short x, short y, short width, short height, String id) {
-		return addDrawable(new Drawable.LiquidIcon(x, y, width, height, id));
+		return addDrawable(new LiquidIcon(x, y, width, height, id));
 	}
 
 }

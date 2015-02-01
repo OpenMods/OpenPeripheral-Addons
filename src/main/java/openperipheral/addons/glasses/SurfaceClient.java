@@ -6,6 +6,7 @@ import openmods.structured.IStructureContainerFactory;
 import openmods.structured.IStructureElement;
 import openmods.structured.StructuredDataSlave;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
+import openperipheral.addons.glasses.drawable.Drawable;
 
 public class SurfaceClient extends StructuredDataSlave<Drawable, IStructureElement> implements Iterable<Drawable> {
 

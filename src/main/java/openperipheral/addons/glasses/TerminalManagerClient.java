@@ -10,6 +10,7 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
+import openperipheral.addons.glasses.drawable.Drawable;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -25,12 +26,14 @@ public class TerminalManagerClient {
 		public final boolean isPrivate;
 		public final int dx;
 		public final int dy;
+		public final int z;
 
-		public DrawableHitInfo(int id, boolean isPrivate, int dx, int dy) {
+		public DrawableHitInfo(int id, boolean isPrivate, int dx, int dy, int z) {
 			this.id = id;
 			this.isPrivate = isPrivate;
 			this.dx = dx;
 			this.dy = dy;
+			this.z = z;
 		}
 	}
 
@@ -44,7 +47,7 @@ public class TerminalManagerClient {
 		SurfaceClient surface = surfaces.get(guid, player);
 		if (surface != null) {
 			for (Drawable drawable : surface)
-				drawable.draw(resolution, partialTicks);
+				if (drawable.shouldRender()) drawable.draw(resolution, partialTicks);
 		}
 	}
 
@@ -117,15 +120,17 @@ public class TerminalManagerClient {
 
 		if (surface == null) return null;
 
+		DrawableHitInfo result = null;
+
 		for (Drawable d : surface) {
 			final int dx = x - d.x;
 			final int dy = y - d.y;
 
-			if (0 <= dx && 0 <= dy &&
-					dx < d.getWidth() &&
-					dy < d.getHeight()) return new DrawableHitInfo(d.getId(), isPrivate, dx, dy);
+			if (0 <= dx && 0 <= dy && dx < d.getWidth() && dy < d.getHeight()) {
+				if (result == null || result.z <= d.z) result = new DrawableHitInfo(d.getId(), isPrivate, dx, dy, d.z);
+			}
 		}
 
-		return null;
+		return result;
 	}
 }
