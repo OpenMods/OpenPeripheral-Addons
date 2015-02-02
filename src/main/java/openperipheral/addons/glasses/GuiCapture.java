@@ -1,9 +1,13 @@
 package openperipheral.addons.glasses;
 
 import net.minecraft.client.gui.GuiScreen;
-import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseEvent;
-import openperipheral.addons.glasses.GlassesEvent.GlassesKeyEvent;
-import openperipheral.addons.glasses.GlassesEvent.GlassesMouseEvent;
+import openmods.network.event.NetworkEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseButtonEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseWheelEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesKeyDownEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesKeyUpEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesMouseButtonEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesMouseWheelEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSignalCaptureEvent;
 import openperipheral.addons.glasses.TerminalManagerClient.DrawableHitInfo;
 
@@ -17,7 +21,6 @@ public class GuiCapture extends GuiScreen {
 
 	public GuiCapture(long guid) {
 		this.guid = guid;
-		new GlassesSignalCaptureEvent(guid, true).sendToServer();
 	}
 
 	@Override
@@ -32,14 +35,23 @@ public class GuiCapture extends GuiScreen {
 			int x = Mouse.getEventX() * this.width / this.mc.displayWidth;
 			int y = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
 
-			DrawableHitInfo hit = TerminalManagerClient.instance.findDrawableHit(guid, x, y);
+			final DrawableHitInfo hit = TerminalManagerClient.instance.findDrawableHit(guid, x, y);
 
-			if (hit != null) {
-				new GlassesComponentMouseEvent(guid, button, wheel, state, hit.id, hit.isPrivate, hit.dx, hit.dy).sendToServer();
-			} else {
-				new GlassesMouseEvent(guid, button, wheel, state).sendToServer();
-			}
+			if (button != -1) createMouseButtonEvent(button, state, hit).sendToServer();
+			if (wheel != 0) createMouseWheelEvent(wheel, hit).sendToServer();
 		}
+	}
+
+	private NetworkEvent createMouseButtonEvent(int button, boolean state, DrawableHitInfo hit) {
+		return hit != null?
+				new GlassesComponentMouseButtonEvent(guid, hit.id, hit.isPrivate, hit.dx, hit.dy, button, state) :
+				new GlassesMouseButtonEvent(guid, button, state);
+	}
+
+	private NetworkEvent createMouseWheelEvent(int wheel, DrawableHitInfo hit) {
+		return hit != null?
+				new GlassesComponentMouseWheelEvent(guid, hit.id, hit.isPrivate, hit.dx, hit.dy, wheel) :
+				new GlassesMouseWheelEvent(guid, wheel);
 	}
 
 	@Override
@@ -50,10 +62,15 @@ public class GuiCapture extends GuiScreen {
 			this.mc.displayGuiScreen(null);
 			this.mc.setIngameFocus();
 		} else {
-			final char ch = Keyboard.getEventCharacter();
 			final boolean state = Keyboard.getEventKeyState();
-			final boolean isRepeat = Keyboard.isRepeatEvent();
-			new GlassesKeyEvent(guid, ch, key, state, isRepeat).sendToServer();
+			if (state) {
+				final char ch = Keyboard.getEventCharacter();
+
+				final boolean isRepeat = Keyboard.isRepeatEvent();
+				new GlassesKeyDownEvent(guid, ch, key, isRepeat).sendToServer();
+			} else {
+				new GlassesKeyUpEvent(guid, key).sendToServer();
+			}
 		}
 
 		// looks like twitch controls
@@ -66,8 +83,15 @@ public class GuiCapture extends GuiScreen {
 	}
 
 	@Override
+	public void initGui() {
+		new GlassesSignalCaptureEvent(guid, true).sendToServer();
+		Keyboard.enableRepeatEvents(true);
+	}
+
+	@Override
 	public void onGuiClosed() {
 		new GlassesSignalCaptureEvent(guid, false).sendToServer();
+		Keyboard.enableRepeatEvents(false);
 	}
 
 	@Override

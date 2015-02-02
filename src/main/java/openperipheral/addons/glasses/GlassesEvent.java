@@ -1,14 +1,11 @@
 package openperipheral.addons.glasses;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import openmods.network.event.EventDirection;
-import openmods.network.event.NetworkEvent;
 import openmods.network.event.NetworkEventMeta;
+import openmods.network.event.SerializableNetworkEvent;
+import openmods.serializable.cls.Serialize;
 
-public class GlassesEvent extends NetworkEvent {
+public class GlassesEvent extends SerializableNetworkEvent {
 
 	private static final Object[] NO_EXTRAS = new Object[0];
 
@@ -16,20 +13,11 @@ public class GlassesEvent extends NetworkEvent {
 		return args;
 	}
 
+	@Serialize
 	public long guid;
 
 	public GlassesEvent(long guid) {
 		this.guid = guid;
-	}
-
-	@Override
-	protected void readFromStream(DataInput input) throws IOException {
-		this.guid = input.readLong();
-	}
-
-	@Override
-	protected void writeToStream(DataOutput output) throws IOException {
-		output.writeLong(this.guid);
 	}
 
 	public static class GlassesClientEvent extends GlassesEvent {
@@ -47,44 +35,26 @@ public class GlassesEvent extends NetworkEvent {
 	}
 
 	@NetworkEventMeta(direction = EventDirection.C2S)
-	public static class GlassesKeyEvent extends GlassesClientEvent {
+	public static class GlassesKeyDownEvent extends GlassesClientEvent {
+		@Serialize
 		public char ch;
 
+		@Serialize
 		public int code;
 
-		public boolean pressed;
-
+		@Serialize
 		public boolean isRepeat;
 
-		public GlassesKeyEvent(long guid, char ch, int code, boolean pressed, boolean isRepeat) {
+		public GlassesKeyDownEvent(long guid, char ch, int code, boolean isRepeat) {
 			super(guid);
 			this.ch = ch;
 			this.code = code;
-			this.pressed = pressed;
 			this.isRepeat = isRepeat;
 		}
 
 		@Override
-		protected void readFromStream(DataInput input) throws IOException {
-			super.readFromStream(input);
-			this.ch = input.readChar();
-			this.code = input.readInt();
-			final byte flags = input.readByte();
-			this.pressed = (flags & 1) != 0;
-			this.isRepeat = (flags & 2) != 0;
-		}
-
-		@Override
-		protected void writeToStream(DataOutput output) throws IOException {
-			super.writeToStream(output);
-			output.writeChar(this.ch);
-			output.writeInt(this.code);
-			output.writeByte((this.pressed? 1 : 0) | (this.isRepeat? 2 : 0));
-		}
-
-		@Override
 		public String getEventName() {
-			return pressed? "glasses_key_down" : "glasses_key_up";
+			return "glasses_key_down";
 		}
 
 		@Override
@@ -93,108 +63,150 @@ public class GlassesEvent extends NetworkEvent {
 		}
 	}
 
-	public static class GlassesMouseEvent extends GlassesClientEvent {
-		public int button;
-		public int wheel;
-		public boolean pressed;
+	@NetworkEventMeta(direction = EventDirection.C2S)
+	public static class GlassesKeyUpEvent extends GlassesClientEvent {
 
-		public GlassesMouseEvent(long guid, int button, int wheel, boolean pressed) {
+		@Serialize
+		public int code;
+
+		public GlassesKeyUpEvent(long guid, int code) {
 			super(guid);
-			this.button = button;
-			this.wheel = wheel;
-			this.pressed = pressed;
-		}
-
-		@Override
-		protected void readFromStream(DataInput input) throws IOException {
-			super.readFromStream(input);
-			this.button = input.readInt();
-			this.wheel = input.readInt();
-			this.pressed = input.readBoolean();
-		}
-
-		@Override
-		protected void writeToStream(DataOutput output) throws IOException {
-			super.writeToStream(output);
-			output.writeInt(this.button);
-			output.writeInt(this.wheel);
-			output.writeBoolean(this.pressed);
+			this.code = code;
 		}
 
 		@Override
 		public String getEventName() {
-			return "glasses_general_mouse";
+			return "glasses_key_up";
 		}
 
 		@Override
 		public Object[] getEventArgs() {
-			return wrap(button, wheel, pressed);
+			return wrap(code);
 		}
 	}
 
 	@NetworkEventMeta(direction = EventDirection.C2S)
-	public static class GlassesComponentMouseEvent extends GlassesMouseEvent {
+	public static class GlassesMouseWheelEvent extends GlassesClientEvent {
+		@Serialize
+		public int wheel;
+
+		public GlassesMouseWheelEvent(long guid, int wheel) {
+			super(guid);
+			this.wheel = wheel;
+		}
+
+		@Override
+		public String getEventName() {
+			return "glasses_mouse_scroll";
+		}
+
+		@Override
+		public Object[] getEventArgs() {
+			return wrap(wheel);
+		}
+	}
+
+	@NetworkEventMeta(direction = EventDirection.C2S)
+	public static class GlassesMouseButtonEvent extends GlassesClientEvent {
+		@Serialize
+		public int button;
+
+		@Serialize
+		public boolean pressed;
+
+		public GlassesMouseButtonEvent(long guid, int button, boolean pressed) {
+			super(guid);
+			this.button = button;
+			this.pressed = pressed;
+		}
+
+		@Override
+		public String getEventName() {
+			return pressed? "glasses_mouse_down" : "glasses_mouse_up";
+		}
+
+		@Override
+		public Object[] getEventArgs() {
+			return wrap(button);
+		}
+	}
+
+	public abstract static class GlassesComponentMouseEvent extends GlassesClientEvent {
+		@Serialize
 		public int componentId;
+
+		@Serialize
 		public boolean isPrivate;
+
+		@Serialize
 		public int x;
+
+		@Serialize
 		public int y;
 
-		public GlassesComponentMouseEvent(long guid, int button, int wheel, boolean pressed, int componentId, boolean isPrivate, int x, int y) {
-			super(guid, button, wheel, pressed);
+		public GlassesComponentMouseEvent(long guid, int componentId, boolean isPrivate, int x, int y) {
+			super(guid);
 			this.componentId = componentId;
 			this.isPrivate = isPrivate;
 			this.x = x;
 			this.y = y;
 		}
+	}
 
-		@Override
-		protected void readFromStream(DataInput input) throws IOException {
-			super.readFromStream(input);
-			this.componentId = input.readInt();
-			this.isPrivate = input.readBoolean();
-			this.x = input.readInt();
-			this.y = input.readInt();
-		}
+	@NetworkEventMeta(direction = EventDirection.C2S)
+	public static class GlassesComponentMouseWheelEvent extends GlassesComponentMouseEvent {
+		@Serialize
+		public int wheel;
 
-		@Override
-		protected void writeToStream(DataOutput output) throws IOException {
-			super.writeToStream(output);
-			output.writeInt(this.componentId);
-			output.writeBoolean(this.isPrivate);
-			output.writeInt(this.x);
-			output.writeInt(this.y);
+		public GlassesComponentMouseWheelEvent(long guid, int componentId, boolean isPrivate, int x, int y, int wheel) {
+			super(guid, componentId, isPrivate, x, y);
+			this.wheel = wheel;
 		}
 
 		@Override
 		public String getEventName() {
-			return "glasses_component_mouse";
+			return "glasses_component_mouse_wheel";
 		}
 
 		@Override
 		public Object[] getEventArgs() {
-			return wrap(button, wheel, pressed, componentId, isPrivate, x, y);
+			return wrap(componentId, isPrivate, x, y, wheel);
+		}
+	}
+
+	@NetworkEventMeta(direction = EventDirection.C2S)
+	public static class GlassesComponentMouseButtonEvent extends GlassesComponentMouseEvent {
+		@Serialize
+		public int button;
+
+		@Serialize
+		public boolean pressed;
+
+		public GlassesComponentMouseButtonEvent(long guid, int componentId, boolean isPrivate, int x, int y, int button, boolean pressed) {
+			super(guid, componentId, isPrivate, x, y);
+			this.button = button;
+			this.pressed = pressed;
+		}
+
+		@Override
+		public String getEventName() {
+			return pressed? "glasses_component_mouse_down" : "glasses_component_mouse_up";
+		}
+
+		@Override
+		public Object[] getEventArgs() {
+			return wrap(componentId, isPrivate, x, y, button);
 		}
 	}
 
 	@NetworkEventMeta(direction = EventDirection.C2S)
 	public static class GlassesSignalCaptureEvent extends GlassesClientEvent {
+		@Serialize
 		public boolean captureState;
 
 		public GlassesSignalCaptureEvent(long guid, boolean captureState) {
 			super(guid);
 			this.captureState = captureState;
-		}
-
-		@Override
-		protected void readFromStream(DataInput input) throws IOException {
-			super.readFromStream(input);
-			this.captureState = input.readBoolean();
-		}
-
-		@Override
-		protected void writeToStream(DataOutput output) throws IOException {
-			super.writeToStream(output);
-			output.writeBoolean(this.captureState);
 		}
 
 		@Override
@@ -219,23 +231,12 @@ public class GlassesEvent extends NetworkEvent {
 	@NetworkEventMeta(direction = EventDirection.S2C)
 	public static class GlassesChangeBackground extends GlassesEvent {
 
+		@Serialize
 		public int backgroundColor;
 
 		public GlassesChangeBackground(long guid, int backgroundColor) {
 			super(guid);
 			this.backgroundColor = backgroundColor;
-		}
-
-		@Override
-		protected void readFromStream(DataInput input) throws IOException {
-			super.readFromStream(input);
-			this.backgroundColor = input.readInt();
-		}
-
-		@Override
-		protected void writeToStream(DataOutput output) throws IOException {
-			super.writeToStream(output);
-			output.writeInt(this.backgroundColor);
 		}
 	}
 }

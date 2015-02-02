@@ -18,9 +18,12 @@ import openmods.config.properties.ConfigProcessing;
 import openmods.network.event.NetworkEventManager;
 import openperipheral.addons.glasses.*;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
-import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseEvent;
-import openperipheral.addons.glasses.GlassesEvent.GlassesKeyEvent;
-import openperipheral.addons.glasses.GlassesEvent.GlassesMouseEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseButtonEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseWheelEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesKeyDownEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesKeyUpEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesMouseButtonEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesMouseWheelEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSignalCaptureEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
@@ -150,11 +153,15 @@ public class OpenPeripheralAddons {
 				.register(TerminalResetEvent.class)
 				.register(TerminalClearEvent.class)
 				.register(TerminalDataEvent.class)
+
 				.register(GlassesSignalCaptureEvent.class)
 				.register(GlassesStopCaptureEvent.class)
-				.register(GlassesMouseEvent.class)
-				.register(GlassesComponentMouseEvent.class)
-				.register(GlassesKeyEvent.class)
+				.register(GlassesMouseWheelEvent.class)
+				.register(GlassesMouseButtonEvent.class)
+				.register(GlassesComponentMouseWheelEvent.class)
+				.register(GlassesComponentMouseButtonEvent.class)
+				.register(GlassesKeyDownEvent.class)
+				.register(GlassesKeyUpEvent.class)
 				.register(GlassesChangeBackground.class);
 
 		Items.generic.initRecipes();
