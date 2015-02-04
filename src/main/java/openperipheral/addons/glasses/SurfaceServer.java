@@ -7,12 +7,12 @@ import java.util.Set;
 import openmods.structured.IStructureElement;
 import openmods.structured.StructuredDataMaster;
 import openperipheral.addons.glasses.drawable.*;
-import openperipheral.api.AdapterSourceName;
-import openperipheral.api.LuaObject;
+import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.api.adapter.method.ScriptObject;
 
 import com.google.common.base.Objects;
 
-@LuaObject
+@ScriptObject
 @AdapterSourceName("glasses_surface")
 public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElement> implements IDrawableContainer {
 

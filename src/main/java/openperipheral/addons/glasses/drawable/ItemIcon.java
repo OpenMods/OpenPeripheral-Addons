@@ -4,9 +4,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import openperipheral.api.AdapterSourceName;
-import openperipheral.api.CallbackProperty;
-import openperipheral.api.LuaObject;
+import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.api.adapter.CallbackProperty;
+import openperipheral.api.adapter.method.ScriptObject;
 
 import org.lwjgl.opengl.GL11;
 
@@ -16,7 +16,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@LuaObject
+@ScriptObject
 @AdapterSourceName("glasses_icon")
 public class ItemIcon extends Drawable {
 	@SideOnly(Side.CLIENT)

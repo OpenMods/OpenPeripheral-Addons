@@ -6,14 +6,14 @@ import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import openperipheral.addons.glasses.GlassesRenderingUtils;
-import openperipheral.api.AdapterSourceName;
-import openperipheral.api.CallbackProperty;
-import openperipheral.api.LuaObject;
+import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.api.adapter.CallbackProperty;
+import openperipheral.api.adapter.method.ScriptObject;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@LuaObject
+@ScriptObject
 @AdapterSourceName("glasses_liquid")
 public class LiquidIcon extends Drawable {
 	@CallbackProperty

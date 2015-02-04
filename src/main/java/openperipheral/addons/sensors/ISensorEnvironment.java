@@ -1,7 +1,7 @@
 package openperipheral.addons.sensors;
 
 import net.minecraft.util.Vec3;
-import openperipheral.api.IWorldProvider;
+import openperipheral.api.adapter.IWorldProvider;
 
 public interface ISensorEnvironment extends IWorldProvider {
 	public boolean isTurtle();

@@ -19,15 +19,18 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesClientEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
-import openperipheral.api.*;
+import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.api.adapter.Asynchronous;
+import openperipheral.api.adapter.method.*;
+import openperipheral.api.architecture.IArchitectureAccess;
+import openperipheral.api.architecture.IAttachable;
+import openperipheral.api.peripheral.PeripheralTypeId;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
-
-import dan200.computercraft.api.peripheral.IComputerAccess;
 
 @PeripheralTypeId("openperipheral_bridge")
 public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable, IPlaceAwareTile, ICustomHarvestDrops {
@@ -52,7 +55,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		}
 	}
 
-	@LuaObject
+	@ScriptObject
 	@AdapterSourceName("glasses-capture")
 	public class CaptureControl {
 		private final WeakReference<EntityPlayerMP> player;
@@ -67,13 +70,13 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 			return player;
 		}
 
-		@LuaCallable(description = "Stops capture for player")
+		@ScriptCallable(description = "Stops capture for player")
 		public void stopCapturing() {
 			EntityPlayer player = getPlayer();
 			new GlassesStopCaptureEvent(guid).sendToPlayer(player);
 		}
 
-		@LuaCallable(description = "Stest background on capture mode screen")
+		@ScriptCallable(description = "Stest background on capture mode screen")
 		public void setBackground(@Arg(name = "background") int background,
 				@Optionals @Arg(name = "alpha") Integer alpha) {
 			EntityPlayer player = getPlayer();
@@ -86,7 +89,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	private final Map<String, PlayerInfo> knownPlayersByName = Maps.newHashMap();
 	private final Set<EntityPlayerMP> newPlayers = Sets.newSetFromMap(new WeakHashMap<EntityPlayerMP, Boolean>());
 
-	private List<IComputerAccess> computers = Lists.newArrayList();
+	private Set<IArchitectureAccess> computers = Sets.newIdentityHashSet();
 
 	private long guid;
 
@@ -124,10 +127,10 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 			template[i + 3] = v != null? v.toString() : null;
 		}
 
-		for (IComputerAccess computer : computers) {
+		for (IArchitectureAccess computer : computers) {
 			Object[] args = Arrays.copyOf(template, template.length);
-			args[0] = computer.getAttachmentName();
-			computer.queueEvent(event, args);
+			args[0] = computer.peripheralName();
+			computer.signal(event, args);
 		}
 	}
 
@@ -219,14 +222,14 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Override
-	public void addComputer(IComputerAccess computer) {
+	public void addComputer(IArchitectureAccess computer) {
 		if (!computers.contains(computer)) {
 			computers.add(computer);
 		}
 	}
 
 	@Override
-	public void removeComputer(IComputerAccess computer) {
+	public void removeComputer(IArchitectureAccess computer) {
 		computers.remove(computer);
 	}
 
@@ -247,7 +250,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	// never, ever make this asynchronous
-	@LuaCallable(description = "Send updates to client. Without it changes won't be visible", name = "sync")
+	@ScriptCallable(description = "Send updates to client. Without it changes won't be visible", name = "sync")
 	public void syncContents() {
 		TerminalDataEvent globalChange = null;
 
@@ -290,7 +293,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Asynchronous
-	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get the names of all the users linked up to this bridge")
+	@ScriptCallable(returnTypes = ReturnType.TABLE, description = "Get the names of all the users linked up to this bridge")
 	public List<GameProfile> getUsers() {
 		List<GameProfile> result = Lists.newArrayList();
 		for (PlayerInfo info : knownPlayersByName.values())
@@ -300,7 +303,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Asynchronous
-	@LuaCallable(returnTypes = LuaReturnType.STRING, name = "getGuid", description = "Get the Guid of this bridge")
+	@ScriptCallable(returnTypes = ReturnType.STRING, name = "getGuid", description = "Get the Guid of this bridge")
 	public String getGuidString() {
 		return TerminalUtils.formatTerminalId(guid);
 	}
@@ -310,13 +313,13 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Asynchronous
-	@LuaCallable(returnTypes = LuaReturnType.NUMBER, description = "Get the display width of some text")
+	@ScriptCallable(returnTypes = ReturnType.NUMBER, description = "Get the display width of some text")
 	public int getStringWidth(@Arg(name = "text", description = "The text you want to measure") String text) {
 		return GlassesRenderingUtils.getStringWidth(text);
 	}
 
 	@Asynchronous
-	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
 	public IDrawableContainer getSurfaceByName(@Arg(name = "username", description = "The username of the user to get the draw surface for") String username) {
 		SurfaceServer playerSurface = getSurface(username);
 		Preconditions.checkNotNull(playerSurface, "Invalid player");
@@ -324,7 +327,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Asynchronous
-	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
 	public IDrawableContainer getSurfaceByUUID(@Arg(name = "uuid", description = "The uuid of the user to get the draw surface for") UUID uuid) {
 		SurfaceServer playerSurface = getSurface(uuid);
 		Preconditions.checkNotNull(playerSurface, "Invalid player");
@@ -332,7 +335,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Asynchronous
-	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Returns object used for controlling player capture mode")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Returns object used for controlling player capture mode")
 	public CaptureControl getCaptureControl(@Arg(name = "uuid") UUID uuid) {
 		PlayerInfo info = knownPlayersByUUID.get(uuid);
 		return info != null? new CaptureControl(info.player) : null;

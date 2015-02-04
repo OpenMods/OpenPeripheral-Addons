@@ -12,7 +12,12 @@ import openmods.structured.ElementField;
 import openmods.structured.IStructureContainer;
 import openmods.structured.IStructureElement;
 import openperipheral.addons.glasses.SurfaceServer;
-import openperipheral.api.*;
+import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.api.adapter.CallbackProperty;
+import openperipheral.api.adapter.IPropertyCallback;
+import openperipheral.api.adapter.method.Arg;
+import openperipheral.api.adapter.method.ReturnType;
+import openperipheral.api.adapter.method.ScriptCallable;
 
 import org.lwjgl.opengl.GL11;
 
@@ -246,12 +251,13 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 		return container;
 	}
 
-	@LuaCallable(returnTypes = LuaReturnType.STRING, name = "getType", description = "Get object type")
+	@ScriptCallable(returnTypes = ReturnType
+			.STRING, name = "getType", description = "Get object type")
 	public String getTypeName() {
 		return getTypeEnum().name().toLowerCase();
 	}
 
-	@LuaCallable
+	@ScriptCallable
 	public void delete() {
 		Preconditions.checkState(!deleted, "Object is already deleted");
 		Preconditions.checkState(owner != null, "Invalid side");
@@ -259,7 +265,8 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 		deleted = true;
 	}
 
-	@LuaCallable(returnTypes = LuaReturnType.NUMBER, name = "getId")
+	@ScriptCallable(returnTypes = ReturnType
+			.NUMBER, name = "getId")
 	public int getId() {
 		Preconditions.checkState(!deleted, "Object is already deleted");
 		return containerId + 1;
@@ -269,21 +276,21 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 		return alignment.screenVerticalAnchor;
 	}
 
-	@LuaCallable
+	@ScriptCallable
 	public void setScreenAnchor(@Arg(name = "horizontal") HorizontalAlignment horizontal, @Arg(name = "vertical") VerticalAlignment vertical) {
 		alignment.screenVerticalAnchor = vertical;
 		alignment.screenHorizontalAnchor = horizontal;
 		owner.markElementModified(alignment);
 	}
 
-	@LuaCallable
+	@ScriptCallable
 	public void setObjectAnchor(@Arg(name = "horizontal") HorizontalAlignment horizontal, @Arg(name = "vertical") VerticalAlignment vertical) {
 		alignment.objectVerticalAnchor = vertical;
 		alignment.objectHorizontalAnchor = horizontal;
 		owner.markElementModified(alignment);
 	}
 
-	@LuaCallable
+	@ScriptCallable
 	public void setAlignment(@Arg(name = "horizontal") HorizontalAlignment horizontal, @Arg(name = "vertical") VerticalAlignment vertical) {
 		alignment.objectVerticalAnchor = alignment.screenVerticalAnchor = vertical;
 		alignment.objectHorizontalAnchor = alignment.screenHorizontalAnchor = horizontal;

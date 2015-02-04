@@ -40,7 +40,7 @@ import openperipheral.addons.sensors.*;
 import openperipheral.addons.ticketmachine.BlockTicketMachine;
 import openperipheral.addons.ticketmachine.TileEntityTicketMachine;
 import openperipheral.api.ApiAccess;
-import openperipheral.api.IAdapterRegistry;
+import openperipheral.api.adapter.IPeripheralAdapterRegistry;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -166,7 +166,7 @@ public class OpenPeripheralAddons {
 
 		Items.generic.initRecipes();
 
-		IAdapterRegistry adapters = ApiAccess.getApi(IAdapterRegistry.class);
+		IPeripheralAdapterRegistry adapters = ApiAccess.getApi(IPeripheralAdapterRegistry.class);
 		adapters.registerInline(TileEntityGlassesBridge.class);
 		adapters.registerInline(TileEntityTicketMachine.class);
 		adapters.registerInline(TileEntitySelector.class);

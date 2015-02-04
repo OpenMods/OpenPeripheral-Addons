@@ -1,9 +1,9 @@
 package openperipheral.addons.glasses.drawable;
 
 import net.minecraft.client.gui.FontRenderer;
-import openperipheral.api.AdapterSourceName;
-import openperipheral.api.CallbackProperty;
-import openperipheral.api.LuaObject;
+import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.api.adapter.CallbackProperty;
+import openperipheral.api.adapter.method.ScriptObject;
 
 import org.lwjgl.opengl.GL11;
 
@@ -11,7 +11,7 @@ import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@LuaObject
+@ScriptObject
 @AdapterSourceName("glasses_text")
 public class Text extends Drawable {
 	@CallbackProperty

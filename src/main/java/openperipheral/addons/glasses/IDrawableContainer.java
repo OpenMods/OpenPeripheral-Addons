@@ -4,27 +4,29 @@ import java.util.Map;
 import java.util.Set;
 
 import openperipheral.addons.glasses.drawable.Drawable;
-import openperipheral.api.*;
+import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.api.adapter.Asynchronous;
+import openperipheral.api.adapter.method.*;
 
 @Asynchronous
 @AdapterSourceName("glasses_container")
 public interface IDrawableContainer {
 
-	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Get object by id")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get object by id")
 	public Drawable getById(
 			@Arg(name = "id", description = "Id of drawed object") int id
 			);
 
-	@LuaCallable(description = "Clear all the objects from the screen")
+	@ScriptCallable(description = "Clear all the objects from the screen")
 	public void clear();
 
-	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get the Ids of all the objects on the screen")
+	@ScriptCallable(returnTypes = ReturnType.TABLE, description = "Get the Ids of all the objects on the screen")
 	public Set<Integer> getAllIds();
 
-	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get all objects on the screen")
+	@ScriptCallable(returnTypes = ReturnType.TABLE, description = "Get all objects on the screen")
 	public Map<Integer, Drawable> getAllObjects();
 
-	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Add a new text object to the screen")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a new text object to the screen")
 	public Drawable addText(
 			@Arg(name = "x", description = "The x position from the top left") short x,
 			@Arg(name = "y", description = "The y position from the top left") short y,
@@ -32,7 +34,7 @@ public interface IDrawableContainer {
 			@Optionals @Arg(name = "color", description = "The text color") Integer color
 			);
 
-	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Add a new box to the screen")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a new box to the screen")
 	public Drawable addBox(
 			@Arg(name = "x", description = "The x position from the top left") short x,
 			@Arg(name = "y", description = "The y position from the top left") short y,
@@ -42,7 +44,7 @@ public interface IDrawableContainer {
 			@Arg(name = "opacity", description = "The opacity of the box (from 0 to 1)") Float opacity
 			);
 
-	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Add a new gradient box to the screen")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a new gradient box to the screen")
 	public Drawable addGradientBox(
 			@Arg(name = "x", description = "The x position from the top left") short x,
 			@Arg(name = "y", description = "The y position from the top left") short y,
@@ -55,7 +57,7 @@ public interface IDrawableContainer {
 			@Arg(name = "gradient", description = "The gradient direction (1 for horizontal, 2 for vertical)") int gradient
 			);
 
-	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Add an icon of an item to the screen")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add an icon of an item to the screen")
 	public Drawable addIcon(
 			@Arg(name = "x", description = "The x position from the top left") short x,
 			@Arg(name = "y", description = "The y position from the top left") short y,
@@ -63,7 +65,7 @@ public interface IDrawableContainer {
 			@Arg(name = "meta", description = "The meta of the item to draw") short meta
 			);
 
-	@LuaCallable(returnTypes = LuaReturnType.OBJECT, description = "Add a box textured like a liquid to the screen")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a box textured like a liquid to the screen")
 	public Drawable addLiquid(
 			@Arg(name = "x", description = "The x position from the top left") short x,
 			@Arg(name = "y", description = "The y position from the top left") short y,

@@ -21,7 +21,9 @@ import openmods.tileentity.SyncedTileEntity;
 import openmods.utils.ColorUtils;
 import openmods.utils.ColorUtils.ColorMeta;
 import openmods.utils.ItemUtils;
-import openperipheral.api.*;
+import openperipheral.api.adapter.Asynchronous;
+import openperipheral.api.adapter.method.*;
+import openperipheral.api.peripheral.PeripheralTypeId;
 
 import com.google.common.base.Preconditions;
 
@@ -96,7 +98,8 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 		syncMap.addUpdateListener(createRenderUpdateListener());
 	}
 
-	@LuaCallable(returnTypes = LuaReturnType.BOOLEAN, description = "Create a new ticket to the specified destination")
+	@ScriptCallable(returnTypes = ReturnType
+			.BOOLEAN, description = "Create a new ticket to the specified destination")
 	public boolean createTicket(@Arg(name = "destination", description = "The destination for the ticket") String destination,
 			@Arg(name = "amount") @Optionals Integer amount) {
 		if (amount == null) amount = 1;
@@ -131,7 +134,8 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 	}
 
 	@Asynchronous
-	@LuaCallable(returnTypes = LuaReturnType.STRING, description = "Returns owner of this machine")
+	@ScriptCallable(returnTypes = ReturnType
+			.STRING, description = "Returns owner of this machine")
 	public String getOwner() {
 		return owner.getValue();
 	}

@@ -9,7 +9,7 @@ import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import openperipheral.addons.OpenPeripheralAddons.Icons;
 import openperipheral.addons.utils.CCUtils;
 import openperipheral.api.ApiAccess;
-import openperipheral.api.IAdapterFactory;
+import openperipheral.api.architecture.cc.IComputerCraftObjectsFactory;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 
@@ -73,7 +73,7 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 
 	@Override
 	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
-		return ApiAccess.getApi(IAdapterFactory.class).createPeripheral(new TurtleSensorEnvironment(turtle));
+		return ApiAccess.getApi(IComputerCraftObjectsFactory.class).createPeripheral(new TurtleSensorEnvironment(turtle));
 	}
 
 	@Override

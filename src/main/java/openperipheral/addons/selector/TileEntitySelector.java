@@ -1,6 +1,8 @@
 package openperipheral.addons.selector;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,17 +16,21 @@ import openmods.api.IHasGui;
 import openmods.inventory.IInventoryProvider;
 import openmods.tileentity.SyncedTileEntity;
 import openperipheral.addons.OpenPeripheralAddons;
-import openperipheral.api.*;
+import openperipheral.api.Constants;
+import openperipheral.api.adapter.method.*;
+import openperipheral.api.architecture.IArchitectureAccess;
+import openperipheral.api.architecture.IAttachable;
+import openperipheral.api.converter.IConverter;
+import openperipheral.api.peripheral.PeripheralTypeId;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.google.common.base.Preconditions;
-
-import dan200.computercraft.api.peripheral.IComputerAccess;
+import com.google.common.collect.Sets;
 
 @PeripheralTypeId("openperipheral_selector")
 public class TileEntitySelector extends SyncedTileEntity implements IActivateAwareTile, IAttachable, ICustomHarvestDrops, IHasGui, IInventoryProvider {
-	private Set<IComputerAccess> computers = Collections.newSetFromMap(new WeakHashMap<IComputerAccess, Boolean>());
+	private Set<IArchitectureAccess> computers = Sets.newIdentityHashSet();
 
 	// We need a "Fake" inventory which cannot be modified except by server
 	// code, i.e. when a computer wants to set a slot or when a client clicks
@@ -188,7 +194,8 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 		return true;
 	}
 
-	@LuaCallable(description = "Get the item currently being displayed in a specific slot", returnTypes = LuaReturnType.TABLE)
+	@ScriptCallable(description = "Get the item currently being displayed in a specific slot", returnTypes = ReturnType
+			.TABLE)
 	public ItemStack getSlot(
 			@Arg(name = "slot", description = "The slot you want to get details about") int slot) {
 
@@ -196,10 +203,10 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 		return getInventory().getStackInSlot(slot - 1);
 	}
 
-	@LuaCallable(description = "Set the item being displayed on a specific slot")
+	@ScriptCallable(description = "Set the item being displayed on a specific slot")
 	public void setSlots(
-			@Env(Constants.ARG_CONVERTER) ITypeConvertersRegistry converter,
-			@Arg(name = "items", description = "A table containing itemstacks", type = LuaArgType.TABLE) Map<Double, Object> stacks) {
+			@Env(Constants.ARG_CONVERTER) IConverter converter,
+			@Arg(name = "items", description = "A table containing itemstacks", type = ArgType.TABLE) Map<Double, Object> stacks) {
 
 		for (int slot = 1; slot <= 9; slot++) {
 			final Object value = stacks.get(Double.valueOf(slot));
@@ -214,10 +221,10 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 		sync();
 	}
 
-	@LuaCallable(description = "Set the item being displayed on a specific slot")
+	@ScriptCallable(description = "Set the item being displayed on a specific slot")
 	public void setSlot(
 			@Arg(name = "slot", description = "The slot you want to modify") int slot,
-			@Optionals @Arg(name = "item", description = "The item you want to display. nil to set empty.", type = LuaArgType.TABLE) ItemStack stack) {
+			@Optionals @Arg(name = "item", description = "The item you want to display. nil to set empty.", type = ArgType.TABLE) ItemStack stack) {
 
 		Preconditions.checkArgument(slot >= 1 && slot <= 9, "slot must be between 1 and 9");
 		slot -= 1;
@@ -231,21 +238,19 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	}
 
 	private void fireEvent(String eventName, Object... args) {
-		for (IComputerAccess computer : computers) {
-			Object[] extendedArgs = ArrayUtils.add(args, computer.getAttachmentName());
-			computer.queueEvent(eventName, extendedArgs);
+		for (IArchitectureAccess computer : computers) {
+			Object[] extendedArgs = ArrayUtils.add(args, computer.peripheralName());
+			computer.signal(eventName, extendedArgs);
 		}
 	}
 
 	@Override
-	public void addComputer(IComputerAccess computer) {
-		if (!computers.contains(computer)) {
-			computers.add(computer);
-		}
+	public void addComputer(IArchitectureAccess computer) {
+		computers.add(computer);
 	}
 
 	@Override
-	public void removeComputer(IComputerAccess computer) {
+	public void removeComputer(IArchitectureAccess computer) {
 		computers.remove(computer);
 	}
 

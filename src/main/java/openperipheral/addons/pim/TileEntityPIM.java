@@ -1,28 +1,27 @@
 package openperipheral.addons.pim;
 
 import java.lang.ref.WeakReference;
-import java.util.Collections;
 import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.UUID;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MathHelper;
 import openmods.tileentity.OpenTileEntity;
-import openperipheral.api.IAttachable;
+import openperipheral.api.architecture.IArchitectureAccess;
+import openperipheral.api.architecture.IAttachable;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
-
-import dan200.computercraft.api.peripheral.IComputerAccess;
 
 public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttachable {
 
 	private WeakReference<EntityPlayer> player;
 
-	private Set<IComputerAccess> computers = Collections.newSetFromMap(new WeakHashMap<IComputerAccess, Boolean>());
+	private Set<IArchitectureAccess> computers = Sets.newIdentityHashSet();
 
 	public EntityPlayer getPlayer() {
 		return player != null? player.get() : null;
@@ -91,12 +90,12 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttach
 	}
 
 	@Override
-	public void addComputer(IComputerAccess computer) {
+	public void addComputer(IArchitectureAccess computer) {
 		computers.add(computer);
 	}
 
 	@Override
-	public void removeComputer(IComputerAccess computer) {
+	public void removeComputer(IArchitectureAccess computer) {
 		computers.remove(computer);
 	}
 
@@ -105,16 +104,26 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttach
 		return worldObj.getBlockMetadata(xCoord, yCoord, zCoord) == 1;
 	}
 
-	private void setPlayer(EntityPlayer p) {
+	private void setPlayer(EntityPlayer newPlayer) {
 		worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.1D, zCoord + 0.5D, "random.click", 0.3F, 0.6F);
-		worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, p == null? 0 : 1, 3);
-		if (p != null) {
-			player = new WeakReference<EntityPlayer>(p);
-			GameProfile profile = p.getGameProfile();
-			fireEvent("player_on", profile.getName(), profile.getId());
-		} else {
-			player = null;
-			fireEvent("player_off");
+		worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, newPlayer == null? 0 : 1, 3);
+
+		if (player != null) {
+			EntityPlayer prevPlayer = player.get();
+			if (prevPlayer != null) {
+				GameProfile profile = prevPlayer.getGameProfile();
+				final UUID uuid = profile.getId();
+				fireEvent("player_off", profile.getName(), uuid != null? uuid.toString() : "?");
+			}
+		}
+
+		player = null;
+
+		if (newPlayer != null) {
+			player = new WeakReference<EntityPlayer>(newPlayer);
+			GameProfile profile = newPlayer.getGameProfile();
+			final UUID uuid = profile.getId();
+			fireEvent("player_on", profile.getName(), uuid != null? uuid.toString() : "?");
 		}
 	}
 
@@ -125,9 +134,9 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttach
 	}
 
 	private void fireEvent(String eventName, Object... args) {
-		for (IComputerAccess computer : computers) {
-			Object[] extendedArgs = ArrayUtils.add(args, computer.getAttachmentName());
-			computer.queueEvent(eventName, extendedArgs);
+		for (IArchitectureAccess computer : computers) {
+			Object[] extendedArgs = ArrayUtils.add(args, computer.peripheralName());
+			computer.signal(eventName, extendedArgs);
 		}
 	}
 

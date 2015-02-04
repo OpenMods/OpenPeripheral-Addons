@@ -1,16 +1,16 @@
 package openperipheral.addons.glasses.drawable;
 
 import net.minecraft.client.renderer.Tessellator;
-import openperipheral.api.AdapterSourceName;
-import openperipheral.api.CallbackProperty;
-import openperipheral.api.LuaObject;
+import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.api.adapter.CallbackProperty;
+import openperipheral.api.adapter.method.ScriptObject;
 
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@LuaObject
+@ScriptObject
 @AdapterSourceName("glasses_gradient")
 public class GradientBox extends Drawable {
 	@CallbackProperty

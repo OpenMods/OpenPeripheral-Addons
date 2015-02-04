@@ -11,8 +11,8 @@ import openmods.reflection.MethodAccess.Function0;
 import openmods.reflection.MethodAccess.Function5;
 import openmods.tileentity.OpenTileEntity;
 import openperipheral.addons.OpenPeripheralAddons;
-import openperipheral.api.ICustomPeripheralProvider;
-import openperipheral.api.Volatile;
+import openperipheral.api.architecture.cc.ICustomPeripheralProvider;
+import openperipheral.api.peripheral.Volatile;
 
 import com.google.common.base.Preconditions;
 

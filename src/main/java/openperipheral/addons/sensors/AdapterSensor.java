@@ -14,7 +14,12 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import openmods.utils.WorldUtils;
-import openperipheral.api.*;
+import openperipheral.api.ApiAccess;
+import openperipheral.api.adapter.IPeripheralAdapter;
+import openperipheral.api.adapter.method.Arg;
+import openperipheral.api.adapter.method.ReturnType;
+import openperipheral.api.adapter.method.ScriptCallable;
+import openperipheral.api.meta.IEntityMetaBuilder;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -80,7 +85,8 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return ApiAccess.getApi(IEntityMetaBuilder.class).getEntityMetadata(mob, sensorPos);
 	}
 
-	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get the usernames of all the players in range")
+	@ScriptCallable(returnTypes = ReturnType
+			.TABLE, description = "Get the usernames of all the players in range")
 	public List<GameProfile> getPlayers(ISensorEnvironment env) {
 		List<EntityPlayer> players = WorldUtils.getEntitiesWithinAABB(env.getWorld(), EntityPlayer.class, getBoundingBox(env));
 
@@ -91,41 +97,48 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return names;
 	}
 
-	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get the ids of all the mobs in range")
+	@ScriptCallable(returnTypes = ReturnType
+			.TABLE, description = "Get the ids of all the mobs in range")
 	public List<Integer> getMobIds(ISensorEnvironment env) {
 		return listEntityIds(env, EntityLiving.class);
 	}
 
-	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get the ids of all the minecarts in range")
+	@ScriptCallable(returnTypes = ReturnType
+			.TABLE, description = "Get the ids of all the minecarts in range")
 	public List<Integer> getMinecartIds(ISensorEnvironment env) {
 		return listEntityIds(env, EntityMinecart.class);
 	}
 
-	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get full details of a particular player if they're in range")
+	@ScriptCallable(returnTypes = ReturnType
+			.TABLE, description = "Get full details of a particular player if they're in range")
 	public Map<?, ?> getPlayerByName(ISensorEnvironment env,
 			@Arg(name = "username", description = "The players username") String username) {
 		return getPlayerInfo(env, username);
 	}
 
-	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get full details of a particular player if they're in range")
+	@ScriptCallable(returnTypes = ReturnType
+			.TABLE, description = "Get full details of a particular player if they're in range")
 	public Map<?, ?> getPlayerByUUID(ISensorEnvironment env,
 			@Arg(name = "uuid", description = "The players uuid") UUID uuid) {
 		return getPlayerInfo(env, uuid);
 	}
 
-	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get full details of a particular mob if it's in range")
+	@ScriptCallable(returnTypes = ReturnType
+			.TABLE, description = "Get full details of a particular mob if it's in range")
 	public Map<String, Object> getMobData(ISensorEnvironment sensor,
 			@Arg(name = "mobId", description = "The mob id retrieved from getMobIds()") int mobId) {
 		return getEntityInfoById(sensor, mobId);
 	}
 
-	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get full details of a particular minecart if it's in range")
+	@ScriptCallable(returnTypes = ReturnType
+			.TABLE, description = "Get full details of a particular minecart if it's in range")
 	public Map<?, ?> getMinecartData(ISensorEnvironment sensor,
 			@Arg(name = "minecartId", description = "The minecart id retrieved from getMobIds()") int minecartId) {
 		return getEntityInfoById(sensor, minecartId);
 	}
 
-	@LuaCallable(returnTypes = LuaReturnType.TABLE, description = "Get a table of information about the surrounding area. Includes whether each block is UNKNOWN, AIR, LIQUID or SOLID")
+	@ScriptCallable(returnTypes = ReturnType
+			.TABLE, description = "Get a table of information about the surrounding area. Includes whether each block is UNKNOWN, AIR, LIQUID or SOLID")
 	public Map<Integer, Map<String, Object>> sonicScan(ISensorEnvironment env) {
 
 		int range = 1 + env.getSensorRange() / 2;
