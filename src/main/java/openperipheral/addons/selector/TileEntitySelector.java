@@ -210,7 +210,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 
 		for (int slot = 1; slot <= 9; slot++) {
 			final Object value = stacks.get(Double.valueOf(slot));
-			ItemStack stack = (ItemStack)converter.fromLua(value, ItemStack.class);
+			ItemStack stack = converter.toJava(value, ItemStack.class);
 			Preconditions.checkArgument(value == null || stack != null, "Can't convert %s to item stack", value);
 			if (stack != null) stack.stackSize = 1;
 
