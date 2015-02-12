@@ -3,12 +3,16 @@ package openperipheral.addons.selector;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import openmods.block.BlockRotationMode;
 import openperipheral.addons.BlockOP;
 
 public class BlockSelector extends BlockOP {
+	private AxisAlignedBB selectorAABB;
+
 	public static class Icons {
 		public static IIcon top;
 		public static IIcon bottom;
@@ -37,9 +41,17 @@ public class BlockSelector extends BlockOP {
 		setDefaultTexture(Icons.side);
 	}
 
+	public void overrideSelection(AxisAlignedBB aabb) {
+		this.selectorAABB = aabb;
+	}
+
+	@Override
+	public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x, int y, int z) {
+		return selectorAABB != null? selectorAABB : super.getSelectedBoundingBoxFromPool(world, x, y, z);
+	}
+
 	@Override
 	public boolean isOpaqueCube() {
-		// Make sure the TESR renders the items correctly.
 		return false;
 	}
 
@@ -48,12 +60,5 @@ public class BlockSelector extends BlockOP {
 		// Mimic ComputerCraft Monitor placement behaviour, i.e. the screen is
 		// looking at the player when placing the block.
 		return super.calculateSide(player, direction).getOpposite();
-	}
-
-	@Override
-	public boolean shouldDropFromTeAfterBreak() {
-		// Prevent the fake inventory contents from spilling into the world
-		// when the block is being broken
-		return false;
 	}
 }

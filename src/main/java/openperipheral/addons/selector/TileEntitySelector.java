@@ -8,216 +8,197 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
 import openmods.api.IActivateAwareTile;
-import openmods.api.ICustomHarvestDrops;
 import openmods.api.IHasGui;
-import openmods.inventory.IInventoryProvider;
+import openmods.sync.ISyncListener;
+import openmods.sync.ISyncableObject;
+import openmods.sync.SyncableItemStack;
 import openmods.tileentity.SyncedTileEntity;
 import openperipheral.addons.OpenPeripheralAddons;
-import openperipheral.api.Constants;
+import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.*;
 import openperipheral.api.architecture.IArchitectureAccess;
 import openperipheral.api.architecture.IAttachable;
-import openperipheral.api.converter.IConverter;
 import openperipheral.api.peripheral.PeripheralTypeId;
 
 import org.apache.commons.lang3.ArrayUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 @PeripheralTypeId("openperipheral_selector")
-public class TileEntitySelector extends SyncedTileEntity implements IActivateAwareTile, IAttachable, ICustomHarvestDrops, IHasGui, IInventoryProvider {
-	private Set<IArchitectureAccess> computers = Sets.newIdentityHashSet();
+public class TileEntitySelector extends SyncedTileEntity implements IActivateAwareTile, IAttachable, IHasGui {
 
-	// We need a "Fake" inventory which cannot be modified except by server
-	// code, i.e. when a computer wants to set a slot or when a client clicks
-	// one of the slots in the gui holding an Item.
-	protected SyncableInventory inventory;
+	public static class ItemSlot {
+		public final int slot;
+		public final double size;
+		public final double x;
+		public final double y;
 
-	private static class CustomInventory extends SyncableInventory {
-		// Hardcoded 9 slots.
-		public CustomInventory() {
-			super("selector", false, 9);
+		public ItemSlot(int absSlot, double size, double x, double y) {
+			this.slot = absSlot;
+			this.size = size;
+			this.x = x;
+			this.y = y;
 		}
 
-		// Nothing can be put in
-		@Override
-		public boolean isItemValidForSlot(int i, ItemStack itemstack) {
-			return false;
+		private AxisAlignedBB createCenteredBox(double x, double y, double z) {
+			return AxisAlignedBB.getBoundingBox(x - size, y - size, z - size, x + size, y + size, z + size);
 		}
 
-		// Nothing can be pulled out
-		@Override
-		public ItemStack decrStackSize(int slot, int qty) {
-			return null;
+		public AxisAlignedBB createBox(int originX, int originY, int originZ, ForgeDirection orientation) {
+			switch (orientation) {
+				default:
+				case NORTH:
+					return createCenteredBox(originX + (1 - x), originY + y, originZ);
+				case SOUTH:
+					return createCenteredBox(originX + x, originY + y, originZ + 1);
+				case WEST:
+					return createCenteredBox(originX, originY + y, originZ + x);
+				case EAST:
+					return createCenteredBox(originX + 1, originY + y, originZ + (1 - x));
+				case UP:
+					return createCenteredBox(originX + x, originY + 1, originZ + (1 - y));
+				case DOWN:
+					return createCenteredBox(originX + x, originY, originZ + y);
+			}
 		}
 	}
 
-	public TileEntitySelector() {
-		super();
+	private static final List<ItemSlot> BOXES_0 = ImmutableList.of();
 
-		// Clients need to get notified to re-render the blocks when the
-		// inventory changed.
-		syncMap.addUpdateListener(createRenderUpdateListener());
-		registerInventoryCallback(inventory);
+	private static final List<ItemSlot> BOXES_1 = ImmutableList.of(new ItemSlot(0, 0.2, 0.5, 0.5));
+
+	private static final double PADDING_2 = 0.05;
+
+	private static final double SIZE_2 = 0.12;
+
+	private static final double DELTA_2 = SIZE_2 + PADDING_2;
+
+	private static final ImmutableList<ItemSlot> BOXES_2 = ImmutableList.of(
+			new ItemSlot(0, SIZE_2, 0.5 - DELTA_2, 0.5 + DELTA_2),
+			new ItemSlot(1, SIZE_2, 0.5 + DELTA_2, 0.5 + DELTA_2),
+			new ItemSlot(3, SIZE_2, 0.5 - DELTA_2, 0.5 - DELTA_2),
+			new ItemSlot(4, SIZE_2, 0.5 + DELTA_2, 0.5 - DELTA_2));
+
+	private static final double SIZE_3 = 0.085;
+
+	private static final double PADDING_3 = 0.08;
+
+	private static final double DELTA_3 = SIZE_3 + PADDING_3 + SIZE_3;
+
+	private static final List<ItemSlot> BOXES_3 = ImmutableList.of(
+			new ItemSlot(0, SIZE_3, 0.5 - DELTA_3, 0.5 + DELTA_3),
+			new ItemSlot(1, SIZE_3, 0.5, 0.5 + DELTA_3),
+			new ItemSlot(2, SIZE_3, 0.5 + DELTA_3, 0.5 + DELTA_3),
+			new ItemSlot(3, SIZE_3, 0.5 - DELTA_3, 0.5),
+			new ItemSlot(4, SIZE_3, 0.5, 0.5),
+			new ItemSlot(5, SIZE_3, 0.5 + DELTA_3, 0.5),
+			new ItemSlot(6, SIZE_3, 0.5 - DELTA_3, 0.5 - DELTA_3),
+			new ItemSlot(7, SIZE_3, 0.5, 0.5 - DELTA_3),
+			new ItemSlot(8, SIZE_3, 0.5 + DELTA_3, 0.5 - DELTA_3));
+
+	private Set<IArchitectureAccess> computers = Sets.newIdentityHashSet();
+
+	private final SyncableItemStack[] slots = new SyncableItemStack[9];
+
+	private EntityItem displayEntity;
+
+	private int gridSize;
+
+	public TileEntitySelector() {
+		for (int i = 0; i < 9; i++) {
+			SyncableItemStack item = new SyncableItemStack();
+			syncMap.put("Stack" + i, item);
+			slots[i] = item;
+		}
+
+		syncMap.addUpdateListener(new ISyncListener() {
+
+			@Override
+			public void onSync(Set<ISyncableObject> changes) {
+				gridSize = calculateGridSize();
+			}
+		});
 	}
 
 	@Override
-	protected void createSyncedFields() {
-		inventory = new CustomInventory();
-	}
-
-	// Since the items displayed on a monitor with a grid size of 2 are not
-	// using linear slots (but 0,1,3,4), we need to do some maths to get it
-	// right.
-	public int getSlotFromCoords(int row, int col) {
-		int slot = 0;
-		if (getGridSize() == 3) {
-			slot = row * getGridSize() + col;
-		} else if (getGridSize() == 2) {
-			slot = col;
-			if (row == 1) {
-				slot += 3;
-			}
-		}
-		return slot;
-	}
-
-	// Helper method for the TESR to get an EntityItem reference for an item
-	// in a specific slot. This item is never placed in the world, but only
-	// rendered.
-	public EntityItem getStackEntity(int row, int col) {
-		int slot = getSlotFromCoords(row, col);
-
-		if (getInventory().getStackInSlot(slot) == null) { return null; }
-
-		EntityItem entity = new EntityItem(getWorldObj(), 0.0D, 0.0D, 0.0D, getInventory().getStackInSlot(slot));
-		entity.hoverStart = 0.0F;
-		entity.lifespan = 72000;
-
-		return entity;
-	}
+	protected void createSyncedFields() {}
 
 	private boolean hasStack(int slot) {
-		return (inventory.getStackInSlot(slot) != null);
+		return slots[slot].get() != null;
 	}
 
 	// We're having a dynamic display size, i.e. if there's only an item in the
 	// first slot, only the single item will be shown - slightly enlarged. If
 	// there are items one slot further out, we're showing a 2x2 grid and so on.
 	// There's probably a mathematical way to do this more efficiently, but meh.
-	public int getGridSize() {
-		if (hasStack(2) || hasStack(5) || hasStack(6) || hasStack(7) || hasStack(8)) { return 3; }
-		if (hasStack(1) || hasStack(3) || hasStack(4)) { return 2; }
-		if (hasStack(0)) { return 1; }
+	public int calculateGridSize() {
+		if (hasStack(2) || hasStack(5) || hasStack(6) || hasStack(7) || hasStack(8)) return 3;
+		if (hasStack(1) || hasStack(3) || hasStack(4)) return 2;
+		if (hasStack(0)) return 1;
 
 		return 0;
 	}
 
-	// Whenever a player hits one of the buttons we want to fire an event on all
-	// attached computers. For this we need to know which button he pressed and
-	// act accordingly.
-	// But we also need to open the gui ourselves, because the sidedness matters
-	// in this case. Problem is that canOpenGui(EntityPlayer player) does not
-	// have a "side" parameter which would allow for opening the GUI the
-	// OpenBlocks way.
+	public int getGridSize() {
+		return gridSize;
+	}
+
 	@Override
 	public boolean onBlockActivated(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
-		// Never do anything when the player is sneaking
-		if (player.isSneaking()) { return false; }
+		if (worldObj.isRemote) return true;
+		if (player.isSneaking()) return true;
 
-		// Open the GUI unless player clicked on the screen.
-		if (getRotation().ordinal() != side) {
+		Vec3 vec = Vec3.createVectorHelper(xCoord + hitX, yCoord + hitY, zCoord + hitZ);
+		ItemSlot slot = getClickedSlot(vec, side);
+
+		if (slot == null) {
 			openGui(OpenPeripheralAddons.instance, player);
-			return true;
+		} else {
+			if (hasStack(slot.slot)) fireEvent("slot_click", slot.slot + 1);
 		}
 
-		// Go server-side only
-		if (worldObj.isRemote) { return true; }
-
-		// No computers -> no events to fire -> nothing to calculate
-		if (computers.size() == 0) { return true; }
-
-		// Figure out which slot the user clicked incorporating
-		// the blocks rotation and grid size.
-		float clickX = hitX;
-		float clickY = hitY;
-		ForgeDirection dir = getRotation();
-
-		if (dir == ForgeDirection.SOUTH) {
-			clickY = 1 - hitY;
-		}
-
-		if (dir == ForgeDirection.NORTH) {
-			clickX = 1 - hitX;
-			clickY = 1 - hitY;
-		}
-
-		if (dir == ForgeDirection.EAST) {
-			clickX = 1 - hitZ;
-			clickY = 1 - hitY;
-		}
-
-		if (dir == ForgeDirection.WEST) {
-			clickX = hitZ;
-			clickY = 1 - hitY;
-		}
-
-		if (dir == ForgeDirection.UP) {
-			clickX = 1 - hitX;
-			clickY = 1 - hitZ;
-		}
-
-		if (dir == ForgeDirection.DOWN) {
-			clickX = 1 - hitX;
-			clickY = hitZ;
-		}
-
-		// After that it's easy to calculate which "quadrant" the player clicked
-		float squareSize = 1.0F / getGridSize();
-
-		int col = (int)Math.floor(clickX / squareSize);
-		int row = (int)Math.floor(clickY / squareSize);
-
-		// And from that we can get slot
-		int slot = getSlotFromCoords(row, col);
-
-		// But only fire the event if there is an item in the slot
-		if (getInventory().getStackInSlot(slot) != null) {
-			fireEvent("slot_click", slot + 1);
-		}
-
-		// Yes, interaction happened -> don't place a block
 		return true;
 	}
 
-	@ScriptCallable(description = "Get the item currently being displayed in a specific slot", returnTypes = ReturnType
-			.TABLE)
-	public ItemStack getSlot(
-			@Arg(name = "slot", description = "The slot you want to get details about") int slot) {
-
-		Preconditions.checkArgument(slot >= 1 && slot <= 9, "slot must be between 1 and 9");
-		return getInventory().getStackInSlot(slot - 1);
+	public ItemStack getSlot(int slot) {
+		return slots[slot].get();
 	}
 
-	@ScriptCallable(description = "Set the item being displayed on a specific slot")
-	public void setSlots(
-			@Env(Constants.ARG_CONVERTER) IConverter converter,
-			@Arg(name = "items", description = "A table containing itemstacks", type = ArgType.TABLE) Map<Double, Object> stacks) {
+	@Asynchronous
+	@ScriptCallable(description = "Get the item currently being displayed in a specific slot", returnTypes = ReturnType.TABLE, name = "getSlot")
+	public ItemStack getSlotOneBased(@Arg(name = "slot", description = "The slot you want to get details about") int slot) {
 
-		for (int slot = 1; slot <= 9; slot++) {
-			final Object value = stacks.get(Double.valueOf(slot));
-			ItemStack stack = converter.toJava(value, ItemStack.class);
-			Preconditions.checkArgument(value == null || stack != null, "Can't convert %s to item stack", value);
-			if (stack != null) stack.stackSize = 1;
+		Preconditions.checkArgument(slot >= 1 && slot <= 9, "slot must be between 1 and 9");
+		return slots[slot - 1].get();
+	}
 
-			inventory.setInventorySlotContents(slot - 1, stack);
+	@Asynchronous
+	@ScriptCallable(description = "Gets all slots", returnTypes = ReturnType.TABLE)
+	public List<ItemStack> getSlots() {
+		List<ItemStack> result = Lists.newArrayList();
+
+		for (SyncableItemStack slot : slots)
+			result.add(slot.get());
+
+		return result;
+	}
+
+	@ScriptCallable(description = "Set the items being displayed in all slots")
+	public void setSlots(@Arg(name = "items", description = "A table containing itemstacks", type = ArgType.TABLE) Map<Integer, ItemStack> stacks) {
+		for (int slot = 0; slot < 9; slot++) {
+			final ItemStack value = stacks.get(slot + 1);
+			if (value != null) value.stackSize = 1;
+
+			this.slots[slot].set(value);
 		}
 
-		inventory.markDirty();
 		sync();
 	}
 
@@ -231,9 +212,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 
 		if (stack != null) stack.stackSize = 1;
 
-		inventory.setInventorySlotContents(slot, stack);
-
-		inventory.markDirty();
+		this.slots[slot].set(stack);
 		sync();
 	}
 
@@ -256,8 +235,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 
 	@Override
 	public boolean canOpenGui(EntityPlayer player) {
-		// No one can open the GUI the OpenBlocks way because we're doing
-		// it manually.
+		// Don't use default GUI mechanism, since this block has special rules
 		return false;
 	}
 
@@ -271,32 +249,120 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 		return new ContainerSelector(player.inventory, this);
 	}
 
-	@Override
-	public IInventory getInventory() {
-		return inventory;
+	public IInventory createInventoryWrapper() {
+		return new IInventory() {
+
+			@Override
+			public void setInventorySlotContents(int slot, ItemStack stack) {
+				slots[slot].set(stack);
+			}
+
+			@Override
+			public void openInventory() {}
+
+			@Override
+			public void markDirty() {
+				if (!worldObj.isRemote) sync();
+			}
+
+			@Override
+			public boolean isUseableByPlayer(EntityPlayer player) {
+				return (getWorldObj().getTileEntity(xCoord, yCoord, zCoord) == TileEntitySelector.this)
+						&& (player.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5) <= 64.0D);
+			}
+
+			@Override
+			public boolean isItemValidForSlot(int slot, ItemStack stack) {
+				return true;
+			}
+
+			@Override
+			public boolean hasCustomInventoryName() {
+				return false;
+			}
+
+			@Override
+			public ItemStack getStackInSlotOnClosing(int slot) {
+				return null;
+			}
+
+			@Override
+			public ItemStack getStackInSlot(int slot) {
+				return slots[slot].get();
+			}
+
+			@Override
+			public int getSizeInventory() {
+				return 9;
+			}
+
+			@Override
+			public int getInventoryStackLimit() {
+				return 1;
+			}
+
+			@Override
+			public String getInventoryName() {
+				return "selector";
+			}
+
+			@Override
+			public ItemStack decrStackSize(int p_70298_1_, int p_70298_2_) {
+				throw new UnsupportedOperationException();
+			}
+
+			@Override
+			public void closeInventory() {}
+		};
 	}
 
-	@Override
-	public void writeToNBT(NBTTagCompound tag) {
-		super.writeToNBT(tag);
-		inventory.writeToNBT(tag);
+	public AxisAlignedBB getSelection(Vec3 hitVec, int side) {
+		final ForgeDirection rotation = getRotation();
+		if (side == rotation.ordinal()) {
+			int gridSize = getGridSize();
+
+			for (ItemSlot center : getSlots(gridSize)) {
+				AxisAlignedBB aabb = center.createBox(xCoord, yCoord, zCoord, rotation);
+				if (aabb.isVecInside(hitVec)) return aabb;
+			}
+		}
+
+		return null;
 	}
 
-	@Override
-	public void readFromNBT(NBTTagCompound tag) {
-		super.readFromNBT(tag);
-		inventory.readFromNBT(tag);
+	private ItemSlot getClickedSlot(Vec3 hitVec, int side) {
+		final ForgeDirection rotation = getRotation();
+		if (side == rotation.ordinal()) {
+			int gridSize = getGridSize();
+
+			for (ItemSlot center : getSlots(gridSize)) {
+				AxisAlignedBB aabb = center.createBox(xCoord, yCoord, zCoord, rotation);
+				if (aabb.isVecInside(hitVec)) return center;
+			}
+		}
+
+		return null;
 	}
 
-	@Override
-	public void addHarvestDrops(EntityPlayer player, List<ItemStack> drops) {
-		// The only thing we do want to drop is the Item Selector itself.
-		drops.add(new ItemStack(OpenPeripheralAddons.Blocks.selector, 1));
+	public List<ItemSlot> getSlots(int gridSize) {
+		switch (gridSize) {
+			case 1:
+				return BOXES_1;
+			case 2:
+				return BOXES_2;
+			case 3:
+				return BOXES_3;
+			default:
+				return BOXES_0;
+		}
 	}
 
-	@Override
-	public boolean suppressNormalHarvestDrops() {
-		// We don't want anything to drop on its own
-		return true;
+	public EntityItem getDisplayEntity() {
+		if (displayEntity == null) {
+			displayEntity = new EntityItem(getWorldObj(), 0, 0, 0);
+			displayEntity.hoverStart = 0.0F;
+		}
+
+		return displayEntity;
 	}
 }
