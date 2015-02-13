@@ -1,5 +1,6 @@
 package openperipheral.addons.selector;
 
+import java.lang.ref.SoftReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -107,7 +108,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 
 	private final SyncableItemStack[] slots = new SyncableItemStack[9];
 
-	private EntityItem displayEntity;
+	private SoftReference<EntityItem> displayEntity = new SoftReference<EntityItem>(null);
 
 	private int gridSize;
 
@@ -358,11 +359,14 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	}
 
 	public EntityItem getDisplayEntity() {
-		if (displayEntity == null) {
-			displayEntity = new EntityItem(getWorldObj(), 0, 0, 0);
-			displayEntity.hoverStart = 0.0F;
+		EntityItem result = displayEntity.get();
+		if (result == null) {
+			result = new EntityItem(getWorldObj(), 0, 0, 0);
+			result.hoverStart = 0.0F;
+
+			displayEntity = new SoftReference<EntityItem>(result);
 		}
 
-		return displayEntity;
+		return result;
 	}
 }
