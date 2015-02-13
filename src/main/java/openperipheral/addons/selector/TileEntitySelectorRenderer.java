@@ -78,9 +78,8 @@ public class TileEntitySelectorRenderer extends TileEntitySpecialRenderer {
 
 				GL11.glPushMatrix();
 				GL11.glTranslated(slot.x, slot.y, 0);
-				final double scale = slot.size * 6;
+				final double scale = slot.size * 5;
 				GL11.glScaled(scale, scale, scale);
-				GL11.glRotatef(90, 0, 1, 0);
 				GL11.glTranslated(0, -0.06, 0);
 				display.setEntityItemStack(stack);
 				RenderItem.renderInFrame = true;
