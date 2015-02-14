@@ -239,4 +239,17 @@ public class GlassesEvent extends SerializableNetworkEvent {
 			this.backgroundColor = backgroundColor;
 		}
 	}
+
+	@NetworkEventMeta(direction = EventDirection.S2C)
+	public static class GlassesSetKeyRepeat extends GlassesEvent {
+
+		@Serialize
+		public boolean repeat;
+
+		public GlassesSetKeyRepeat(long guid, boolean repeat) {
+			super(guid);
+			this.repeat = repeat;
+		}
+
+	}
 }

@@ -23,6 +23,7 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesKeyDownEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesKeyUpEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesMouseButtonEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesMouseWheelEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeat;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSignalCaptureEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
@@ -134,7 +135,8 @@ public class OpenPeripheralAddons {
 				.register(GlassesComponentMouseButtonEvent.class)
 				.register(GlassesKeyDownEvent.class)
 				.register(GlassesKeyUpEvent.class)
-				.register(GlassesChangeBackground.class);
+				.register(GlassesChangeBackground.class)
+				.register(GlassesSetKeyRepeat.class);
 
 		Items.generic.initRecipes();
 

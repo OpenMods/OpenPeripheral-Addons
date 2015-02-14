@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeat;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
@@ -94,6 +95,17 @@ public class TerminalManagerClient {
 			final GuiCapture capture = (GuiCapture)gui;
 			long guid = capture.getGuid();
 			if (guid == evt.guid) capture.setBackground(evt.backgroundColor);
+		}
+	}
+
+	@SubscribeEvent
+	public void onKeyRepeatSet(GlassesSetKeyRepeat evt) {
+		GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
+
+		if (gui instanceof GuiCapture) {
+			final GuiCapture capture = (GuiCapture)gui;
+			long guid = capture.getGuid();
+			if (guid == evt.guid) capture.setKeyRepeat(evt.repeat);
 		}
 	}
 

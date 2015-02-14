@@ -16,6 +16,7 @@ import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
 import openperipheral.addons.glasses.GlassesEvent.GlassesClientEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeat;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
@@ -76,12 +77,18 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 			new GlassesStopCaptureEvent(guid).sendToPlayer(player);
 		}
 
-		@ScriptCallable(description = "Stest background on capture mode screen")
+		@ScriptCallable(description = "Set background on capture mode screen")
 		public void setBackground(@Arg(name = "background") int background,
 				@Optionals @Arg(name = "alpha") Integer alpha) {
 			EntityPlayer player = getPlayer();
 			final int a = alpha != null? (alpha << 24) : 0x2A000000;
 			new GlassesChangeBackground(guid, background & 0x00FFFFFF | a).sendToPlayer(player);
+		}
+
+		@ScriptCallable(description = "When enabled, holding key down for long time will generate multiple events")
+		public void setKeyRepeat(@Arg(name = "isEnabled") boolean keyRepeat) {
+			EntityPlayer player = getPlayer();
+			new GlassesSetKeyRepeat(guid, keyRepeat).sendToPlayer(player);
 		}
 	}
 
@@ -139,16 +146,11 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Override
-	public void validate() {
-		super.validate();
-		TerminalManagerServer.instance.registerBridge(guid, this);
-	}
-
-	@Override
 	public void updateEntity() {
 		super.updateEntity();
 		if (worldObj.isRemote || globalSurface == null) return;
 
+		TerminalManagerServer.instance.registerBridge(guid, this);
 		Iterator<PlayerInfo> it = knownPlayersByUUID.values().iterator();
 		while (it.hasNext()) {
 			final PlayerInfo info = it.next();

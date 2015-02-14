@@ -85,7 +85,7 @@ public class GuiCapture extends GuiScreen {
 	@Override
 	public void initGui() {
 		new GlassesSignalCaptureEvent(guid, true).sendToServer();
-		Keyboard.enableRepeatEvents(true);
+		Keyboard.enableRepeatEvents(false);
 	}
 
 	@Override
@@ -105,5 +105,9 @@ public class GuiCapture extends GuiScreen {
 
 	public void setBackground(int backgroundColor) {
 		this.backgroundColor = backgroundColor;
+	}
+
+	public void setKeyRepeat(boolean repeat) {
+		Keyboard.enableRepeatEvents(repeat);
 	}
 }
