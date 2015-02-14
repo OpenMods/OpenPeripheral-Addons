@@ -6,8 +6,9 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
+import openmods.Mods;
 import openmods.item.IMetaItem;
-import openperipheral.addons.utils.CCUtils;
+import cpw.mods.fml.common.Loader;
 
 public enum MetasGeneric {
 	duckAntenna {
@@ -19,7 +20,7 @@ public enum MetasGeneric {
 				@Override
 				public void addToCreativeList(Item item, int meta, List<ItemStack> result) {
 					super.addToCreativeList(item, meta, result);
-					if (Config.addTurtlesToCreative) CCUtils.addUpgradedTurtles(result, OpenPeripheralAddons.narcissiticUpgrade);
+					if (Config.addTurtlesToCreative && Loader.isModLoaded(Mods.COMPUTERCRAFT)) ModuleComputerCraft.listNarcissisticTurtles(result);
 				}
 			};
 		}

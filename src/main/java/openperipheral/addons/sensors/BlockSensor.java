@@ -8,10 +8,9 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
-import openperipheral.addons.BlockOP;
-import openperipheral.addons.Config;
-import openperipheral.addons.OpenPeripheralAddons;
-import openperipheral.addons.utils.CCUtils;
+import openmods.Mods;
+import openperipheral.addons.*;
+import cpw.mods.fml.common.Loader;
 
 public class BlockSensor extends BlockOP {
 
@@ -55,7 +54,7 @@ public class BlockSensor extends BlockOP {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void getSubBlocks(Item item, CreativeTabs tab, List result) {
 		super.getSubBlocks(item, tab, result);
-		if (Config.addTurtlesToCreative) CCUtils.addUpgradedTurtles(result, OpenPeripheralAddons.sensorUpgrade);
+		if (Config.addTurtlesToCreative && Loader.isModLoaded(Mods.COMPUTERCRAFT)) ModuleComputerCraft.listSensorTurtles(result);
 	}
 
 }

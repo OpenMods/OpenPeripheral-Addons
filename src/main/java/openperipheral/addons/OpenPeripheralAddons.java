@@ -1,7 +1,5 @@
 package openperipheral.addons;
 
-import java.io.File;
-
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.util.IIcon;
@@ -12,8 +10,9 @@ import openmods.OpenMods;
 import openmods.api.IProxy;
 import openmods.config.BlockInstances;
 import openmods.config.ItemInstances;
-import openmods.config.game.*;
-import openmods.config.game.ConfigurableFeatureManager.CustomFeatureRule;
+import openmods.config.game.ModStartupHelper;
+import openmods.config.game.RegisterBlock;
+import openmods.config.game.RegisterItem;
 import openmods.config.properties.ConfigProcessing;
 import openmods.network.event.NetworkEventManager;
 import openperipheral.addons.glasses.*;
@@ -29,23 +28,19 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
-import openperipheral.addons.narcissistic.TurtleUpgradeNarcissistic;
-import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
-import openperipheral.addons.peripheralproxy.TileEntityPeripheralProxy;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.pim.TileEntityPIM;
 import openperipheral.addons.selector.BlockSelector;
 import openperipheral.addons.selector.SelectorHighlightHandler;
 import openperipheral.addons.selector.TileEntitySelector;
-import openperipheral.addons.sensors.*;
-import openperipheral.addons.ticketmachine.BlockTicketMachine;
+import openperipheral.addons.sensors.AdapterSensor;
+import openperipheral.addons.sensors.BlockSensor;
+import openperipheral.addons.sensors.TileEntitySensor;
 import openperipheral.addons.ticketmachine.TileEntityTicketMachine;
 import openperipheral.api.ApiAccess;
 import openperipheral.api.adapter.IPeripheralAdapterRegistry;
 
 import org.apache.commons.lang3.ObjectUtils;
-
-import com.google.common.base.Preconditions;
 
 import cpw.mods.fml.common.*;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -54,7 +49,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
-import dan200.computercraft.api.ComputerCraftAPI;
 
 @Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$];required-after:ComputerCraft@[1.64,];required-after:OpenPeripheralCore")
 public class OpenPeripheralAddons {
@@ -65,17 +59,11 @@ public class OpenPeripheralAddons {
 		@RegisterBlock(name = "glassesbridge", tileEntity = TileEntityGlassesBridge.class, itemBlock = ItemGlassesBridge.class)
 		public static BlockGlassesBridge glassesBridge;
 
-		@RegisterBlock(name = "peripheralproxy", tileEntity = TileEntityPeripheralProxy.class)
-		public static BlockPeripheralProxy peripheralProxy;
-
 		@RegisterBlock(name = "pim", tileEntity = TileEntityPIM.class, unlocalizedName = "playerinventory")
 		public static BlockPIM pim;
 
 		@RegisterBlock(name = "sensor", tileEntity = TileEntitySensor.class)
 		public static BlockSensor sensor;
-
-		@RegisterBlock(name = "ticketmachine", tileEntity = TileEntityTicketMachine.class)
-		public static BlockTicketMachine ticketMachine;
 
 		@RegisterBlock(name = "selector", tileEntity = TileEntitySelector.class)
 		public static BlockSelector selector;
@@ -97,8 +85,6 @@ public class OpenPeripheralAddons {
 		public static IIcon narcissiticTurtle;
 	}
 
-	private GameConfigProvider gameConfig;
-
 	public static int renderId;
 
 	@Instance(MODID)
@@ -114,40 +100,25 @@ public class OpenPeripheralAddons {
 		}
 	};
 
-	public static TurtleUpgradeSensor sensorUpgrade;
-
-	public static TurtleUpgradeNarcissistic narcissiticUpgrade;
+	private final ModStartupHelper startupHelper = new ModStartupHelper("openperipheral") {
+		@Override
+		protected void populateConfig(Configuration config) {
+			ConfigProcessing.processAnnotations("OpenPeripheralAddons", config, Config.class);
+		}
+	};
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent evt) {
-		ConfigurableFeatureManager features = new ConfigurableFeatureManager();
-		features.collectFromBlocks(OpenPeripheralAddons.Blocks.class);
-		features.collectFromItems(OpenPeripheralAddons.Items.class);
+		startupHelper.registerBlocksHolder(OpenPeripheralAddons.Blocks.class);
+		startupHelper.registerItemsHolder(OpenPeripheralAddons.Items.class);
 
-		features.addCustomRule(AbstractFeatureManager.CATEGORY_BLOCKS, "ticketmachine", new CustomFeatureRule() {
-			@Override
-			public boolean isEnabled(boolean flag) {
-				return flag && Loader.isModLoaded(Mods.RAILCRAFT);
-			}
-		});
+		if (Loader.isModLoaded(Mods.COMPUTERCRAFT)) ModuleComputerCraft.preInit(startupHelper);
+		if (Loader.isModLoaded(Mods.RAILCRAFT)) ModuleRailcraft.preInit(startupHelper);
 
-		final File configFile = evt.getSuggestedConfigurationFile();
-		Configuration config = new Configuration(configFile);
+		startupHelper.preInit(evt.getSuggestedConfigurationFile());
 
-		ConfigProcessing.processAnnotations(configFile, "OpenPeripheralAddons", config, Config.class);
-		features.loadFromConfiguration(config);
-
-		if (config.hasChanged()) config.save();
-
-		gameConfig = new GameConfigProvider("openperipheral");
-		gameConfig.setFeatures(features);
-
-		gameConfig.registerBlocks(OpenPeripheralAddons.Blocks.class);
-		gameConfig.registerItems(OpenPeripheralAddons.Items.class);
-
-		if (OpenPeripheralAddons.Blocks.peripheralProxy != null) TileEntityPeripheralProxy.initAccess();
-
-		Config.register();
+		Recipes.register();
+		MetasGeneric.registerItems();
 
 		NetworkEventManager.INSTANCE
 				.startRegistration()
@@ -173,12 +144,6 @@ public class OpenPeripheralAddons {
 		adapters.registerInline(TileEntitySelector.class);
 		adapters.register(new AdapterSensor());
 
-		sensorUpgrade = new TurtleUpgradeSensor();
-		ComputerCraftAPI.registerTurtleUpgrade(sensorUpgrade);
-
-		narcissiticUpgrade = new TurtleUpgradeNarcissistic();
-		ComputerCraftAPI.registerTurtleUpgrade(narcissiticUpgrade);
-
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, OpenMods.proxy.wrapHandler(null));
@@ -192,13 +157,14 @@ public class OpenPeripheralAddons {
 
 	@EventHandler
 	public void handleRenames(FMLMissingMappingsEvent event) {
-		Preconditions.checkNotNull(gameConfig, "What?");
-		gameConfig.handleRemaps(event.get());
+		startupHelper.handleRenames(event);
 	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent evt) {
 		proxy.init();
 		proxy.registerRenderInformation();
+
+		if (Loader.isModLoaded(Mods.COMPUTERCRAFT)) ModuleComputerCraft.init();
 	}
 }

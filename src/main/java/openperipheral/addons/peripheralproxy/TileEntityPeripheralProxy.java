@@ -10,7 +10,6 @@ import openmods.reflection.*;
 import openmods.reflection.MethodAccess.Function0;
 import openmods.reflection.MethodAccess.Function5;
 import openmods.tileentity.OpenTileEntity;
-import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.api.architecture.cc.ICustomPeripheralProvider;
 import openperipheral.api.peripheral.Volatile;
 
@@ -99,11 +98,6 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 			Log.warn(t, "Failed to update modem %s", attachedModem);
 		}
 
-		worldObj.notifyBlockOfNeighborChange(
-				attachedX,
-				attachedY,
-				attachedZ,
-				OpenPeripheralAddons.Blocks.peripheralProxy
-				);
+		worldObj.notifyBlockOfNeighborChange(attachedX, attachedY, attachedZ, getBlockType());
 	}
 }
