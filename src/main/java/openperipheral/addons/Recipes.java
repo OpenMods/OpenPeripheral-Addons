@@ -32,6 +32,10 @@ public class Recipes {
 			recipeList.add(new ShapedOreRecipe(OpenPeripheralAddons.Blocks.glassesBridge, "sas", "ses", "srs", 's', Blocks.stone, 'r', Blocks.redstone_block, 'e', Items.ender_pearl, 'a', duckAntenna.copy()));
 		}
 
+		if (OpenPeripheralAddons.Blocks.selector != null) {
+			recipeList.add(new ShapedOreRecipe(OpenPeripheralAddons.Blocks.selector, "sss", "scs", "sgs", 's', Blocks.stone, 'c', Blocks.trapped_chest, 'g', Blocks.glass_pane));
+		}
+
 		if (OpenPeripheralAddons.Items.glasses != null) {
 			recipeList.add(new ShapedOreRecipe(OpenPeripheralAddons.Items.glasses, "igi", "aei", "prp", 'g', Blocks.glowstone, 'i', Items.iron_ingot, 'e', Items.ender_pearl, 'p', Blocks.glass_pane, 'r', Items.redstone, 'a', duckAntenna.copy()));
 			recipeList.add(new ShapedOreRecipe(OpenPeripheralAddons.Items.glasses, "igi", "iea", "prp", 'g', Blocks.glowstone, 'i', Items.iron_ingot, 'e', Items.ender_pearl, 'p', Blocks.glass_pane, 'r', Items.redstone, 'a', duckAntenna.copy()));
