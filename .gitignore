@@ -9,3 +9,9 @@
 /.gradle
 /build/
 /run/
+/bin/
+
+# Eclipse
+.classpath
+.project
+.settings/
