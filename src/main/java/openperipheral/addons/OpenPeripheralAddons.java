@@ -32,7 +32,6 @@ import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.pim.TileEntityPIM;
 import openperipheral.addons.selector.BlockSelector;
-import openperipheral.addons.selector.SelectorHighlightHandler;
 import openperipheral.addons.selector.TileEntitySelector;
 import openperipheral.addons.sensors.AdapterSensor;
 import openperipheral.addons.sensors.BlockSensor;
@@ -149,10 +148,6 @@ public class OpenPeripheralAddons {
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, OpenMods.proxy.wrapHandler(null));
-
-		if (Blocks.selector != null) {
-			MinecraftForge.EVENT_BUS.register(new SelectorHighlightHandler());
-		}
 
 		proxy.preInit();
 	}
