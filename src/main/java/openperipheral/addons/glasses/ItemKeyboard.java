@@ -28,8 +28,8 @@ public class ItemKeyboard extends Item {
 			if (helmet != null) {
 				Item item = helmet.getItem();
 				if (item instanceof ITerminalItem) {
-					long guid = ((ITerminalItem)item).getTerminalGuid(helmet);
-					FMLCommonHandler.instance().showGuiScreen(new GuiCapture(guid));
+					Long guid = ((ITerminalItem)item).getTerminalGuid(helmet);
+					if (guid != null) FMLCommonHandler.instance().showGuiScreen(new GuiCapture(guid));
 				}
 			}
 		}
