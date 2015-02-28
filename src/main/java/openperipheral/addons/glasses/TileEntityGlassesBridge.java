@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import openmods.api.ICustomHarvestDrops;
 import openmods.api.IPlaceAwareTile;
 import openmods.include.IncludeInterface;
+import openmods.network.event.NetworkEventManager;
 import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
@@ -20,6 +21,7 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeat;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
+import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.*;
@@ -49,7 +51,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		public final WeakReference<EntityPlayerMP> player;
 		public SurfaceServer surface;
 
-		public PlayerInfo(TileEntityGlassesBridge parent, EntityPlayerMP player) {
+		public PlayerInfo(EntityPlayerMP player) {
 			this.player = new WeakReference<EntityPlayerMP>(player);
 			this.profile = player.getGameProfile();
 			this.surface = new SurfaceServer();
@@ -94,7 +96,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	private final Map<UUID, PlayerInfo> knownPlayersByUUID = Maps.newHashMap();
 	private final Map<String, PlayerInfo> knownPlayersByName = Maps.newHashMap();
-	private final Set<EntityPlayerMP> newPlayers = Sets.newSetFromMap(new WeakHashMap<EntityPlayerMP, Boolean>());
+	private List<Object> lastSyncPackets;
 
 	private Set<IArchitectureAccess> computers = Sets.newIdentityHashSet();
 
@@ -107,17 +109,31 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	public void registerTerminal(EntityPlayerMP player) {
 		if (!knownPlayersByUUID.containsKey(player.getGameProfile().getId())) {
-			boolean added = newPlayers.add(player);
+			final PlayerInfo playerInfo = new PlayerInfo(player);
+			final GameProfile gameProfile = player.getGameProfile();
 
-			if (added) {
-				final PlayerInfo playerInfo = new PlayerInfo(this, player);
-				final GameProfile gameProfile = player.getGameProfile();
+			knownPlayersByUUID.put(gameProfile.getId(), playerInfo);
+			knownPlayersByName.put(gameProfile.getName(), playerInfo);
+			queueEvent(EVENT_PLAYER_ATTACH, player);
 
-				knownPlayersByUUID.put(gameProfile.getId(), playerInfo);
-				knownPlayersByName.put(gameProfile.getName(), playerInfo);
-				queueEvent(EVENT_PLAYER_ATTACH, player);
-			}
+			sentFullDataToPlayer(player);
 		}
+	}
+
+	private static TerminalDataEvent createFullDataEvent(SurfaceServer surface, long terminalId, boolean isPrivate) {
+		TerminalDataEvent result = new TerminalDataEvent(terminalId, isPrivate);
+		surface.appendFullCommands(result.commands);
+		return result;
+	}
+
+	private static TerminalDataEvent createUpdateDataEvent(SurfaceServer surface, long terminalId, boolean isPrivate) {
+		TerminalDataEvent result = new TerminalDataEvent(terminalId, isPrivate);
+		surface.appendUpdateCommands(result.commands);
+		return result;
+	}
+
+	private void sentFullDataToPlayer(EntityPlayer player) {
+		if (lastSyncPackets != null) NetworkEventManager.INSTANCE.dispatcher().senders.player.sendMessages(lastSyncPackets, player);
 	}
 
 	private void queueEvent(String event, EntityPlayer user, Object... extra) {
@@ -254,44 +270,53 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	// never, ever make this asynchronous
 	@ScriptCallable(description = "Send updates to client. Without it changes won't be visible", name = "sync")
 	public void syncContents() {
-		TerminalDataEvent globalChange = null;
-
-		final boolean sendGlobalUpdate = globalSurface.hasUpdates();
-
 		synchronized (globalSurface) {
+			final boolean globalChanged = globalSurface.hasUpdates();
+
+			// need to call it anyway, to clear changes
+			TerminalDataEvent globalDelta = globalChanged? createUpdateDataEvent(globalSurface, guid, false) : null;
+
 			for (PlayerInfo info : knownPlayersByUUID.values()) {
 				final EntityPlayerMP player = info.player.get();
-
-				if (!isPlayerValid(player)) continue;
-
-				if (sendGlobalUpdate) {
-					if (globalChange == null) globalChange = TerminalManagerServer.createUpdateDataEvent(globalSurface, guid, false);
-					globalChange.sendToPlayer(player);
-				}
-
-				final SurfaceServer privateSurface = info.surface;
-
-				if (privateSurface != null) {
-					synchronized (privateSurface) {
-						if (privateSurface.hasUpdates()) {
-							TerminalDataEvent privateData = TerminalManagerServer.createUpdateDataEvent(privateSurface, guid, true);
-							privateData.sendToPlayer(player);
-						}
-					}
+				if (isPlayerValid(player)) {
+					if (globalDelta != null) globalDelta.sendToPlayer(player);
+					sendPrivateUpdateToPlayer(player, info);
 				}
 			}
 
-			TerminalDataEvent globalFull = null;
-
-			for (EntityPlayerMP newPlayer : newPlayers) {
-				if (isPlayerValid(newPlayer)) {
-					if (globalFull == null) globalFull = TerminalManagerServer.createFullDataEvent(globalSurface, guid, false);
-					globalFull.sendToPlayer(newPlayer);
-				}
+			if (globalChanged) {
+				TerminalDataEvent globalFullData = createFullDataEvent(globalSurface, guid, false);
+				lastSyncPackets = globalFullData.serialize();
 			}
-
 		}
-		newPlayers.clear();
+	}
+
+	private void sendPrivateUpdateToPlayer(final EntityPlayerMP player, PlayerInfo info) {
+		final SurfaceServer privateSurface = info.surface;
+
+		if (privateSurface != null) {
+			synchronized (privateSurface) {
+				if (privateSurface.hasUpdates()) {
+					TerminalDataEvent privateData = createUpdateDataEvent(privateSurface, guid, true);
+					privateData.sendToPlayer(player);
+				}
+			}
+		}
+	}
+
+	private void sendPrivateFullToPlayer(EntityPlayer player) {
+		UUID playerUuid = player.getGameProfile().getId();
+		PlayerInfo info = knownPlayersByUUID.get(playerUuid);
+
+		if (info != null) {
+			TerminalDataEvent privateData = createFullDataEvent(info.surface, guid, true);
+			privateData.sendToPlayer(player);
+		}
+	}
+
+	public void handleResetRequest(TerminalResetEvent evt) {
+		if (evt.isPrivate) sendPrivateFullToPlayer(evt.sender);
+		else sentFullDataToPlayer(evt.sender);
 	}
 
 	@Asynchronous
