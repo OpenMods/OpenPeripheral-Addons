@@ -8,11 +8,13 @@ import openmods.structured.IStructureElement;
 import openmods.structured.StructuredDataMaster;
 import openperipheral.addons.glasses.drawable.*;
 import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.ScriptObject;
 
 import com.google.common.base.Objects;
 
 @ScriptObject
+@Asynchronous
 @AdapterSourceName("glasses_surface")
 public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElement> implements IDrawableContainer {
 

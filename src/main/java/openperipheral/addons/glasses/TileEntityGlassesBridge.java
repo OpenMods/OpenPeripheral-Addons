@@ -59,6 +59,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@ScriptObject
+	@Asynchronous
 	@AdapterSourceName("glasses-capture")
 	public class CaptureControl {
 		private final WeakReference<EntityPlayerMP> player;

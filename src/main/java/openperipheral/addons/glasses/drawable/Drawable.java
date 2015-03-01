@@ -12,9 +12,7 @@ import openmods.structured.ElementField;
 import openmods.structured.IStructureContainer;
 import openmods.structured.IStructureElement;
 import openperipheral.addons.glasses.SurfaceServer;
-import openperipheral.api.adapter.AdapterSourceName;
-import openperipheral.api.adapter.CallbackProperty;
-import openperipheral.api.adapter.IPropertyCallback;
+import openperipheral.api.adapter.*;
 import openperipheral.api.adapter.method.Arg;
 import openperipheral.api.adapter.method.ReturnType;
 import openperipheral.api.adapter.method.ScriptCallable;
@@ -28,6 +26,7 @@ import com.google.common.collect.Maps;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+@Asynchronous
 @AdapterSourceName("glasses_drawable")
 public abstract class Drawable implements IPropertyCallback, IStructureContainer<IStructureElement> {
 
