@@ -38,7 +38,7 @@ repositories {
     }
     maven {
         name "OpenMods"
-        url "http://xn--oxe.xn--jxe.net/artifactory/openmods"
+        url "http://repo.openmods.info/artifactory/openmods"
     }
 }
 
