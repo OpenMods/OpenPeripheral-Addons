@@ -123,10 +123,10 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 			this.id = id;
 		}
 
-		protected int getScreenAnchorX(ScaledResolution resolution, Drawable drawable) {
+		public float getScreenAnchorX(ScaledResolution resolution, Drawable drawable) {
 			switch (screenHorizontalAnchor) {
 				case MIDDLE:
-					return resolution.getScaledWidth() / 2;
+					return resolution.getScaledWidth() / 2.0f;
 				case RIGHT:
 					return resolution.getScaledWidth();
 				case LEFT:
@@ -136,10 +136,10 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 			}
 		}
 
-		protected int getObjectAnchorX(Drawable drawable) {
+		public float getObjectAnchorX(Drawable drawable) {
 			switch (objectHorizontalAnchor) {
 				case MIDDLE:
-					return -drawable.getWidth() / 2;
+					return -drawable.getWidth() / 2.0f;
 				case RIGHT:
 					return -drawable.getWidth();
 				case LEFT:
@@ -149,36 +149,28 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 			}
 		}
 
-		public int getX(ScaledResolution resolution, Drawable drawable) {
-			return drawable.x + getScreenAnchorX(resolution, drawable) + getObjectAnchorX(drawable);
-		}
-
-		public int getScreenAnchorY(ScaledResolution resolution, Drawable drawable) {
+		public float getScreenAnchorY(ScaledResolution resolution, Drawable drawable) {
 			switch (screenVerticalAnchor) {
 				case BOTTOM:
 					return resolution.getScaledHeight();
 				case MIDDLE:
-					return resolution.getScaledHeight() / 2;
+					return resolution.getScaledHeight() / 2.0f;
 				default:
 				case TOP:
 					return 0;
 			}
 		}
 
-		public int getObjectAnchorY(Drawable drawable) {
+		public float getObjectAnchorY(Drawable drawable) {
 			switch (objectVerticalAnchor) {
 				case BOTTOM:
 					return -drawable.getHeight();
 				case MIDDLE:
-					return -drawable.getHeight() / 2;
+					return -drawable.getHeight() / 2.0f;
 				default:
 				case TOP:
 					return 0;
 			}
-		}
-
-		public int getY(ScaledResolution resolution, Drawable drawable) {
-			return drawable.y + getScreenAnchorY(resolution, drawable) + getObjectAnchorY(drawable);
 		}
 	}
 
@@ -204,6 +196,9 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 	@CallbackProperty
 	public boolean visible = true;
 
+	@CallbackProperty
+	public float rotation = 0;
+
 	protected Drawable() {}
 
 	protected Drawable(short x, short y) {
@@ -213,12 +208,21 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 
 	@SideOnly(Side.CLIENT)
 	public void draw(ScaledResolution resolution, float partialTicks) {
+		final float globalX = alignment.getScreenAnchorX(resolution, this) + x;
+		final float globalY = alignment.getScreenAnchorY(resolution, this) + y;
+
+		final float localX = alignment.getObjectAnchorX(this);
+		final float localY = alignment.getObjectAnchorY(this);
+
 		GL11.glPushMatrix();
+		if (rotation != 0) {
+			GL11.glTranslatef(globalX, globalY, z);
+			GL11.glRotated(rotation, 0, 0, 1);
+			GL11.glTranslatef(localX, localY, 0);
+		} else {
+			GL11.glTranslatef(globalX + localX, globalY + localY, z);
+		}
 
-		final int x = alignment.getX(resolution, this);
-		final int y = alignment.getY(resolution, this);
-
-		GL11.glTranslated(x, y, z);
 		drawContents(partialTicks);
 		GL11.glPopMatrix();
 	}
