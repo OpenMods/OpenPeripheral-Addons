@@ -28,6 +28,12 @@ public class LiquidIcon extends Drawable {
 	@CallbackProperty
 	public float alpha = 1;
 
+	private IIcon fluidIcon;
+
+	private int iconWidth;
+
+	private int iconHeight;
+
 	LiquidIcon() {}
 
 	public LiquidIcon(short x, short y, short width, short height, String fluid) {
@@ -40,17 +46,7 @@ public class LiquidIcon extends Drawable {
 	@Override
 	@SideOnly(Side.CLIENT)
 	protected void drawContents(float partialTicks) {
-		Fluid drawLiquid = FluidRegistry.getFluid(fluid);
-
-		if (drawLiquid == null) return;
-
-		IIcon fluidIcon = drawLiquid.getFlowingIcon();
-		if (fluidIcon == null) return;
-
-		final int iconWidth = fluidIcon.getIconWidth();
-		final int iconHeight = fluidIcon.getIconHeight();
-
-		if (iconWidth <= 0 || iconHeight <= 0) return;
+		if (fluidIcon == null || iconWidth <= 0 || iconHeight <= 0) return;
 
 		TextureManager render = FMLClientHandler.instance().getClient().renderEngine;
 		render.bindTexture(TextureMap.locationBlocksTexture);
@@ -95,6 +91,20 @@ public class LiquidIcon extends Drawable {
 	@Override
 	public boolean isVisible() {
 		return alpha > 0;
+	}
+
+	@Override
+	protected void onUpdate() {
+		fluidIcon = findFluidIcon(fluid);
+		if (fluidIcon != null) {
+			iconWidth = fluidIcon.getIconWidth();
+			iconHeight = fluidIcon.getIconHeight();
+		}
+	}
+
+	private static IIcon findFluidIcon(String fluid) {
+		Fluid drawLiquid = FluidRegistry.getFluid(fluid);
+		return drawLiquid != null? drawLiquid.getFlowingIcon() : null;
 	}
 
 }

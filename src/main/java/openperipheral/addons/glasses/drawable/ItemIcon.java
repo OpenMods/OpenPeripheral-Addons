@@ -22,6 +22,8 @@ public class ItemIcon extends Drawable {
 	@SideOnly(Side.CLIENT)
 	private RenderItem renderItem;
 
+	private ItemStack drawStack;
+
 	@CallbackProperty
 	public float scale = 1;
 
@@ -48,17 +50,11 @@ public class ItemIcon extends Drawable {
 	@Override
 	@SideOnly(Side.CLIENT)
 	protected void drawContents(float partialTicks) {
-		if (Strings.isNullOrEmpty(itemId)) return;
-		String[] itemSplit = itemId.split(":");
-		if (itemSplit.length != 2) return;
-
-		Item item = GameRegistry.findItem(itemSplit[0], itemSplit[1]);
-		if (item == null) return;
-
-		ItemStack drawStack = new ItemStack(item, 1, meta);
-		GL11.glScalef(scale, scale, scale);
-		getRenderItem().renderItemAndEffectIntoGUI(null, Minecraft.getMinecraft().getTextureManager(), drawStack, 0, 0);
-		GL11.glDisable(GL11.GL_LIGHTING);
+		if (drawStack != null) {
+			GL11.glScalef(scale, scale, scale);
+			getRenderItem().renderItemAndEffectIntoGUI(null, Minecraft.getMinecraft().getTextureManager(), drawStack, 0, 0);
+			GL11.glDisable(GL11.GL_LIGHTING);
+		}
 	}
 
 	@Override
@@ -79,6 +75,22 @@ public class ItemIcon extends Drawable {
 	@Override
 	public boolean isVisible() {
 		return true;
+	}
+
+	@Override
+	protected void onUpdate() {
+		drawStack = findDrawStack(itemId, meta);
+	}
+
+	private static ItemStack findDrawStack(String itemId, int meta) {
+		if (Strings.isNullOrEmpty(itemId)) return null;
+		String[] itemSplit = itemId.split(":");
+		if (itemSplit.length != 2) return null;
+
+		Item item = GameRegistry.findItem(itemSplit[0], itemSplit[1]);
+		if (item == null) return null;
+
+		return new ItemStack(item, 1, meta);
 	}
 
 }

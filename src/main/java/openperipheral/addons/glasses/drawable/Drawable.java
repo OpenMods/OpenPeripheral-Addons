@@ -341,7 +341,14 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 	}
 
 	@Override
-	public void onElementAdded(IStructureElement element, int index) {}
+	public void onElementAdded(IStructureElement element) {}
+
+	@Override
+	public void onElementUpdated(IStructureElement element) {
+		onUpdate();
+	}
+
+	protected abstract void onUpdate();
 
 	public void onAdded(SurfaceServer owner, int containerId) {
 		this.containerId = containerId;

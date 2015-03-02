@@ -7,6 +7,8 @@ import openperipheral.api.adapter.method.ScriptObject;
 
 import org.lwjgl.opengl.GL11;
 
+import com.google.common.base.Strings;
+
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -25,6 +27,10 @@ public class Text extends Drawable {
 
 	@CallbackProperty
 	public float scale = 1;
+
+	private int width;
+
+	private int height;
 
 	Text() {}
 
@@ -49,13 +55,12 @@ public class Text extends Drawable {
 
 	@Override
 	public int getWidth() {
-		FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
-		return Math.round(fontRenderer.getStringWidth(text) * scale);
+		return width;
 	}
 
 	@Override
 	public int getHeight() {
-		return Math.round(8 * scale);
+		return height;
 	}
 
 	@Override
@@ -63,4 +68,15 @@ public class Text extends Drawable {
 		return alpha > 0;
 	}
 
+	@Override
+	protected void onUpdate() {
+		height = Math.round(8 * scale);
+
+		if (Strings.isNullOrEmpty(text)) {
+			width = 0;
+		} else {
+			FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+			width = Math.round(fontRenderer.getStringWidth(text) * scale);
+		}
+	}
 }

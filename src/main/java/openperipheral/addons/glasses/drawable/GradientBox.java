@@ -113,4 +113,7 @@ public class GradientBox extends Drawable {
 	public boolean isVisible() {
 		return opacity1 > 0 && opacity2 > 0;
 	}
+
+	@Override
+	protected void onUpdate() {}
 }

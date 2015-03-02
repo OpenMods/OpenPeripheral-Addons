@@ -78,4 +78,7 @@ public class SolidBox extends Drawable {
 	public boolean isVisible() {
 		return opacity > 0;
 	}
+
+	@Override
+	protected void onUpdate() {}
 }

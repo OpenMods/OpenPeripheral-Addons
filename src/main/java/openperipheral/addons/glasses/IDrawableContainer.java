@@ -65,6 +65,7 @@ public interface IDrawableContainer {
 			@Arg(name = "meta", description = "The meta of the item to draw") short meta
 			);
 
+	@Alias("addFluid")
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a box textured like a liquid to the screen")
 	public Drawable addLiquid(
 			@Arg(name = "x", description = "The x position from the top left") short x,
