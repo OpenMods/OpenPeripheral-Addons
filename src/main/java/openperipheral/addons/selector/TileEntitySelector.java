@@ -9,6 +9,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -119,13 +120,14 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 			slots[i] = item;
 		}
 
-		syncMap.addUpdateListener(new ISyncListener() {
-
+		final ISyncListener listener = new ISyncListener() {
 			@Override
 			public void onSync(Set<ISyncableObject> changes) {
 				gridSize = calculateGridSize();
 			}
-		});
+		};
+		syncMap.addUpdateListener(listener);
+		syncMap.addSyncListener(listener);
 	}
 
 	@Override
@@ -369,4 +371,11 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 
 		return result;
 	}
+
+	@Override
+	public void readFromNBT(NBTTagCompound tag) {
+		super.readFromNBT(tag);
+		gridSize = calculateGridSize();
+	}
+
 }

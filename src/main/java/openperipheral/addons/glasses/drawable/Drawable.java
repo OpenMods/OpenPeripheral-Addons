@@ -254,8 +254,7 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 		return container;
 	}
 
-	@ScriptCallable(returnTypes = ReturnType
-			.STRING, name = "getType", description = "Get object type")
+	@ScriptCallable(returnTypes = ReturnType.STRING, name = "getType", description = "Get object type")
 	public String getTypeName() {
 		return getTypeEnum().name().toLowerCase();
 	}
@@ -268,8 +267,7 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 		deleted = true;
 	}
 
-	@ScriptCallable(returnTypes = ReturnType
-			.NUMBER, name = "getId")
+	@ScriptCallable(returnTypes = ReturnType.NUMBER, name = "getId")
 	public int getId() {
 		Preconditions.checkState(!deleted, "Object is already deleted");
 		return containerId + 1;
