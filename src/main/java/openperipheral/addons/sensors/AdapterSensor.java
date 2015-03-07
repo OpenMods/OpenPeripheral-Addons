@@ -19,7 +19,8 @@ import openperipheral.api.adapter.IPeripheralAdapter;
 import openperipheral.api.adapter.method.Arg;
 import openperipheral.api.adapter.method.ReturnType;
 import openperipheral.api.adapter.method.ScriptCallable;
-import openperipheral.api.meta.IEntityMetaBuilder;
+import openperipheral.api.meta.IEntityPartialMetaBuilder;
+import openperipheral.api.meta.IMetaProviderProxy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -61,32 +62,31 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return ids;
 	}
 
-	private static Map<String, Object> getEntityInfoById(ISensorEnvironment sensor, int mobId) {
+	private static IMetaProviderProxy getEntityInfoById(ISensorEnvironment sensor, int mobId) {
 		Entity mob = sensor.getWorld().getEntityByID(mobId);
 		return getEntityInfo(sensor, mob);
 	}
 
-	private static Map<String, Object> getPlayerInfo(ISensorEnvironment sensor, String username) {
+	private static IMetaProviderProxy getPlayerInfo(ISensorEnvironment sensor, String username) {
 		EntityPlayer player = sensor.getWorld().getPlayerEntityByName(username);
 		return getEntityInfo(sensor, player);
 	}
 
-	private static Map<String, Object> getPlayerInfo(ISensorEnvironment sensor, UUID uuid) {
+	private static IMetaProviderProxy getPlayerInfo(ISensorEnvironment sensor, UUID uuid) {
 		EntityPlayer player = sensor.getWorld().func_152378_a(uuid);
 		return getEntityInfo(sensor, player);
 	}
 
-	protected static Map<String, Object> getEntityInfo(ISensorEnvironment sensor, Entity mob) {
+	protected static IMetaProviderProxy getEntityInfo(ISensorEnvironment sensor, Entity mob) {
 		Preconditions.checkNotNull(mob, DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
 		final AxisAlignedBB aabb = getBoundingBox(sensor);
 
 		Preconditions.checkArgument(mob.boundingBox.intersectsWith(aabb), DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
 		final Vec3 sensorPos = sensor.getLocation();
-		return ApiAccess.getApi(IEntityMetaBuilder.class).getEntityMetadata(mob, sensorPos);
+		return ApiAccess.getApi(IEntityPartialMetaBuilder.class).createProxy(mob, sensorPos);
 	}
 
-	@ScriptCallable(returnTypes = ReturnType
-			.TABLE, description = "Get the usernames of all the players in range")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the usernames of all the players in range")
 	public List<GameProfile> getPlayers(ISensorEnvironment env) {
 		List<EntityPlayer> players = WorldUtils.getEntitiesWithinAABB(env.getWorld(), EntityPlayer.class, getBoundingBox(env));
 
@@ -97,48 +97,41 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return names;
 	}
 
-	@ScriptCallable(returnTypes = ReturnType
-			.TABLE, description = "Get the ids of all the mobs in range")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the ids of all the mobs in range")
 	public List<Integer> getMobIds(ISensorEnvironment env) {
 		return listEntityIds(env, EntityLiving.class);
 	}
 
-	@ScriptCallable(returnTypes = ReturnType
-			.TABLE, description = "Get the ids of all the minecarts in range")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the ids of all the minecarts in range")
 	public List<Integer> getMinecartIds(ISensorEnvironment env) {
 		return listEntityIds(env, EntityMinecart.class);
 	}
 
-	@ScriptCallable(returnTypes = ReturnType
-			.TABLE, description = "Get full details of a particular player if they're in range")
-	public Map<?, ?> getPlayerByName(ISensorEnvironment env,
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get full details of a particular player if they're in range")
+	public IMetaProviderProxy getPlayerByName(ISensorEnvironment env,
 			@Arg(name = "username", description = "The players username") String username) {
 		return getPlayerInfo(env, username);
 	}
 
-	@ScriptCallable(returnTypes = ReturnType
-			.TABLE, description = "Get full details of a particular player if they're in range")
-	public Map<?, ?> getPlayerByUUID(ISensorEnvironment env,
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get full details of a particular player if they're in range")
+	public IMetaProviderProxy getPlayerByUUID(ISensorEnvironment env,
 			@Arg(name = "uuid", description = "The players uuid") UUID uuid) {
 		return getPlayerInfo(env, uuid);
 	}
 
-	@ScriptCallable(returnTypes = ReturnType
-			.TABLE, description = "Get full details of a particular mob if it's in range")
-	public Map<String, Object> getMobData(ISensorEnvironment sensor,
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get full details of a particular mob if it's in range")
+	public IMetaProviderProxy getMobData(ISensorEnvironment sensor,
 			@Arg(name = "mobId", description = "The mob id retrieved from getMobIds()") int mobId) {
 		return getEntityInfoById(sensor, mobId);
 	}
 
-	@ScriptCallable(returnTypes = ReturnType
-			.TABLE, description = "Get full details of a particular minecart if it's in range")
-	public Map<?, ?> getMinecartData(ISensorEnvironment sensor,
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get full details of a particular minecart if it's in range")
+	public IMetaProviderProxy getMinecartData(ISensorEnvironment sensor,
 			@Arg(name = "minecartId", description = "The minecart id retrieved from getMobIds()") int minecartId) {
 		return getEntityInfoById(sensor, minecartId);
 	}
 
-	@ScriptCallable(returnTypes = ReturnType
-			.TABLE, description = "Get a table of information about the surrounding area. Includes whether each block is UNKNOWN, AIR, LIQUID or SOLID")
+	@ScriptCallable(returnTypes = ReturnType.TABLE, description = "Get a table of information about the surrounding area. Includes whether each block is UNKNOWN, AIR, LIQUID or SOLID")
 	public Map<Integer, Map<String, Object>> sonicScan(ISensorEnvironment env) {
 
 		int range = 1 + env.getSensorRange() / 2;
