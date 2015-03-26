@@ -341,12 +341,6 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Asynchronous
-	@ScriptCallable(returnTypes = ReturnType.NUMBER, description = "Get the display width of some text")
-	public int getStringWidth(@Arg(name = "text", description = "The text you want to measure") String text) {
-		return GlassesRenderingUtils.getStringWidth(text);
-	}
-
-	@Asynchronous
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
 	public IDrawableContainer getSurfaceByName(@Arg(name = "username", description = "The username of the user to get the draw surface for") String username) {
 		SurfaceServer playerSurface = getSurface(username);

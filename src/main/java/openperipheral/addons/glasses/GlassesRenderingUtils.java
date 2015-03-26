@@ -2,8 +2,6 @@ package openperipheral.addons.glasses;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
-import openmods.Log;
-import openmods.utils.render.FontSizeChecker;
 
 import org.lwjgl.opengl.GL11;
 
@@ -27,12 +25,4 @@ public final class GlassesRenderingUtils {
 		GL11.glPopMatrix();
 	}
 
-	public static int getStringWidth(String str) {
-		try {
-			return FontSizeChecker.getInstance().getStringWidth(str);
-		} catch (Exception e) {
-			Log.warn(e, "Can calculate font size");
-		}
-		return str.length() * 8;
-	}
 }
