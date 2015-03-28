@@ -70,3 +70,4 @@ openperipheral.turtle.sensor.adjective=Sensor
 openperipheral.turtle.narcissistic.adjective=Narcissistic
 
 openperipheral.misc.key=Key: %s
+openperipheral.misc.no_glasses=This item can be only used with bound terminal glasses!

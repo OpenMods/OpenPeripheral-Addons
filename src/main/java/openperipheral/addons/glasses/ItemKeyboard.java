@@ -4,6 +4,7 @@ import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.World;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.addons.api.ITerminalItem;
@@ -29,9 +30,14 @@ public class ItemKeyboard extends Item {
 				Item item = helmet.getItem();
 				if (item instanceof ITerminalItem) {
 					Long guid = ((ITerminalItem)item).getTerminalGuid(helmet);
-					if (guid != null) FMLCommonHandler.instance().showGuiScreen(new GuiCapture(guid));
+					if (guid != null) {
+						FMLCommonHandler.instance().showGuiScreen(new GuiCapture(guid));
+						return stack;
+					}
 				}
 			}
+
+			player.addChatMessage(new ChatComponentTranslation("openperipheral.misc.no_glasses"));
 		}
 
 		return stack;
