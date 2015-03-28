@@ -13,9 +13,7 @@ import openmods.structured.IStructureContainer;
 import openmods.structured.IStructureElement;
 import openperipheral.addons.glasses.SurfaceServer;
 import openperipheral.api.adapter.*;
-import openperipheral.api.adapter.method.Arg;
-import openperipheral.api.adapter.method.ReturnType;
-import openperipheral.api.adapter.method.ScriptCallable;
+import openperipheral.api.adapter.method.*;
 
 import org.lwjgl.opengl.GL11;
 
@@ -198,6 +196,11 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 
 	@CallbackProperty
 	public float rotation = 0;
+
+	@Property(type = ArgType.OBJECT,
+			getterDesc = "Get userdata",
+			setterDesc = "Set userdata (no restrictions, not sent to clients)")
+	public Object userdata;
 
 	protected Drawable() {}
 
