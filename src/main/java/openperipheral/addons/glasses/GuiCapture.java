@@ -76,7 +76,7 @@ public class GuiCapture extends GuiScreen {
 		}
 
 		// looks like twitch controls
-		this.mc.func_152348_aa();
+		super.handleKeyboardInput();
 	}
 
 	@Override

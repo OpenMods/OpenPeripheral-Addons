@@ -109,13 +109,25 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	public TileEntityGlassesBridge() {}
 
+	private void rebuildPlayerNamesMap() {
+		knownPlayersByName.clear();
+
+		for (PlayerInfo info : knownPlayersByUUID.values()) {
+			final EntityPlayerMP player = info.player.get();
+			if (isPlayerValid(player)) {
+				String name = player.getGameProfile().getName();
+				knownPlayersByName.put(name, info);
+			}
+		}
+	}
+
 	public void registerTerminal(EntityPlayerMP player) {
 		if (!knownPlayersByUUID.containsKey(player.getGameProfile().getId())) {
 			final PlayerInfo playerInfo = new PlayerInfo(player);
 			final GameProfile gameProfile = player.getGameProfile();
 
 			knownPlayersByUUID.put(gameProfile.getId(), playerInfo);
-			knownPlayersByName.put(gameProfile.getName(), playerInfo);
+			rebuildPlayerNamesMap();
 			queueEvent(EVENT_PLAYER_ATTACH, player);
 
 			sentFullDataToPlayer(player);
@@ -168,6 +180,8 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		if (worldObj.isRemote || globalSurface == null) return;
 
 		TerminalManagerServer.instance.registerBridge(guid, this);
+
+		boolean playersRemoved = false;
 		Iterator<PlayerInfo> it = knownPlayersByUUID.values().iterator();
 		while (it.hasNext()) {
 			final PlayerInfo info = it.next();
@@ -177,8 +191,11 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 				queueEvent(EVENT_PLAYER_DETACH, player);
 				sendCleanPackets(player);
 				it.remove();
+				playersRemoved = true;
 			}
 		}
+
+		if (playersRemoved) rebuildPlayerNamesMap();
 	}
 
 	private void sendCleanPackets(EntityPlayerMP player) {
@@ -324,7 +341,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	@ScriptCallable(returnTypes = ReturnType.TABLE, description = "Get the names of all the users linked up to this bridge")
 	public List<GameProfile> getUsers() {
 		List<GameProfile> result = Lists.newArrayList();
-		for (PlayerInfo info : knownPlayersByName.values())
+		for (PlayerInfo info : knownPlayersByUUID.values())
 			result.add(info.profile);
 
 		return result;
