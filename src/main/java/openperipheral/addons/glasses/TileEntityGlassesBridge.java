@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import openmods.api.ICustomHarvestDrops;
 import openmods.api.IPlaceAwareTile;
 import openmods.include.IncludeInterface;
+import openmods.include.IncludeOverride;
 import openmods.network.event.NetworkEventManager;
 import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
@@ -146,9 +147,8 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		template[2] = id != null? id.toString() : null;
 
 		for (int i = 0; i < extra.length; i++) {
-			// looks like CC has some problems with stuff like Character
 			final Object v = extra[i];
-			template[i + 3] = v != null? v.toString() : null;
+			template[i + 3] = v;
 		}
 
 		for (IArchitectureAccess computer : computers) {
@@ -338,6 +338,14 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	public long getGuid() {
 		return guid;
+	}
+
+	@IncludeOverride
+	public void clear() {
+		globalSurface.clear();
+
+		for (PlayerInfo info : knownPlayersByUUID.values())
+			info.surface.clear();
 	}
 
 	@Asynchronous

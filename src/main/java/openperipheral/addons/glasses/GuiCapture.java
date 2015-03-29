@@ -1,6 +1,7 @@
 package openperipheral.addons.glasses;
 
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import openmods.network.event.NetworkEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseButtonEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseWheelEvent;
@@ -32,10 +33,11 @@ public class GuiCapture extends GuiScreen {
 		int wheel = Mouse.getEventDWheel();
 
 		if (button != -1 || state || wheel != 0) {
+			ScaledResolution resolution = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
 			int x = Mouse.getEventX() * this.width / this.mc.displayWidth;
 			int y = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
 
-			final DrawableHitInfo hit = TerminalManagerClient.instance.findDrawableHit(guid, x, y);
+			final DrawableHitInfo hit = TerminalManagerClient.instance.findDrawableHit(guid, resolution, x, y);
 
 			if (button != -1) createMouseButtonEvent(button, state, hit).sendToServer();
 			if (wheel != 0) createMouseWheelEvent(wheel, hit).sendToServer();

@@ -59,7 +59,8 @@ public class GlassesEvent extends SerializableNetworkEvent {
 
 		@Override
 		public Object[] getEventArgs() {
-			return wrap(code, ch, isRepeat);
+			// CC has some problems with chars
+			return wrap(code, Character.toString(ch), isRepeat);
 		}
 	}
 
@@ -139,12 +140,12 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		public boolean isPrivate;
 
 		@Serialize
-		public int x;
+		public float x;
 
 		@Serialize
-		public int y;
+		public float y;
 
-		public GlassesComponentMouseEvent(long guid, int componentId, boolean isPrivate, int x, int y) {
+		public GlassesComponentMouseEvent(long guid, int componentId, boolean isPrivate, float x, float y) {
 			super(guid);
 			this.componentId = componentId;
 			this.isPrivate = isPrivate;
@@ -158,7 +159,7 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		@Serialize
 		public int wheel;
 
-		public GlassesComponentMouseWheelEvent(long guid, int componentId, boolean isPrivate, int x, int y, int wheel) {
+		public GlassesComponentMouseWheelEvent(long guid, int componentId, boolean isPrivate, float x, float y, int wheel) {
 			super(guid, componentId, isPrivate, x, y);
 			this.wheel = wheel;
 		}
@@ -182,7 +183,7 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		@Serialize
 		public boolean pressed;
 
-		public GlassesComponentMouseButtonEvent(long guid, int componentId, boolean isPrivate, int x, int y, int button, boolean pressed) {
+		public GlassesComponentMouseButtonEvent(long guid, int componentId, boolean isPrivate, float x, float y, int button, boolean pressed) {
 			super(guid, componentId, isPrivate, x, y);
 			this.button = button;
 			this.pressed = pressed;

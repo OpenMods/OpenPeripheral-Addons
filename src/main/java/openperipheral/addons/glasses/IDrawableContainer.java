@@ -12,6 +12,7 @@ import openperipheral.api.adapter.method.*;
 @AdapterSourceName("glasses_container")
 public interface IDrawableContainer {
 
+	@Alias("getObjectById")
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get object by id")
 	public Drawable getById(
 			@Arg(name = "id", description = "Id of drawed object") int id

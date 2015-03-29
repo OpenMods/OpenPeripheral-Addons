@@ -25,11 +25,11 @@ public class TerminalManagerClient {
 	public static class DrawableHitInfo {
 		public final int id;
 		public final boolean isPrivate;
-		public final int dx;
-		public final int dy;
+		public final float dx;
+		public final float dy;
 		public final int z;
 
-		public DrawableHitInfo(int id, boolean isPrivate, int dx, int dy, int z) {
+		public DrawableHitInfo(int id, boolean isPrivate, float dx, float dy, int z) {
 			this.id = id;
 			this.isPrivate = isPrivate;
 			this.dx = dx;
@@ -119,14 +119,14 @@ public class TerminalManagerClient {
 		}
 	}
 
-	public DrawableHitInfo findDrawableHit(long guid, int x, int y) {
-		DrawableHitInfo result = findDrawableHit(guid, x, y, false);
+	public DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, int x, int y) {
+		DrawableHitInfo result = findDrawableHit(guid, resolution, x, y, false);
 		if (result != null) return result;
 
-		return findDrawableHit(guid, x, y, true);
+		return findDrawableHit(guid, resolution, x, y, true);
 	}
 
-	private DrawableHitInfo findDrawableHit(long guid, int x, int y, boolean isPrivate) {
+	private DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, int x, int y, boolean isPrivate) {
 		final String surfaceName = getSurfaceName(isPrivate);
 		SurfaceClient surface = surfaces.get(guid, surfaceName);
 
@@ -135,8 +135,11 @@ public class TerminalManagerClient {
 		DrawableHitInfo result = null;
 
 		for (Drawable d : surface) {
-			final int dx = x - d.x;
-			final int dy = y - d.y;
+			final float scaledX = (float)d.getX(resolution);
+			final float scaledY = (float)d.getY(resolution);
+
+			final float dx = x - scaledX;
+			final float dy = y - scaledY;
 
 			if (0 <= dx && 0 <= dy && dx < d.getWidth() && dy < d.getHeight()) {
 				if (result == null || result.z <= d.z) result = new DrawableHitInfo(d.getId(), isPrivate, dx, dy, d.z);
