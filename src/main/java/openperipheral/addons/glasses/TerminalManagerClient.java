@@ -13,6 +13,8 @@ import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.addons.glasses.drawable.Drawable;
 
+import org.lwjgl.opengl.GL11;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
@@ -47,8 +49,14 @@ public class TerminalManagerClient {
 	private void tryDrawSurface(long guid, String player, float partialTicks, ScaledResolution resolution) {
 		SurfaceClient surface = surfaces.get(guid, player);
 		if (surface != null) {
+			GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_ENABLE_BIT);
+
+			GL11.glEnable(GL11.GL_BLEND);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
+			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			for (Drawable drawable : surface)
 				if (drawable.shouldRender()) drawable.draw(resolution, partialTicks);
+			GL11.glPopAttrib();
 		}
 	}
 

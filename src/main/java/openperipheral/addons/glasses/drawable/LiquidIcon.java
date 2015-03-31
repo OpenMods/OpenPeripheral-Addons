@@ -9,6 +9,9 @@ import openperipheral.addons.glasses.GlassesRenderingUtils;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.CallbackProperty;
 import openperipheral.api.adapter.method.ScriptObject;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -53,6 +56,7 @@ public class LiquidIcon extends Drawable {
 		float xIterations = (float)width / iconWidth;
 		float yIterations = (float)height / iconHeight;
 
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		for (float xIteration = 0; xIteration < xIterations; xIteration += 1) {
 			for (float yIteration = 0; yIteration < yIterations; yIteration += 1) {
 				// Draw whole or partial
@@ -70,7 +74,7 @@ public class LiquidIcon extends Drawable {
 						alpha);
 			}
 		}
-
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
 
 	@Override

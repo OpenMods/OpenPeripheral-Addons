@@ -64,8 +64,8 @@ public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElem
 	}
 
 	@Override
-	public Drawable addIcon(short x, short y, String id, short meta) {
-		return addDrawable(new ItemIcon(x, y, id, meta));
+	public Drawable addIcon(short x, short y, String id, Short meta) {
+		return addDrawable(new ItemIcon(x, y, id, meta != null? meta : 0));
 	}
 
 	@Override

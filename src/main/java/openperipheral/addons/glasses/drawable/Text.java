@@ -43,9 +43,11 @@ public class Text extends Drawable {
 	@Override
 	@SideOnly(Side.CLIENT)
 	protected void drawContents(float partialTicks) {
+		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 		GL11.glScalef(scale, scale, scale);
 		fontRenderer.drawString(text, 0, 0, ((int)(alpha * 255) << 24 | color));
+		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
 
 	@Override

@@ -51,9 +51,11 @@ public class ItemIcon extends Drawable {
 	@SideOnly(Side.CLIENT)
 	protected void drawContents(float partialTicks) {
 		if (drawStack != null) {
+			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glScalef(scale, scale, scale);
 			getRenderItem().renderItemAndEffectIntoGUI(null, Minecraft.getMinecraft().getTextureManager(), drawStack, 0, 0);
-			GL11.glDisable(GL11.GL_LIGHTING);
+			GL11.glEnable(GL11.GL_BLEND);
+			GL11.glDisable(GL11.GL_TEXTURE_2D);
 		}
 	}
 

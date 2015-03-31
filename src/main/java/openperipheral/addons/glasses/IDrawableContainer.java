@@ -53,8 +53,8 @@ public interface IDrawableContainer {
 			@Arg(name = "height", description = "The height of the box") short height,
 			@Arg(name = "color", description = "The color of the box") int color,
 			@Arg(name = "opacity", description = "The opacity of the box (from 0 to 1)") float alpha,
-			@Arg(name = "color", description = "The color of the other side of the box") int color2,
-			@Arg(name = "opacity", description = "The opacity of the other side of the box (from 0 to 1)") float alpha2,
+			@Arg(name = "color2", description = "The color of the other side of the box") int color2,
+			@Arg(name = "opacity2", description = "The opacity of the other side of the box (from 0 to 1)") float alpha2,
 			@Arg(name = "gradient", description = "The gradient direction (1 for horizontal, 2 for vertical)") int gradient
 			);
 
@@ -63,7 +63,7 @@ public interface IDrawableContainer {
 			@Arg(name = "x", description = "The x position from the top left") short x,
 			@Arg(name = "y", description = "The y position from the top left") short y,
 			@Arg(name = "id", description = "The id of the item to draw") String id,
-			@Arg(name = "meta", description = "The meta of the item to draw") short meta
+			@Optionals @Arg(name = "meta", description = "The meta of the item to draw") Short meta
 			);
 
 	@Alias("addFluid")
@@ -73,6 +73,6 @@ public interface IDrawableContainer {
 			@Arg(name = "y", description = "The y position from the top left") short y,
 			@Arg(name = "width", description = "The width of the liquid box") short width,
 			@Arg(name = "height", description = "The height of the liquid box") short height,
-			@Arg(name = "string", description = "The name of the fluid to render") String id
+			@Arg(name = "liquid", description = "The name of the fluid to render") String id
 			);
 }

@@ -56,10 +56,7 @@ public class GradientBox extends Drawable {
 	@Override
 	@SideOnly(Side.CLIENT)
 	protected void drawContents(float partialTicks) {
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_ALPHA_TEST);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 
 		Tessellator tessellator = Tessellator.instance;
@@ -88,10 +85,7 @@ public class GradientBox extends Drawable {
 
 		tessellator.draw();
 		GL11.glShadeModel(GL11.GL_FLAT);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_ALPHA_TEST);
-
 	}
 
 	@Override
@@ -111,7 +105,7 @@ public class GradientBox extends Drawable {
 
 	@Override
 	public boolean isVisible() {
-		return opacity1 > 0 && opacity2 > 0;
+		return opacity1 > 0 || opacity2 > 0;
 	}
 
 	@Override

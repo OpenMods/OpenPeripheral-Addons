@@ -4,9 +4,6 @@ import net.minecraft.client.renderer.Tessellator;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.CallbackProperty;
 import openperipheral.api.adapter.method.ScriptObject;
-
-import org.lwjgl.opengl.GL11;
-
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -38,11 +35,6 @@ public class SolidBox extends Drawable {
 	@Override
 	@SideOnly(Side.CLIENT)
 	protected void drawContents(float partialTicks) {
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-
 		Tessellator tessellator = Tessellator.instance;
 		tessellator.startDrawingQuads();
 		tessellator.setColorRGBA_I(color, (int)(opacity * 255));
@@ -54,9 +46,6 @@ public class SolidBox extends Drawable {
 		tessellator.addVertex(width, 0, 0);
 
 		tessellator.draw();
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
 	}
 
 	@Override
