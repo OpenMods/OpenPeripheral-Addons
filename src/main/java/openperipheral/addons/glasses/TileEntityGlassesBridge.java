@@ -25,6 +25,7 @@ import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
+import openperipheral.api.adapter.Doc;
 import openperipheral.api.adapter.method.*;
 import openperipheral.api.architecture.IArchitectureAccess;
 import openperipheral.api.architecture.IAttachable;
@@ -36,6 +37,12 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 
+@Doc({ "This peripheral is used to control terminal glasses and wireless keyboard.",
+		"There is one global surface and one private surface for every glasses user.",
+		"All calls names .add*() will return object that can be later used to modify it.",
+		"To make changes visible to players, call .sync().",
+		"This peripheral signals few events. Full list available here: http://goo.gl/8Hf2yA",
+		"Simple demo: http://goo.gl/n5HPN8" })
 @PeripheralTypeId("openperipheral_bridge")
 public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable, IPlaceAwareTile, ICustomHarvestDrops {
 
