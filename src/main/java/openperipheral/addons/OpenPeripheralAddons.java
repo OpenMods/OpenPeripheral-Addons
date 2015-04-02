@@ -50,7 +50,7 @@ import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 
-@Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$];required-after:ComputerCraft@[1.70,];required-after:OpenPeripheralCore")
+@Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$];required-after:OpenPeripheralCore;after:ComputerCraft@[1.70,]")
 public class OpenPeripheralAddons {
 
 	public static final String MODID = "OpenPeripheral";
