@@ -15,6 +15,7 @@ import openperipheral.addons.sensors.TileEntitySensor;
 import openperipheral.addons.sensors.TileEntitySensorRenderer;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class ClientProxy implements IProxy {
@@ -31,7 +32,9 @@ public class ClientProxy implements IProxy {
 
 	@Override
 	public void preInit() {
-		MinecraftForge.EVENT_BUS.register(TerminalManagerClient.instance);
+		MinecraftForge.EVENT_BUS.register(TerminalManagerClient.instance.createForgeBusListener());
+		FMLCommonHandler.instance().bus().register(TerminalManagerClient.instance.createFmlBusListener());
+
 		MinecraftForge.EVENT_BUS.register(new IconLoader());
 
 		if (Blocks.selector != null) {
