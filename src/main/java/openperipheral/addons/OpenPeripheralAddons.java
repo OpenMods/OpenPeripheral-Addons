@@ -39,6 +39,7 @@ import openperipheral.addons.sensors.TileEntitySensor;
 import openperipheral.addons.ticketmachine.TileEntityTicketMachine;
 import openperipheral.api.ApiAccess;
 import openperipheral.api.adapter.IPeripheralAdapterRegistry;
+import openperipheral.api.meta.IItemStackMetaBuilder;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -144,6 +145,9 @@ public class OpenPeripheralAddons {
 		adapters.registerInline(TileEntityTicketMachine.class);
 		adapters.registerInline(TileEntitySelector.class);
 		adapters.register(new AdapterSensor());
+
+		IItemStackMetaBuilder itemStackBuilder = ApiAccess.getApi(IItemStackMetaBuilder.class);
+		itemStackBuilder.register(new ItemTerminalMetaProvider());
 
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
 
