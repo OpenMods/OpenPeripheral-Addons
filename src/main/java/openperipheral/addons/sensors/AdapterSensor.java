@@ -7,7 +7,7 @@ import java.util.UUID;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.entity.item.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
@@ -30,6 +30,20 @@ import com.mojang.authlib.GameProfile;
 public class AdapterSensor implements IPeripheralAdapter {
 
 	private static final String DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING = "Entity not found";
+
+	public static enum SupportedEntityTypes {
+		MOB(EntityLiving.class),
+		MINECART(EntityMinecart.class),
+		ITEM(EntityItem.class),
+		ITEM_FRAME(EntityItemFrame.class),
+		PAINTING(EntityPainting.class);
+
+		public final Class<? extends Entity> cls;
+
+		private SupportedEntityTypes(Class<? extends Entity> cls) {
+			this.cls = cls;
+		}
+	}
 
 	@Override
 	public Class<?> getTargetClass() {
@@ -62,8 +76,9 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return ids;
 	}
 
-	private static IMetaProviderProxy getEntityInfoById(ISensorEnvironment sensor, int mobId) {
+	private static IMetaProviderProxy getEntityInfoById(ISensorEnvironment sensor, int mobId, Class<? extends Entity> cls) {
 		Entity mob = sensor.getWorld().getEntityByID(mobId);
+		Preconditions.checkArgument(cls.isInstance(mob), DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
 		return getEntityInfo(sensor, mob);
 	}
 
@@ -77,13 +92,47 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return getEntityInfo(sensor, player);
 	}
 
-	protected static IMetaProviderProxy getEntityInfo(ISensorEnvironment sensor, Entity mob) {
+	private static IMetaProviderProxy getEntityInfo(ISensorEnvironment sensor, Entity mob) {
 		Preconditions.checkNotNull(mob, DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
 		final AxisAlignedBB aabb = getBoundingBox(sensor);
 
 		Preconditions.checkArgument(mob.boundingBox.intersectsWith(aabb), DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
 		final Vec3 sensorPos = sensor.getLocation();
 		return ApiAccess.getApi(IEntityPartialMetaBuilder.class).createProxy(mob, sensorPos);
+	}
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the ids of all the mobs in range. Deprecated, please use getEntityIds('mob')")
+	public List<Integer> getMobIds(ISensorEnvironment env) {
+		return listEntityIds(env, EntityLiving.class);
+	}
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get full details of a particular mob if it's in range. Deprecated, please use getEntityData(id, 'mob')")
+	public IMetaProviderProxy getMobData(ISensorEnvironment sensor,
+			@Arg(name = "mobId", description = "The id retrieved from getMobIds()") int id) {
+		return getEntityInfoById(sensor, id, EntityLiving.class);
+	}
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the ids of all the minecarts in range. Deprecated, please use getEntityIds('minecart')")
+	public List<Integer> getMinecartIds(ISensorEnvironment env) {
+		return listEntityIds(env, EntityMinecart.class);
+	}
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get full details of a particular minecart if it's in range. Deprecated, please use getEntityIds(id, 'minecraft')")
+	public IMetaProviderProxy getMinecartData(ISensorEnvironment sensor,
+			@Arg(name = "minecartId", description = "The id retrieved from getMinecartIds()") int id) {
+		return getEntityInfoById(sensor, id, EntityMinecart.class);
+	}
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the ids of all entities of single type in range")
+	public List<Integer> getEntityIds(ISensorEnvironment env, @Arg(name = "type") SupportedEntityTypes type) {
+		return listEntityIds(env, type.cls);
+	}
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get full details of a particular entity if it's in range")
+	public IMetaProviderProxy getEntityData(ISensorEnvironment sensor,
+			@Arg(name = "id", description = "The id retrieved from getEntityIds()") int id,
+			@Arg(name = "type") SupportedEntityTypes type) {
+		return getEntityInfoById(sensor, id, type.cls);
 	}
 
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the usernames of all the players in range")
@@ -97,16 +146,6 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return names;
 	}
 
-	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the ids of all the mobs in range")
-	public List<Integer> getMobIds(ISensorEnvironment env) {
-		return listEntityIds(env, EntityLiving.class);
-	}
-
-	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the ids of all the minecarts in range")
-	public List<Integer> getMinecartIds(ISensorEnvironment env) {
-		return listEntityIds(env, EntityMinecart.class);
-	}
-
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get full details of a particular player if they're in range")
 	public IMetaProviderProxy getPlayerByName(ISensorEnvironment env,
 			@Arg(name = "username", description = "The players username") String username) {
@@ -117,18 +156,6 @@ public class AdapterSensor implements IPeripheralAdapter {
 	public IMetaProviderProxy getPlayerByUUID(ISensorEnvironment env,
 			@Arg(name = "uuid", description = "The players uuid") UUID uuid) {
 		return getPlayerInfo(env, uuid);
-	}
-
-	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get full details of a particular mob if it's in range")
-	public IMetaProviderProxy getMobData(ISensorEnvironment sensor,
-			@Arg(name = "mobId", description = "The mob id retrieved from getMobIds()") int mobId) {
-		return getEntityInfoById(sensor, mobId);
-	}
-
-	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get full details of a particular minecart if it's in range")
-	public IMetaProviderProxy getMinecartData(ISensorEnvironment sensor,
-			@Arg(name = "minecartId", description = "The minecart id retrieved from getMobIds()") int minecartId) {
-		return getEntityInfoById(sensor, minecartId);
 	}
 
 	@ScriptCallable(returnTypes = ReturnType.TABLE, description = "Get a table of information about the surrounding area. Includes whether each block is UNKNOWN, AIR, LIQUID or SOLID")
