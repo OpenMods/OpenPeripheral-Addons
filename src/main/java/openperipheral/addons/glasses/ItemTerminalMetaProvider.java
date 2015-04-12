@@ -12,14 +12,14 @@ public class ItemTerminalMetaProvider extends ItemStackMetaProviderSimple<ITermi
 
 	@Override
 	public String getKey() {
-		return "op-terminal";
+		return "op_terminal";
 	}
 
 	@Override
 	public Object getMeta(ITerminalItem target, ItemStack stack) {
 		Map<String, Object> results = Maps.newHashMap();
 		final Long terminalGuid = target.getTerminalGuid(stack);
-		if (terminalGuid != null) results.put("bridge-name", TerminalUtils.formatTerminalId(terminalGuid));
+		if (terminalGuid != null) results.put("bridge_name", TerminalUtils.formatTerminalId(terminalGuid));
 		return results;
 	}
 }
