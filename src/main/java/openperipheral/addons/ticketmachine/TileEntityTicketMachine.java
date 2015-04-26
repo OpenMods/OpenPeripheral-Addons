@@ -98,8 +98,7 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 		syncMap.addUpdateListener(createRenderUpdateListener());
 	}
 
-	@ScriptCallable(returnTypes = ReturnType
-			.BOOLEAN, description = "Create a new ticket to the specified destination")
+	@ScriptCallable(returnTypes = ReturnType.BOOLEAN, description = "Create a new ticket to the specified destination")
 	public boolean createTicket(@Arg(name = "destination", description = "The destination for the ticket") String destination,
 			@Arg(name = "amount") @Optionals Integer amount) {
 		if (amount == null) amount = 1;
@@ -134,8 +133,7 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 	}
 
 	@Asynchronous
-	@ScriptCallable(returnTypes = ReturnType
-			.STRING, description = "Returns owner of this machine")
+	@ScriptCallable(returnTypes = ReturnType.STRING, description = "Returns owner of this machine")
 	public String getOwner() {
 		return owner.getValue();
 	}
