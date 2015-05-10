@@ -209,10 +209,12 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 		this.y = y;
 	}
 
+	@SideOnly(Side.CLIENT)
 	public double getX(ScaledResolution resolution) {
 		return alignment.getScreenAnchorX(resolution, this) + alignment.getObjectAnchorX(this) + x;
 	}
 
+	@SideOnly(Side.CLIENT)
 	public double getY(ScaledResolution resolution) {
 		return alignment.getScreenAnchorY(resolution, this) + alignment.getObjectAnchorY(this) + y;
 	}
