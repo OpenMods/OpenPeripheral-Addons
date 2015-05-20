@@ -1,9 +1,11 @@
 package openperipheral.addons.glasses.drawable;
 
-import net.minecraft.client.renderer.Tessellator;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.CallbackProperty;
 import openperipheral.api.adapter.method.ScriptObject;
+
+import org.lwjgl.opengl.GL11;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -35,17 +37,17 @@ public class SolidBox extends Drawable {
 	@Override
 	@SideOnly(Side.CLIENT)
 	protected void drawContents(float partialTicks) {
-		Tessellator tessellator = Tessellator.instance;
-		tessellator.startDrawingQuads();
-		tessellator.setColorRGBA_I(color, (int)(opacity * 255));
+		final byte r = (byte)(color >> 16);
+		final byte g = (byte)(color >> 8);
+		final byte b = (byte)(color >> 0);
 
-		tessellator.addVertex(0, 0, 0);
-		tessellator.addVertex(0, height, 0);
-
-		tessellator.addVertex(width, height, 0);
-		tessellator.addVertex(width, 0, 0);
-
-		tessellator.draw();
+		GL11.glColor4ub(r, g, b, (byte)(opacity * 255));
+		GL11.glBegin(GL11.GL_QUADS);
+		GL11.glVertex2i(0, 0);
+		GL11.glVertex2i(0, height);
+		GL11.glVertex2i(width, height);
+		GL11.glVertex2i(width, 0);
+		GL11.glEnd();
 	}
 
 	@Override

@@ -1,6 +1,5 @@
 package openperipheral.addons.glasses.drawable;
 
-import net.minecraft.client.renderer.Tessellator;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.CallbackProperty;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -56,36 +55,41 @@ public class GradientBox extends Drawable {
 	@Override
 	@SideOnly(Side.CLIENT)
 	protected void drawContents(float partialTicks) {
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
 		GL11.glShadeModel(GL11.GL_SMOOTH);
 
-		Tessellator tessellator = Tessellator.instance;
+		{
+			final byte r = (byte)(color1 >> 16);
+			final byte g = (byte)(color1 >> 8);
+			final byte b = (byte)(color1 >> 0);
 
-		tessellator.startDrawingQuads();
-		tessellator.setColorRGBA_I(color1, (int)(opacity1 * 255));
-
-		if (gradient == 1) {
-			tessellator.addVertex(0, height, 0);
-			tessellator.addVertex(width, height, 0);
-		} else {
-			tessellator.addVertex(width, height, 0);
-			tessellator.addVertex(width, 0, 0);
-
+			GL11.glColor4ub(r, g, b, (byte)(opacity1 * 255));
+			GL11.glBegin(GL11.GL_QUADS);
+			if (gradient == 1) {
+				GL11.glVertex2i(0, height);
+				GL11.glVertex2i(width, height);
+			} else {
+				GL11.glVertex2i(width, height);
+				GL11.glVertex2i(width, 0);
+			}
 		}
 
-		tessellator.setColorRGBA_I(color2, (int)(opacity2 * 255));
+		{
+			final byte r = (byte)(color2 >> 16);
+			final byte g = (byte)(color2 >> 8);
+			final byte b = (byte)(color2 >> 0);
+			GL11.glColor4ub(r, g, b, (byte)(opacity2 * 255));
 
-		if (gradient == 1) {
-			tessellator.addVertex(width, 0, 0);
-			tessellator.addVertex(0, 0, 0);
-		} else {
-			tessellator.addVertex(0, 0, 0);
-			tessellator.addVertex(0, height, 0);
+			if (gradient == 1) {
+				GL11.glVertex2i(width, 0);
+				GL11.glVertex2i(0, 0);
+			} else {
+				GL11.glVertex2i(0, 0);
+				GL11.glVertex2i(0, height);
+			}
 		}
 
-		tessellator.draw();
+		GL11.glEnd();
 		GL11.glShadeModel(GL11.GL_FLAT);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
 	}
 
 	@Override

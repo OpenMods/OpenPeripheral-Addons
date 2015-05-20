@@ -16,6 +16,7 @@ import openperipheral.addons.glasses.drawable.Drawable;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 
 import cpw.mods.fml.client.FMLClientHandler;
@@ -51,11 +52,8 @@ public class TerminalManagerClient {
 		SurfaceClient surface = surfaces.get(guid, player);
 		if (surface != null) {
 			GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_ENABLE_BIT);
-
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			for (Drawable drawable : surface)
+			Drawable.setupFlatRenderState();
+			for (Drawable drawable : surface.getSortedDrawables())
 				if (drawable.shouldRender()) drawable.draw(resolution, partialTicks);
 			GL11.glPopAttrib();
 		}
@@ -161,20 +159,16 @@ public class TerminalManagerClient {
 
 		if (surface == null) return null;
 
-		DrawableHitInfo result = null;
-
-		for (Drawable d : surface) {
+		for (Drawable d : Lists.reverse(surface.getSortedDrawables())) {
 			final float scaledX = (float)d.getX(resolution);
 			final float scaledY = (float)d.getY(resolution);
 
 			final float dx = x - scaledX;
 			final float dy = y - scaledY;
 
-			if (0 <= dx && 0 <= dy && dx < d.getWidth() && dy < d.getHeight()) {
-				if (result == null || result.z <= d.z) result = new DrawableHitInfo(d.getId(), isPrivate, dx, dy, d.z);
-			}
+			if (0 <= dx && 0 <= dy && dx < d.getWidth() && dy < d.getHeight()) { return new DrawableHitInfo(d.getId(), isPrivate, dx, dy, d.z); }
 		}
 
-		return result;
+		return null;
 	}
 }
