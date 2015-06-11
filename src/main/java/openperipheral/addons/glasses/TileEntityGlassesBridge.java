@@ -177,8 +177,8 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		}
 	}
 
-	public void onChatCommand(String command, EntityPlayer player) {
-		queueEvent(EVENT_CHAT_MESSAGE, player, command);
+	public void onChatCommand(String command, EntityPlayer player, boolean isHidden) {
+		queueEvent(EVENT_CHAT_MESSAGE, player, command, isHidden);
 	}
 
 	@Override

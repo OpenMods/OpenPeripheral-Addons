@@ -4,12 +4,14 @@ import java.util.Map;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.ServerChatEvent;
+import openperipheral.addons.Config;
 import openperipheral.addons.api.TerminalRegisterEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesClientEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
 
 import com.google.common.collect.MapMaker;
 
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class TerminalManagerServer {
@@ -19,19 +21,25 @@ public class TerminalManagerServer {
 
 	private final Map<Long, TileEntityGlassesBridge> listeners = new MapMaker().weakValues().makeMap();
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onServerChatEvent(ServerChatEvent event) {
-		EntityPlayerMP player = event.player;
-
-		if (!event.message.startsWith("$$")) return;
-
-		Long guid = TerminalUtils.tryGetTerminalGuid(player);
+		final EntityPlayerMP player = event.player;
+		final Long guid = TerminalUtils.tryGetTerminalGuid(player);
 		if (guid != null) {
-			TileEntityGlassesBridge listener = listeners.get(guid);
-			if (listener != null) listener.onChatCommand(event.message.substring(2).trim(), player);
-		}
+			final String message;
+			final boolean isHidden;
+			if (event.message.startsWith("$$")) {
+				message = event.message.substring(2).trim();
+				isHidden = true;
+				event.setCanceled(true);
+			} else if (Config.listenToAllChat) {
+				message = event.message;
+				isHidden = false;
+			} else return;
 
-		event.setCanceled(true);
+			final TileEntityGlassesBridge listener = listeners.get(guid);
+			if (listener != null) listener.onChatCommand(message, player, isHidden);
+		}
 	}
 
 	@SubscribeEvent

@@ -16,4 +16,8 @@ public class Config {
 	@ConfigProperty(category = "misc", comment = "Should turtles with OPA updates be visible in creative")
 	public static boolean addTurtlesToCreative = true;
 
+	@OnLineModifiable
+	@ConfigProperty(category = "glasses", comment = "Should glasses listen to all chat (not just prefixed with $$)")
+	public static boolean listenToAllChat = true;
+
 }
