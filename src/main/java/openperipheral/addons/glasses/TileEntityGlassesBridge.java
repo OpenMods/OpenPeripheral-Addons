@@ -48,8 +48,6 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	public static final String TAG_GUID = "guid";
 
-	private static final String EVENT_CHAT_MESSAGE = "glasses_chat_command";
-
 	private static final String EVENT_PLAYER_ATTACH = "glasses_attach";
 
 	private static final String EVENT_PLAYER_DETACH = "glasses_detach";
@@ -177,8 +175,8 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		}
 	}
 
-	public void onChatCommand(String command, EntityPlayer player, boolean isHidden) {
-		queueEvent(EVENT_CHAT_MESSAGE, player, command, isHidden);
+	public void onChatCommand(String event, String content, EntityPlayer player) {
+		queueEvent(event, player, content);
 	}
 
 	@Override

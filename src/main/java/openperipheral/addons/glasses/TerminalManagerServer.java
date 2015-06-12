@@ -21,25 +21,28 @@ public class TerminalManagerServer {
 
 	private final Map<Long, TileEntityGlassesBridge> listeners = new MapMaker().weakValues().makeMap();
 
+	private static final String EVENT_CHAT_COMMAND = "glasses_chat_command";
+
+	private static final String EVENT_CHAT_MESSAGE = "glasses_chat_message";
+
 	@SubscribeEvent(priority = EventPriority.HIGH)
 	public void onServerChatEvent(ServerChatEvent event) {
 		final EntityPlayerMP player = event.player;
 		final Long guid = TerminalUtils.tryGetTerminalGuid(player);
 		if (guid != null) {
-			final String message;
-			final boolean isHidden;
 			if (event.message.startsWith("$$")) {
-				message = event.message.substring(2).trim();
-				isHidden = true;
+				sendChatEvent(EVENT_CHAT_COMMAND, player, guid, event.message.substring(2).trim());
 				event.setCanceled(true);
 			} else if (Config.listenToAllChat) {
-				message = event.message;
-				isHidden = false;
-			} else return;
+				sendChatEvent(EVENT_CHAT_MESSAGE, player, guid, event.message);
+			}
 
-			final TileEntityGlassesBridge listener = listeners.get(guid);
-			if (listener != null) listener.onChatCommand(message, player, isHidden);
 		}
+	}
+
+	private void sendChatEvent(String event, EntityPlayerMP player, Long guid, String message) {
+		final TileEntityGlassesBridge listener = listeners.get(guid);
+		if (listener != null) listener.onChatCommand(event, message, player);
 	}
 
 	@SubscribeEvent
