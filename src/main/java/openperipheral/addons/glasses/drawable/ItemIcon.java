@@ -2,6 +2,8 @@ package openperipheral.addons.glasses.drawable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import openperipheral.api.adapter.AdapterSourceName;
@@ -19,6 +21,8 @@ import cpw.mods.fml.relauncher.SideOnly;
 @ScriptObject
 @AdapterSourceName("glasses_icon")
 public class ItemIcon extends Drawable {
+	private ItemStack dummyStack;
+
 	@SideOnly(Side.CLIENT)
 	private RenderItem renderItem;
 
@@ -32,6 +36,12 @@ public class ItemIcon extends Drawable {
 
 	@CallbackProperty
 	public int meta;
+
+	@CallbackProperty
+	public float damageBar;
+
+	@CallbackProperty
+	public String label;
 
 	ItemIcon() {}
 
@@ -54,7 +64,16 @@ public class ItemIcon extends Drawable {
 			GL11.glEnable(GL11.GL_DEPTH_TEST);
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glScalef(scale, scale, scale);
-			getRenderItem().renderItemAndEffectIntoGUI(null, Minecraft.getMinecraft().getTextureManager(), drawStack, 0, 0);
+			final RenderItem renderItem = getRenderItem();
+			final Minecraft minecraft = Minecraft.getMinecraft();
+			final TextureManager textureManager = minecraft.getTextureManager();
+
+			renderItem.renderItemAndEffectIntoGUI(minecraft.fontRenderer, textureManager, drawStack, 0, 0);
+
+			if (damageBar > 0 || !Strings.isNullOrEmpty(label)) {
+				renderItem.renderItemOverlayIntoGUI(minecraft.fontRenderer, textureManager, dummyStack, 0, 0, label);
+			}
+
 			Drawable.setupFlatRenderState();
 		}
 	}
@@ -81,7 +100,10 @@ public class ItemIcon extends Drawable {
 
 	@Override
 	protected void onUpdate() {
-		drawStack = findDrawStack(itemId, meta);
+		this.drawStack = findDrawStack(itemId, meta);
+
+		int damage = (int)(damageBar * Items.diamond_hoe.getMaxDamage());
+		this.dummyStack = new ItemStack(Items.diamond_hoe, 1, damage);
 	}
 
 	private static ItemStack findDrawStack(String itemId, int meta) {
