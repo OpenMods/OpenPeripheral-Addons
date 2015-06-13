@@ -18,11 +18,13 @@ import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
 import openperipheral.addons.glasses.GlassesEvent.GlassesClientEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibility;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeat;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
+import openperipheral.addons.utils.GuiUtils.GuiElements;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.Doc;
@@ -98,6 +100,12 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		public void setKeyRepeat(@Arg(name = "isEnabled") boolean keyRepeat) {
 			EntityPlayer player = getPlayer();
 			new GlassesSetKeyRepeat(guid, keyRepeat).sendToPlayer(player);
+		}
+
+		@ScriptCallable(description = "Sets visiblity state of various vanilla GUI elements")
+		public void toggleGuiElements(@Arg(name = "visibility") Map<GuiElements, Boolean> visiblity) {
+			EntityPlayer player = getPlayer();
+			new GlassesSetGuiVisibility(guid, visiblity).sendToPlayer(player);
 		}
 	}
 

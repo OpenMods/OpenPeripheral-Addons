@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibility;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeat;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
@@ -66,8 +67,21 @@ public class TerminalManagerClient {
 	public class ForgeBusListener {
 
 		@SubscribeEvent
-		public void onRenderGameOverlay(RenderGameOverlayEvent evt) {
-			if (evt.type == ElementType.HELMET && evt instanceof RenderGameOverlayEvent.Post) {
+		public void onRenderGameOverlay(RenderGameOverlayEvent.Pre evt) {
+			if (evt.type == ElementType.ALL) {
+				GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
+
+				if (gui instanceof GuiCapture) {
+					final GuiCapture capture = (GuiCapture)gui;
+					// this must be here, since there are some elements (like food bar) that are overriden every tick
+					capture.forceGuiElementsState();
+				}
+			}
+		}
+
+		@SubscribeEvent
+		public void onRenderGameOverlay(RenderGameOverlayEvent.Post evt) {
+			if (evt.type == ElementType.HELMET) {
 				EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 				Long guid = TerminalUtils.tryGetTerminalGuid(player);
 				if (guid != null) {
@@ -115,6 +129,17 @@ public class TerminalManagerClient {
 				final GuiCapture capture = (GuiCapture)gui;
 				long guid = capture.getGuid();
 				if (guid == evt.guid) capture.setKeyRepeat(evt.repeat);
+			}
+		}
+
+		@SubscribeEvent
+		public void onGuiVisibilitySet(GlassesSetGuiVisibility evt) {
+			GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
+
+			if (gui instanceof GuiCapture) {
+				final GuiCapture capture = (GuiCapture)gui;
+				long guid = capture.getGuid();
+				if (guid == evt.guid) capture.updateGuiElementsState(evt.visibility);
 			}
 		}
 

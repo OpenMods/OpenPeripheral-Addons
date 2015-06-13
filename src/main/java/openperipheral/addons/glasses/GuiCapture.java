@@ -1,5 +1,7 @@
 package openperipheral.addons.glasses;
 
+import java.util.Map;
+
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import openmods.network.event.NetworkEvent;
@@ -11,17 +13,27 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesMouseButtonEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesMouseWheelEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSignalCaptureEvent;
 import openperipheral.addons.glasses.TerminalManagerClient.DrawableHitInfo;
+import openperipheral.addons.utils.GuiUtils;
+import openperipheral.addons.utils.GuiUtils.GuiElements;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+
+import com.google.common.collect.Maps;
 
 public class GuiCapture extends GuiScreen {
 
 	private int backgroundColor = 0x2A00FF00;
 	private final long guid;
 
+	private final Map<GuiElements, Boolean> originalState;
+
+	private final Map<GuiElements, Boolean> updatedState;
+
 	public GuiCapture(long guid) {
 		this.guid = guid;
+		this.originalState = GuiUtils.storeGuiElementsState();
+		this.updatedState = Maps.newEnumMap(GuiElements.class);
 	}
 
 	@Override
@@ -94,6 +106,7 @@ public class GuiCapture extends GuiScreen {
 	public void onGuiClosed() {
 		new GlassesSignalCaptureEvent(guid, false).sendToServer();
 		Keyboard.enableRepeatEvents(false);
+		GuiUtils.loadGuiElementsState(originalState);
 	}
 
 	@Override
@@ -111,5 +124,13 @@ public class GuiCapture extends GuiScreen {
 
 	public void setKeyRepeat(boolean repeat) {
 		Keyboard.enableRepeatEvents(repeat);
+	}
+
+	public void updateGuiElementsState(Map<GuiElements, Boolean> visibility) {
+		updatedState.putAll(visibility);
+	}
+
+	public void forceGuiElementsState() {
+		GuiUtils.loadGuiElementsState(updatedState);
 	}
 }

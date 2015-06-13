@@ -1,9 +1,12 @@
 package openperipheral.addons.glasses;
 
+import java.util.Map;
+
 import openmods.network.event.EventDirection;
 import openmods.network.event.NetworkEventMeta;
 import openmods.network.event.SerializableNetworkEvent;
 import openmods.serializable.cls.Serialize;
+import openperipheral.addons.utils.GuiUtils.GuiElements;
 
 public class GlassesEvent extends SerializableNetworkEvent {
 
@@ -251,6 +254,17 @@ public class GlassesEvent extends SerializableNetworkEvent {
 			super(guid);
 			this.repeat = repeat;
 		}
+	}
 
+	@NetworkEventMeta(direction = EventDirection.S2C)
+	public static class GlassesSetGuiVisibility extends GlassesEvent {
+
+		@Serialize
+		public Map<GuiElements, Boolean> visibility;
+
+		public GlassesSetGuiVisibility(long guid, Map<GuiElements, Boolean> visibility) {
+			super(guid);
+			this.visibility = visibility;
+		}
 	}
 }
