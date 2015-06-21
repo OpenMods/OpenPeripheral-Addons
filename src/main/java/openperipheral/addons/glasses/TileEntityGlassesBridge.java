@@ -14,6 +14,7 @@ import openmods.api.IPlaceAwareTile;
 import openmods.include.IncludeInterface;
 import openmods.include.IncludeOverride;
 import openmods.network.event.NetworkEventManager;
+import openmods.network.senders.ITargetedPacketSender;
 import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
@@ -62,7 +63,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		public PlayerInfo(EntityPlayerMP player) {
 			this.player = new WeakReference<EntityPlayerMP>(player);
 			this.profile = player.getGameProfile();
-			this.surface = new SurfaceServer();
+			this.surface = new SurfaceServer(true);
 		}
 	}
 
@@ -118,7 +119,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	private long guid;
 
 	@IncludeInterface(IDrawableContainer.class)
-	private SurfaceServer globalSurface = new SurfaceServer();
+	private SurfaceServer globalSurface = new SurfaceServer(false);
 
 	public TileEntityGlassesBridge() {}
 
@@ -147,14 +148,14 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		}
 	}
 
-	private static TerminalDataEvent createFullDataEvent(SurfaceServer surface, long terminalId, boolean isPrivate) {
-		TerminalDataEvent result = new TerminalDataEvent(terminalId, isPrivate);
+	private TerminalDataEvent createFullDataEvent(SurfaceServer surface) {
+		TerminalDataEvent result = new TerminalDataEvent(guid, surface.isPrivate);
 		surface.appendFullCommands(result.commands);
 		return result;
 	}
 
-	private static TerminalDataEvent createUpdateDataEvent(SurfaceServer surface, long terminalId, boolean isPrivate) {
-		TerminalDataEvent result = new TerminalDataEvent(terminalId, isPrivate);
+	private TerminalDataEvent createUpdateDataEvent(SurfaceServer surface) {
+		TerminalDataEvent result = new TerminalDataEvent(guid, surface.isPrivate);
 		surface.appendUpdateCommands(result.commands);
 		return result;
 	}
@@ -304,20 +305,26 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		synchronized (globalSurface) {
 			final boolean globalChanged = globalSurface.hasUpdates();
 
-			// need to call it anyway, to clear changes
-			TerminalDataEvent globalDelta = globalChanged? createUpdateDataEvent(globalSurface, guid, false) : null;
+			if (globalChanged || lastSyncPackets == null) {
+				final TerminalDataEvent globalFullData = createFullDataEvent(globalSurface);
+				lastSyncPackets = globalFullData.serialize();
+			}
+
+			List<Object> globalUpdatePackets = null;
+
+			if (globalChanged) {
+				final TerminalDataEvent globalDelta = createUpdateDataEvent(globalSurface);
+				globalUpdatePackets = globalDelta.serialize();
+			}
+
+			final ITargetedPacketSender<EntityPlayer> playerSender = NetworkEventManager.INSTANCE.dispatcher().senders.player;
 
 			for (PlayerInfo info : knownPlayersByUUID.values()) {
 				final EntityPlayerMP player = info.player.get();
 				if (isPlayerValid(player)) {
-					if (globalDelta != null) globalDelta.sendToPlayer(player);
+					if (globalUpdatePackets != null) playerSender.sendMessages(globalUpdatePackets, player);
 					sendPrivateUpdateToPlayer(player, info);
 				}
-			}
-
-			if (globalChanged) {
-				TerminalDataEvent globalFullData = createFullDataEvent(globalSurface, guid, false);
-				lastSyncPackets = globalFullData.serialize();
 			}
 		}
 	}
@@ -328,7 +335,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		if (privateSurface != null) {
 			synchronized (privateSurface) {
 				if (privateSurface.hasUpdates()) {
-					TerminalDataEvent privateData = createUpdateDataEvent(privateSurface, guid, true);
+					final TerminalDataEvent privateData = createUpdateDataEvent(privateSurface);
 					privateData.sendToPlayer(player);
 				}
 			}
@@ -340,7 +347,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		PlayerInfo info = knownPlayersByUUID.get(playerUuid);
 
 		if (info != null) {
-			TerminalDataEvent privateData = createFullDataEvent(info.surface, guid, true);
+			TerminalDataEvent privateData = createFullDataEvent(info.surface);
 			privateData.sendToPlayer(player);
 		}
 	}
