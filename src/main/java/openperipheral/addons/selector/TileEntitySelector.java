@@ -24,6 +24,7 @@ import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.*;
 import openperipheral.api.architecture.IArchitectureAccess;
 import openperipheral.api.architecture.IAttachable;
+import openperipheral.api.helpers.Index;
 import openperipheral.api.peripheral.PeripheralTypeId;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -194,9 +195,9 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	}
 
 	@ScriptCallable(description = "Set the items being displayed in all slots")
-	public void setSlots(@Arg(name = "items", description = "A table containing itemstacks", type = ArgType.TABLE) Map<Integer, ItemStack> stacks) {
+	public void setSlots(@Arg(name = "items", description = "A table containing itemstacks") Map<Index, ItemStack> stacks) {
 		for (int slot = 0; slot < 9; slot++) {
-			final ItemStack value = stacks.get(slot + 1);
+			final ItemStack value = stacks.get(new Index(slot));
 			if (value != null) value.stackSize = 1;
 
 			this.slots[slot].set(value);
@@ -208,7 +209,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	@ScriptCallable(description = "Set the item being displayed on a specific slot")
 	public void setSlot(
 			@Arg(name = "slot", description = "The slot you want to modify") int slot,
-			@Optionals @Arg(name = "item", description = "The item you want to display. nil to set empty.", type = ArgType.TABLE) ItemStack stack) {
+			@Optionals @Arg(name = "item", description = "The item you want to display. nil to set empty") ItemStack stack) {
 
 		Preconditions.checkArgument(slot >= 1 && slot <= 9, "slot must be between 1 and 9");
 		slot -= 1;
