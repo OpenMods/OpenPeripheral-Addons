@@ -5,9 +5,10 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import openmods.structured.StructureField;
 import openperipheral.addons.glasses.GlassesRenderingUtils;
 import openperipheral.api.adapter.AdapterSourceName;
-import openperipheral.api.adapter.CallbackProperty;
+import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
 
 import org.lwjgl.opengl.GL11;
@@ -19,16 +20,20 @@ import cpw.mods.fml.relauncher.SideOnly;
 @ScriptObject
 @AdapterSourceName("glasses_liquid")
 public class LiquidIcon extends Drawable {
-	@CallbackProperty
+	@Property
+	@StructureField
 	public short width;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public short height;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public String fluid;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public float alpha = 1;
 
 	private IIcon fluidIcon;

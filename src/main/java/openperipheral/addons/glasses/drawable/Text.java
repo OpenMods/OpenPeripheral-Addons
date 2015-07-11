@@ -1,8 +1,9 @@
 package openperipheral.addons.glasses.drawable;
 
 import net.minecraft.client.gui.FontRenderer;
+import openmods.structured.StructureField;
 import openperipheral.api.adapter.AdapterSourceName;
-import openperipheral.api.adapter.CallbackProperty;
+import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
 
 import org.lwjgl.opengl.GL11;
@@ -16,16 +17,20 @@ import cpw.mods.fml.relauncher.SideOnly;
 @ScriptObject
 @AdapterSourceName("glasses_text")
 public class Text extends Drawable {
-	@CallbackProperty
+	@Property
+	@StructureField
 	public String text;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public int color;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public float alpha = 1;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public float scale = 1;
 
 	private int width;

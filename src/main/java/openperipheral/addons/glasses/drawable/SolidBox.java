@@ -1,7 +1,8 @@
 package openperipheral.addons.glasses.drawable;
 
+import openmods.structured.StructureField;
 import openperipheral.api.adapter.AdapterSourceName;
-import openperipheral.api.adapter.CallbackProperty;
+import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
 
 import org.lwjgl.opengl.GL11;
@@ -12,16 +13,20 @@ import cpw.mods.fml.relauncher.SideOnly;
 @ScriptObject
 @AdapterSourceName("glasses_box")
 public class SolidBox extends Drawable {
-	@CallbackProperty
+	@Property
+	@StructureField
 	public short width;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public short height;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public int color;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public float opacity;
 
 	SolidBox() {}

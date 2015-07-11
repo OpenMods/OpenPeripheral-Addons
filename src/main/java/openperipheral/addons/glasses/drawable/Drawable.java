@@ -5,28 +5,28 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 
 import net.minecraft.client.gui.ScaledResolution;
-import openmods.structured.ElementField;
-import openmods.structured.IStructureContainer;
+import openmods.structured.FieldContainer;
 import openmods.structured.IStructureElement;
+import openmods.structured.StructureField;
 import openperipheral.addons.glasses.SurfaceServer;
-import openperipheral.api.adapter.*;
+import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.api.adapter.Asynchronous;
+import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.*;
+import openperipheral.api.property.ISinglePropertyListener;
 
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 @Asynchronous
 @AdapterSourceName("glasses_drawable")
-public abstract class Drawable implements IPropertyCallback, IStructureContainer<IStructureElement> {
+public abstract class Drawable extends FieldContainer implements ISinglePropertyListener {
 
 	enum Type {
 		GRADIENT {
@@ -178,28 +178,32 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 
 	private SurfaceServer owner;
 
-	private final Map<Field, ElementField> fields = Maps.newHashMap();
-
 	private final Alignment alignment = new Alignment();
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public short x;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public short y;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public short z;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public boolean visible = true;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public float rotation = 0;
 
 	@Property(type = ArgType.OBJECT,
 			getterDesc = "Get userdata",
-			setterDesc = "Set userdata (no restrictions, not sent to clients)")
+			setterDesc = "Set userdata (no restrictions, not sent to clients)",
+			nullable = true)
 	public Object userdata;
 
 	protected Drawable() {}
@@ -312,37 +316,22 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 	}
 
 	@Override
-	public void setField(Field field, Object value) {
+	public void onPropertySet(Field field, Object value) {
 		Preconditions.checkState(!deleted, "Object is already deleted");
 		Preconditions.checkState(owner != null, "Invalid side");
 
-		ElementField fieldWrapper = fields.get(field);
-		Preconditions.checkState(fieldWrapper != null, "LOGIC FAIL. BLAME MOD DEVS");
-		owner.markElementModified(fieldWrapper);
-		fieldWrapper.set(value);
+		final IStructureElement fieldWrapper = getElementForField(field);
+		if (fieldWrapper != null) owner.markElementModified(fieldWrapper);
 	}
 
 	@Override
-	public Object getField(Field field) {
+	public void onPropertyGet(Field field) {
 		Preconditions.checkState(!deleted, "Object is already deleted");
-
-		ElementField fieldWrapper = fields.get(field);
-		Preconditions.checkState(fieldWrapper != null, "LOGIC FAIL. BLAME MOD DEVS");
-		return fieldWrapper.get();
 	}
 
 	@Override
 	public List<IStructureElement> createElements() {
-		List<IStructureElement> result = Lists.newArrayList();
-		for (Field field : getClass().getFields()) {
-			field.setAccessible(true);
-			if (!field.isAnnotationPresent(CallbackProperty.class)) continue;
-
-			ElementField fieldWrapper = new ElementField(this, field);
-			result.add(fieldWrapper);
-			fields.put(field, fieldWrapper);
-		}
-
+		final List<IStructureElement> result = super.createElements();
 		result.add(alignment);
 		return result;
 	}
@@ -359,7 +348,7 @@ public abstract class Drawable implements IPropertyCallback, IStructureContainer
 	public void onElementAdded(IStructureElement element) {}
 
 	@Override
-	public void onElementUpdated(IStructureElement element) {
+	public final void onElementUpdated(IStructureElement element) {
 		onUpdate();
 	}
 

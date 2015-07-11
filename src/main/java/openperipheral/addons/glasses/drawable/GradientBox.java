@@ -1,7 +1,8 @@
 package openperipheral.addons.glasses.drawable;
 
+import openmods.structured.StructureField;
 import openperipheral.api.adapter.AdapterSourceName;
-import openperipheral.api.adapter.CallbackProperty;
+import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
 
 import org.lwjgl.opengl.GL11;
@@ -12,25 +13,32 @@ import cpw.mods.fml.relauncher.SideOnly;
 @ScriptObject
 @AdapterSourceName("glasses_gradient")
 public class GradientBox extends Drawable {
-	@CallbackProperty
+	@Property
+	@StructureField
 	public short width;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public short height;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public int color1;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public float opacity1;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public int color2;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public float opacity2;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public int gradient;
 
 	GradientBox() {}

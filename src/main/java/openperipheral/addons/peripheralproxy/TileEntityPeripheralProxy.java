@@ -11,13 +11,11 @@ import openmods.reflection.MethodAccess.Function0;
 import openmods.reflection.MethodAccess.Function5;
 import openmods.tileentity.OpenTileEntity;
 import openperipheral.api.architecture.cc.ICustomPeripheralProvider;
-import openperipheral.api.peripheral.Volatile;
 
 import com.google.common.base.Preconditions;
 
 import dan200.computercraft.api.peripheral.IPeripheral;
 
-@Volatile
 public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustomPeripheralProvider, INeighbourAwareTile {
 
 	private static class Access {

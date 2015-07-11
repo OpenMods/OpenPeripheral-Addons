@@ -6,8 +6,9 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import openmods.structured.StructureField;
 import openperipheral.api.adapter.AdapterSourceName;
-import openperipheral.api.adapter.CallbackProperty;
+import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
 
 import org.lwjgl.opengl.GL11;
@@ -28,19 +29,24 @@ public class ItemIcon extends Drawable {
 
 	private ItemStack drawStack;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public float scale = 1;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public String itemId;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public int meta;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public float damageBar;
 
-	@CallbackProperty
+	@Property
+	@StructureField
 	public String label;
 
 	ItemIcon() {}
