@@ -1,6 +1,8 @@
 package openperipheral.addons.glasses.drawable;
 
+import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
+import openperipheral.addons.glasses.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -13,6 +15,14 @@ import cpw.mods.fml.relauncher.SideOnly;
 @ScriptObject
 @AdapterSourceName("glasses_box")
 public class SolidBox extends Drawable {
+	@Property
+	@StructureField
+	public short x;
+
+	@Property
+	@StructureField
+	public short y;
+
 	@Property
 	@StructureField
 	public short width;
@@ -32,21 +42,24 @@ public class SolidBox extends Drawable {
 	SolidBox() {}
 
 	public SolidBox(short x, short y, short width, short height, int color, float opacity) {
-		super(x, y);
+		this.x = x;
+		this.y = y;
 		this.width = width;
 		this.height = height;
+
+		setBoundingBox(Box2d.fromOriginAndSize(x, y, width, height));
+
 		this.color = color;
 		this.opacity = opacity;
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	protected void drawContents(float partialTicks) {
-		final byte r = (byte)(color >> 16);
-		final byte g = (byte)(color >> 8);
-		final byte b = (byte)(color >> 0);
+	protected void drawContents(RenderState renderState, float partialTicks) {
+		renderState.setFlatShadeModel();
+		renderState.setupSolidRender();
+		renderState.setColor(color, opacity);
 
-		GL11.glColor4ub(r, g, b, (byte)(opacity * 255));
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2i(0, 0);
 		GL11.glVertex2i(0, height);
@@ -61,20 +74,12 @@ public class SolidBox extends Drawable {
 	}
 
 	@Override
-	public int getWidth() {
-		return width;
-	}
-
-	@Override
-	public int getHeight() {
-		return height;
-	}
-
-	@Override
 	public boolean isVisible() {
 		return opacity > 0;
 	}
 
 	@Override
-	protected void onUpdate() {}
+	protected void onUpdate() {
+		setBoundingBox(Box2d.fromOriginAndSize(x, y, width, height));
+	}
 }

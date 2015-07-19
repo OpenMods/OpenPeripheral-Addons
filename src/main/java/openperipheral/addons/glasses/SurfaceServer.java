@@ -52,14 +52,22 @@ public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElem
 		return drawable;
 	}
 
+	private static Integer defaultColor(Integer color) {
+		return Objects.firstNonNull(color, 0xFFFFFF);
+	}
+
+	private static Float defaultOpacity(Float opacity) {
+		return Objects.firstNonNull(opacity, 1.0f);
+	}
+
 	@Override
 	public synchronized Drawable addText(short x, short y, String text, Integer color) {
-		return addDrawable(new Text(x, y, text, Objects.firstNonNull(color, 0xFFFFFF)));
+		return addDrawable(new Text(x, y, text, defaultColor(color)));
 	}
 
 	@Override
 	public synchronized Drawable addBox(short x, short y, short width, short height, Integer color, Float opacity) {
-		return addDrawable(new SolidBox(x, y, width, height, Objects.firstNonNull(color, 0xFFFFFF), Objects.firstNonNull(opacity, 1.0f)));
+		return addDrawable(new SolidBox(x, y, width, height, defaultColor(color), defaultOpacity(opacity)));
 	}
 
 	@Override
@@ -75,6 +83,31 @@ public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElem
 	@Override
 	public synchronized Drawable addLiquid(short x, short y, short width, short height, String id) {
 		return addDrawable(new LiquidIcon(x, y, width, height, id));
+	}
+
+	@Override
+	public Drawable addTriangle(Point2d p1, Point2d p2, Point2d p3, Integer color, Float opacity) {
+		return addDrawable(new Triangle(p1, p2, p3, defaultColor(color), defaultOpacity(opacity)));
+	}
+
+	@Override
+	public Drawable addQuad(Point2d p1, Point2d p2, Point2d p3, Point2d p4, Integer color, Float opacity) {
+		return addDrawable(new Quad(p1, p2, p3, p4, defaultColor(color), defaultOpacity(opacity)));
+	}
+
+	@Override
+	public Drawable addLine(Point2d p1, Point2d p2, Integer color, Float opacity) {
+		return addDrawable(new Line(p1, p2, defaultColor(color), defaultOpacity(opacity)));
+	}
+
+	@Override
+	public Drawable addLineList(Integer color, Float opacity, Point2d... points) {
+		return addDrawable(new LineStrip(defaultColor(color), defaultOpacity(opacity), points));
+	}
+
+	@Override
+	public Drawable addPoint(Point2d p, Integer color, Float opacity) {
+		return addDrawable(new Point(p, defaultColor(color), defaultOpacity(opacity)));
 	}
 
 }

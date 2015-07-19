@@ -7,14 +7,17 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 import net.minecraft.client.gui.ScaledResolution;
+import openmods.geometry.Box2d;
 import openmods.structured.FieldContainer;
 import openmods.structured.IStructureElement;
 import openmods.structured.StructureField;
+import openperipheral.addons.glasses.RenderState;
 import openperipheral.addons.glasses.SurfaceServer;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.*;
+import openperipheral.api.property.IIndexedPropertyListener;
 import openperipheral.api.property.ISinglePropertyListener;
 
 import org.lwjgl.opengl.GL11;
@@ -26,7 +29,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 @Asynchronous
 @AdapterSourceName("glasses_drawable")
-public abstract class Drawable extends FieldContainer implements ISinglePropertyListener {
+public abstract class Drawable extends FieldContainer implements ISinglePropertyListener, IIndexedPropertyListener {
 
 	enum Type {
 		GRADIENT {
@@ -57,6 +60,36 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 			@Override
 			public Drawable create() {
 				return new ItemIcon();
+			}
+		},
+		POINT {
+			@Override
+			public Drawable create() {
+				return new Point();
+			}
+		},
+		LINE {
+			@Override
+			public Drawable create() {
+				return new Line();
+			}
+		},
+		LINE_STRIP {
+			@Override
+			public Drawable create() {
+				return new LineStrip();
+			}
+		},
+		TRIANGLE {
+			@Override
+			public Drawable create() {
+				return new Triangle();
+			}
+		},
+		QUAD {
+			@Override
+			public Drawable create() {
+				return new Quad();
 			}
 		};
 
@@ -121,7 +154,7 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 			this.id = id;
 		}
 
-		public float getScreenAnchorX(ScaledResolution resolution, Drawable drawable) {
+		public float getScreenAnchorX(ScaledResolution resolution) {
 			switch (screenHorizontalAnchor) {
 				case MIDDLE:
 					return resolution.getScaledWidth() / 2.0f;
@@ -134,20 +167,20 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 			}
 		}
 
-		public float getObjectAnchorX(Drawable drawable) {
+		public float getObjectAnchorX(Box2d box) {
 			switch (objectHorizontalAnchor) {
 				case MIDDLE:
-					return -drawable.getWidth() / 2.0f;
+					return box.left - box.width / 2.0f;
 				case RIGHT:
-					return -drawable.getWidth();
+					return box.left - box.width;
 				case LEFT:
 				default:
-					return 0;
+					return box.left;
 
 			}
 		}
 
-		public float getScreenAnchorY(ScaledResolution resolution, Drawable drawable) {
+		public float getScreenAnchorY(ScaledResolution resolution) {
 			switch (screenVerticalAnchor) {
 				case BOTTOM:
 					return resolution.getScaledHeight();
@@ -159,18 +192,20 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 			}
 		}
 
-		public float getObjectAnchorY(Drawable drawable) {
+		public float getObjectAnchorY(Box2d box) {
 			switch (objectVerticalAnchor) {
 				case BOTTOM:
-					return -drawable.getHeight();
+					return box.top - box.height;
 				case MIDDLE:
-					return -drawable.getHeight() / 2.0f;
+					return box.top - box.height / 2.0f;
 				default:
 				case TOP:
-					return 0;
+					return box.top;
 			}
 		}
 	}
+
+	private Box2d boundingBox = Box2d.NULL;
 
 	private boolean deleted;
 
@@ -179,14 +214,6 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 	private SurfaceServer owner;
 
 	private final Alignment alignment = new Alignment();
-
-	@Property
-	@StructureField
-	public short x;
-
-	@Property
-	@StructureField
-	public short y;
 
 	@Property
 	@StructureField
@@ -208,28 +235,23 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 
 	protected Drawable() {}
 
-	protected Drawable(short x, short y) {
-		this.x = x;
-		this.y = y;
-	}
-
 	@SideOnly(Side.CLIENT)
 	public double getX(ScaledResolution resolution) {
-		return alignment.getScreenAnchorX(resolution, this) + alignment.getObjectAnchorX(this) + x;
+		return alignment.getScreenAnchorX(resolution) + alignment.getObjectAnchorX(boundingBox);
 	}
 
 	@SideOnly(Side.CLIENT)
 	public double getY(ScaledResolution resolution) {
-		return alignment.getScreenAnchorY(resolution, this) + alignment.getObjectAnchorY(this) + y;
+		return alignment.getScreenAnchorY(resolution) + alignment.getObjectAnchorY(boundingBox);
 	}
 
 	@SideOnly(Side.CLIENT)
-	public void draw(ScaledResolution resolution, float partialTicks) {
-		final float globalX = alignment.getScreenAnchorX(resolution, this) + x;
-		final float globalY = alignment.getScreenAnchorY(resolution, this) + y;
+	public void draw(ScaledResolution resolution, RenderState renderState, float partialTicks) {
+		final float globalX = alignment.getScreenAnchorX(resolution);
+		final float globalY = alignment.getScreenAnchorY(resolution);
 
-		final float localX = alignment.getObjectAnchorX(this);
-		final float localY = alignment.getObjectAnchorY(this);
+		final float localX = alignment.getObjectAnchorX(boundingBox);
+		final float localY = alignment.getObjectAnchorY(boundingBox);
 
 		GL11.glPushMatrix();
 		if (rotation != 0) {
@@ -240,18 +262,19 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 			GL11.glTranslatef(globalX + localX, globalY + localY, z);
 		}
 
-		drawContents(partialTicks);
+		drawContents(renderState, partialTicks);
 		GL11.glPopMatrix();
 	}
 
+	protected void setBoundingBox(Box2d boundingBox) {
+		Preconditions.checkNotNull(boundingBox);
+		this.boundingBox = boundingBox;
+	}
+
 	@SideOnly(Side.CLIENT)
-	protected abstract void drawContents(float partialTicks);
+	protected abstract void drawContents(RenderState renderState, float partialTicks);
 
 	protected abstract Type getTypeEnum();
-
-	public abstract int getWidth();
-
-	public abstract int getHeight();
 
 	protected abstract boolean isVisible();
 
@@ -278,7 +301,7 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 
 	@ScriptCallable
 	public void delete() {
-		Preconditions.checkState(!deleted, "Object is already deleted");
+		handleFieldGet();
 		Preconditions.checkState(owner != null, "Invalid side");
 		owner.removeContainer(containerId);
 		deleted = true;
@@ -286,7 +309,7 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 
 	@ScriptCallable(returnTypes = ReturnType.NUMBER, name = "getId")
 	public int getId() {
-		Preconditions.checkState(!deleted, "Object is already deleted");
+		handleFieldGet();
 		return containerId + 1;
 	}
 
@@ -315,8 +338,7 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 		owner.markElementModified(alignment);
 	}
 
-	@Override
-	public void onPropertySet(Field field, Object value) {
+	private void handleFieldSet(Field field) {
 		Preconditions.checkState(!deleted, "Object is already deleted");
 		Preconditions.checkState(owner != null, "Invalid side");
 
@@ -324,9 +346,28 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 		if (fieldWrapper != null) owner.markElementModified(fieldWrapper);
 	}
 
+	private void handleFieldGet() {
+		Preconditions.checkState(!deleted, "Object is already deleted");
+	}
+
+	@Override
+	public void onPropertySet(Field field, Object value) {
+		handleFieldSet(field);
+	}
+
+	@Override
+	public void onPropertySet(Field field, Object key, Object value) {
+		handleFieldSet(field);
+	}
+
 	@Override
 	public void onPropertyGet(Field field) {
-		Preconditions.checkState(!deleted, "Object is already deleted");
+		handleFieldGet();
+	}
+
+	@Override
+	public void onPropertyGet(Field field, Object key) {
+		handleFieldGet();
 	}
 
 	@Override
@@ -344,6 +385,10 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 		this.owner = owner;
 	}
 
+	public Box2d getBoundingBox() {
+		return boundingBox;
+	}
+
 	@Override
 	public void onElementAdded(IStructureElement element) {}
 
@@ -359,13 +404,4 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 		this.owner = owner;
 	}
 
-	public static void setupFlatRenderState() {
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-	}
 }

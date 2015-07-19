@@ -1,7 +1,9 @@
 package openperipheral.addons.glasses.drawable;
 
 import net.minecraft.client.gui.FontRenderer;
+import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
+import openperipheral.addons.glasses.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -19,6 +21,14 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class Text extends Drawable {
 	@Property
 	@StructureField
+	public short x;
+
+	@Property
+	@StructureField
+	public short y;
+
+	@Property
+	@StructureField
 	public String text;
 
 	@Property
@@ -33,41 +43,30 @@ public class Text extends Drawable {
 	@StructureField
 	public float scale = 1;
 
-	private int width;
-
-	private int height;
-
 	Text() {}
 
 	public Text(short x, short y, String text, int color) {
-		super(x, y);
+		this.x = x;
+		this.y = y;
 		this.text = text;
 		this.color = color;
+
+		updateBoundingBox();
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	protected void drawContents(float partialTicks) {
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+	protected void drawContents(RenderState renderState, float partialTicks) {
+		renderState.enableTexture();
+		renderState.setColor(color, alpha);
 		FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 		GL11.glScalef(scale, scale, scale);
 		fontRenderer.drawString(text, 0, 0, ((int)(alpha * 255) << 24 | color));
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
 	}
 
 	@Override
 	public Type getTypeEnum() {
 		return Type.TEXT;
-	}
-
-	@Override
-	public int getWidth() {
-		return width;
-	}
-
-	@Override
-	public int getHeight() {
-		return height;
 	}
 
 	@Override
@@ -77,13 +76,20 @@ public class Text extends Drawable {
 
 	@Override
 	protected void onUpdate() {
-		height = Math.round(8 * scale);
+		updateBoundingBox();
+	}
 
+	private void updateBoundingBox() {
+		final int height = Math.round(8 * scale);
+
+		final int width;
 		if (Strings.isNullOrEmpty(text)) {
 			width = 0;
 		} else {
 			FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 			width = Math.round(fontRenderer.getStringWidth(text) * scale);
 		}
+
+		setBoundingBox(Box2d.fromOriginAndSize(x, y, width, height));
 	}
 }

@@ -6,6 +6,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import openmods.geometry.Box2d;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibility;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeat;
@@ -53,9 +54,13 @@ public class TerminalManagerClient {
 		SurfaceClient surface = surfaces.get(guid, player);
 		if (surface != null) {
 			GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_ENABLE_BIT);
-			Drawable.setupFlatRenderState();
+			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+			final RenderState renderState = new RenderState();
+			renderState.forceKnownState();
+
 			for (Drawable drawable : surface.getSortedDrawables())
-				if (drawable.shouldRender()) drawable.draw(resolution, partialTicks);
+				if (drawable.shouldRender()) drawable.draw(resolution, renderState, partialTicks);
 			GL11.glPopAttrib();
 		}
 	}
@@ -191,7 +196,8 @@ public class TerminalManagerClient {
 			final float dx = x - scaledX;
 			final float dy = y - scaledY;
 
-			if (0 <= dx && 0 <= dy && dx < d.getWidth() && dy < d.getHeight()) { return new DrawableHitInfo(d.getId(), isPrivate, dx, dy, d.z); }
+			final Box2d bb = d.getBoundingBox();
+			if (0 <= dx && 0 <= dy && dx < bb.width && dy < bb.height) { return new DrawableHitInfo(d.getId(), isPrivate, dx, dy, d.z); }
 		}
 
 		return null;

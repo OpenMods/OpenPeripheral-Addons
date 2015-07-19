@@ -75,4 +75,37 @@ public interface IDrawableContainer {
 			@Arg(name = "height", description = "The height of the liquid box") short height,
 			@Arg(name = "liquid", description = "The name of the fluid to render") String id
 			);
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a triangle")
+	public Drawable addTriangle(@Arg(name = "p1", description = "Coordinates of first point") Point2d p1,
+			@Arg(name = "p2", description = "Coordinates of second point") Point2d p2,
+			@Arg(name = "p3", description = "Coordinates of third point") Point2d p3,
+			@Optionals @Arg(name = "color", description = "The color of the line") Integer color,
+			@Arg(name = "opacity", description = "The opacity of the line (from 0 to 1)") Float opacity);
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a quad")
+	public Drawable addQuad(
+			@Arg(name = "p1", description = "Coordinates of first point") Point2d p1,
+			@Arg(name = "p2", description = "Coordinates of second point") Point2d p2,
+			@Arg(name = "p3", description = "Coordinates of third point") Point2d p3,
+			@Arg(name = "p4", description = "Coordinates of fourth point") Point2d p4,
+			@Optionals @Arg(name = "color", description = "The color of the line") Integer color,
+			@Arg(name = "opacity", description = "The opacity of the line (from 0 to 1)") Float opacity);
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a line")
+	public Drawable addLine(@Arg(name = "p1", description = "Coordinates of first point") Point2d p1,
+			@Arg(name = "p2", description = "Coordinate of second point") Point2d p2,
+			@Optionals @Arg(name = "color", description = "The color of the line") Integer color,
+			@Arg(name = "opacity", description = "The opacity of the line (from 0 to 1)") Float opacity);
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a line")
+	public Drawable addLineList(
+			@Optionals @Arg(name = "color", description = "The color of the line") Integer color,
+			@Arg(name = "opacity", description = "The opacity of the line (from 0 to 1)") Float opacity,
+			@Arg(name = "points", description = "Coordinates of points") Point2d... points);
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a point")
+	public Drawable addPoint(@Arg(name = "coord", description = "Coordinates of point") Point2d p,
+			@Optionals @Arg(name = "color", description = "The color of the point") Integer color,
+			@Arg(name = "opacity", description = "The opacity of the point (from 0 to 1)") Float opacity);
 }

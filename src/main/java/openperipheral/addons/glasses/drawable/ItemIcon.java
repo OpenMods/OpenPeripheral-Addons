@@ -6,7 +6,9 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
+import openperipheral.addons.glasses.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -22,7 +24,19 @@ import cpw.mods.fml.relauncher.SideOnly;
 @ScriptObject
 @AdapterSourceName("glasses_icon")
 public class ItemIcon extends Drawable {
+	private static final int BASE_HEIGHT = 16;
+
+	private static final int BASE_WIDTH = 16;
+
 	private ItemStack dummyStack;
+
+	@Property
+	@StructureField
+	public short x;
+
+	@Property
+	@StructureField
+	public short y;
 
 	@SideOnly(Side.CLIENT)
 	private RenderItem renderItem;
@@ -52,9 +66,11 @@ public class ItemIcon extends Drawable {
 	ItemIcon() {}
 
 	public ItemIcon(short x, short y, String itemId, int meta) {
-		super(x, y);
+		this.x = x;
+		this.y = y;
 		this.itemId = itemId;
 		this.meta = meta;
+		setBoundingBox(Box2d.fromOriginAndSize(x, y, BASE_WIDTH, BASE_HEIGHT));
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -65,22 +81,22 @@ public class ItemIcon extends Drawable {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	protected void drawContents(float partialTicks) {
-		if (drawStack != null) {
-			GL11.glEnable(GL11.GL_DEPTH_TEST);
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			GL11.glScalef(scale, scale, scale);
-			final RenderItem renderItem = getRenderItem();
-			final Minecraft minecraft = Minecraft.getMinecraft();
-			final TextureManager textureManager = minecraft.getTextureManager();
+	protected void drawContents(RenderState renderState, float partialTicks) {
+		renderState.enableTexture();
+		renderState.enableDepthTest();
+		renderState.disableLight();
+		renderState.enableCullFace();
+		renderState.setColor(0xFFFFFF, 1.0f);
 
-			renderItem.renderItemAndEffectIntoGUI(minecraft.fontRenderer, textureManager, drawStack, 0, 0);
+		GL11.glScalef(scale, scale, scale);
+		final RenderItem renderItem = getRenderItem();
+		final Minecraft minecraft = Minecraft.getMinecraft();
+		final TextureManager textureManager = minecraft.getTextureManager();
 
-			if (damageBar > 0 || !Strings.isNullOrEmpty(label)) {
-				renderItem.renderItemOverlayIntoGUI(minecraft.fontRenderer, textureManager, dummyStack, 0, 0, label);
-			}
+		renderItem.renderItemAndEffectIntoGUI(minecraft.fontRenderer, textureManager, drawStack, 0, 0);
 
-			Drawable.setupFlatRenderState();
+		if (damageBar > 0 || !Strings.isNullOrEmpty(label)) {
+			renderItem.renderItemOverlayIntoGUI(minecraft.fontRenderer, textureManager, dummyStack, 0, 0, label);
 		}
 	}
 
@@ -90,18 +106,8 @@ public class ItemIcon extends Drawable {
 	}
 
 	@Override
-	public int getWidth() {
-		return Math.round(16 * scale);
-	}
-
-	@Override
-	public int getHeight() {
-		return Math.round(16 * scale);
-	}
-
-	@Override
 	public boolean isVisible() {
-		return true;
+		return drawStack != null;
 	}
 
 	@Override
@@ -110,6 +116,10 @@ public class ItemIcon extends Drawable {
 
 		int damage = (int)(damageBar * Items.diamond_hoe.getMaxDamage());
 		this.dummyStack = new ItemStack(Items.diamond_hoe, 1, damage);
+
+		final int width = Math.round(BASE_WIDTH * scale);
+		final int height = Math.round(BASE_HEIGHT * scale);
+		setBoundingBox(Box2d.fromOriginAndSize(x, y, width, height));
 	}
 
 	private static ItemStack findDrawStack(String itemId, int meta) {
