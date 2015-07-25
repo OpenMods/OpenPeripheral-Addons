@@ -36,8 +36,8 @@ public abstract class Line<P> extends BoundedShape<P> {
 			renderState.setLineWidth(width);
 
 			GL11.glBegin(GL11.GL_LINES);
-			pointList.drawPoint(0);
-			pointList.drawPoint(1);
+			pointList.drawPoint(renderState, 0);
+			pointList.drawPoint(renderState, 1);
 			GL11.glEnd();
 		}
 	}

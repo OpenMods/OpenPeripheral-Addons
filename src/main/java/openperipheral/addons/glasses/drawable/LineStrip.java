@@ -38,7 +38,7 @@ public abstract class LineStrip<P> extends BoundedShape<P> {
 			renderState.setLineWidth(width);
 
 			GL11.glBegin(GL11.GL_LINE_STRIP);
-			pointList.drawAllPoints();
+			pointList.drawAllPoints(renderState);
 			GL11.glEnd();
 		}
 	}

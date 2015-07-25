@@ -35,9 +35,9 @@ public abstract class Triangle<P> extends BoundedShape<P> {
 			super.drawContents(renderState, partialTicks);
 
 			GL11.glBegin(GL11.GL_TRIANGLES);
-			pointList.drawPoint(0);
-			pointList.drawPoint(1);
-			pointList.drawPoint(2);
+			pointList.drawPoint(renderState, 0);
+			pointList.drawPoint(renderState, 1);
+			pointList.drawPoint(renderState, 2);
 			GL11.glEnd();
 		}
 	}

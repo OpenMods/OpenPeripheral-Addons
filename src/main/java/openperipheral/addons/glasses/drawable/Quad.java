@@ -44,10 +44,10 @@ public abstract class Quad<P> extends BoundedShape<P> {
 			super.drawContents(renderState, partialTicks);
 
 			GL11.glBegin(GL11.GL_QUADS);
-			pointList.drawPoint(0);
-			pointList.drawPoint(1);
-			pointList.drawPoint(2);
-			pointList.drawPoint(3);
+			pointList.drawPoint(renderState, 0);
+			pointList.drawPoint(renderState, 1);
+			pointList.drawPoint(renderState, 2);
+			pointList.drawPoint(renderState, 3);
 			GL11.glEnd();
 		}
 	}

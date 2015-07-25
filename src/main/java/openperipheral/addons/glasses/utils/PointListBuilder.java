@@ -18,7 +18,7 @@ public class PointListBuilder implements IPointListBuilder<Point2d> {
 		}
 
 		@Override
-		protected void drawPoint(Point2d p) {
+		protected void drawPoint(RenderState renderState, Point2d p) {
 			GL11.glVertex2i(p.x, p.y);
 		}
 
