@@ -128,6 +128,16 @@ public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElem
 	}
 
 	@Override
+	public Drawable addPolygon(Integer color, Float opacity, Point2d... points) {
+		return addDrawable(new SolidPolygon(defaultColor(color), defaultOpacity(opacity), points));
+	}
+
+	@Override
+	public Drawable addGradientPolygon(ColorPoint2d... points) {
+		return addDrawable(new GradientPolygon(points));
+	}
+
+	@Override
 	public Drawable addPoint(Point2d p, Integer color, Float opacity) {
 		return addDrawable(new Point(p, defaultColor(color), defaultOpacity(opacity)));
 	}

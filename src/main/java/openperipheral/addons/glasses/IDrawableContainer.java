@@ -130,6 +130,16 @@ public interface IDrawableContainer {
 	public Drawable addGradientLineList(
 			@Arg(name = "points", description = "Coordinates of points") ColorPoint2d... points);
 
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a concave polygon")
+	public Drawable addPolygon(
+			@Optionals @Arg(name = "color", description = "The color of the line") Integer color,
+			@Arg(name = "opacity", description = "The opacity of the line (from 0 to 1)") Float opacity,
+			@Arg(name = "points", description = "Coordinates of points") Point2d... points);
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a gradient concave polygon")
+	public Drawable addGradientPolygon(
+			@Arg(name = "points", description = "Coordinates of points") ColorPoint2d... points);
+
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a point")
 	public Drawable addPoint(
 			@Arg(name = "coord", description = "Coordinates of point") Point2d p,

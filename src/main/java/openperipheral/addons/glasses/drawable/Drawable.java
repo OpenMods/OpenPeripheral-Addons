@@ -115,6 +115,18 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 			public Drawable create() {
 				return new GradientQuad();
 			}
+		},
+		POLYGON {
+			@Override
+			public Drawable create() {
+				return new SolidPolygon();
+			}
+		},
+		GRADIENT_POLYGON {
+			@Override
+			public Drawable create() {
+				return new GradientPolygon();
+			}
 		};
 
 		public abstract Drawable create();
