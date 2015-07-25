@@ -1,10 +1,8 @@
 package openperipheral.addons.glasses.drawable;
 
-import java.util.List;
-
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.Point2d;
-import openperipheral.addons.glasses.RenderState;
+import openperipheral.addons.glasses.utils.IPointListBuilder;
+import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -13,28 +11,25 @@ import org.lwjgl.opengl.GL11;
 
 @ScriptObject
 @AdapterSourceName("glasses_quad")
-public class Quad extends SolidShape {
+public abstract class Quad<P> extends BoundedShape<P> {
 
 	@Property
 	@StructureField
-	public Point2d p1 = Point2d.NULL;
+	public P p1;
 
 	@Property
 	@StructureField
-	public Point2d p2 = Point2d.NULL;
+	public P p2;
 
 	@Property
 	@StructureField
-	public Point2d p3 = Point2d.NULL;
+	public P p3;
 
 	@Property
 	@StructureField
-	public Point2d p4 = Point2d.NULL;
+	public P p4;
 
-	Quad() {}
-
-	public Quad(Point2d p1, Point2d p2, Point2d p3, Point2d p4, int color, float opacity) {
-		super(color, opacity);
+	public Quad(P p1, P p2, P p3, P p4) {
 		this.p1 = p1;
 		this.p2 = p2;
 		this.p3 = p3;
@@ -45,19 +40,16 @@ public class Quad extends SolidShape {
 
 	@Override
 	protected void drawContents(RenderState renderState, float partialTicks) {
-		super.drawContents(renderState, partialTicks);
+		if (pointList != null) {
+			super.drawContents(renderState, partialTicks);
 
-		GL11.glBegin(GL11.GL_QUADS);
-		drawPoint(0);
-		drawPoint(1);
-		drawPoint(2);
-		drawPoint(3);
-		GL11.glEnd();
-	}
-
-	@Override
-	protected Type getTypeEnum() {
-		return Type.QUAD;
+			GL11.glBegin(GL11.GL_QUADS);
+			pointList.drawPoint(0);
+			pointList.drawPoint(1);
+			pointList.drawPoint(2);
+			pointList.drawPoint(3);
+			GL11.glEnd();
+		}
 	}
 
 	@Override
@@ -66,7 +58,7 @@ public class Quad extends SolidShape {
 	}
 
 	@Override
-	protected void addPoints(List<Point2d> points) {
+	protected void addPoints(IPointListBuilder<P> points) {
 		points.add(p1);
 		points.add(p2);
 		points.add(p3);

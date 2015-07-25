@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.Set;
 
 import openperipheral.addons.glasses.drawable.Drawable;
+import openperipheral.addons.glasses.utils.ColorPoint2d;
+import openperipheral.addons.glasses.utils.Point2d;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.*;
@@ -77,11 +79,18 @@ public interface IDrawableContainer {
 			);
 
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a triangle")
-	public Drawable addTriangle(@Arg(name = "p1", description = "Coordinates of first point") Point2d p1,
+	public Drawable addTriangle(
+			@Arg(name = "p1", description = "Coordinates of first point") Point2d p1,
 			@Arg(name = "p2", description = "Coordinates of second point") Point2d p2,
 			@Arg(name = "p3", description = "Coordinates of third point") Point2d p3,
 			@Optionals @Arg(name = "color", description = "The color of the line") Integer color,
 			@Arg(name = "opacity", description = "The opacity of the line (from 0 to 1)") Float opacity);
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a triangle")
+	public Drawable addGradientTriangle(
+			@Arg(name = "p1", description = "Coordinates of first point") ColorPoint2d p1,
+			@Arg(name = "p2", description = "Coordinates of second point") ColorPoint2d p2,
+			@Arg(name = "p3", description = "Coordinates of third point") ColorPoint2d p3);
 
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a quad")
 	public Drawable addQuad(
@@ -92,20 +101,38 @@ public interface IDrawableContainer {
 			@Optionals @Arg(name = "color", description = "The color of the line") Integer color,
 			@Arg(name = "opacity", description = "The opacity of the line (from 0 to 1)") Float opacity);
 
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a gradient quad")
+	public Drawable addGradientQuad(
+			@Arg(name = "p1", description = "Coordinates of first point") ColorPoint2d p1,
+			@Arg(name = "p2", description = "Coordinates of second point") ColorPoint2d p2,
+			@Arg(name = "p3", description = "Coordinates of third point") ColorPoint2d p3,
+			@Arg(name = "p4", description = "Coordinates of fourth point") ColorPoint2d p4);
+
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a line")
-	public Drawable addLine(@Arg(name = "p1", description = "Coordinates of first point") Point2d p1,
+	public Drawable addLine(
+			@Arg(name = "p1", description = "Coordinates of first point") Point2d p1,
 			@Arg(name = "p2", description = "Coordinate of second point") Point2d p2,
 			@Optionals @Arg(name = "color", description = "The color of the line") Integer color,
 			@Arg(name = "opacity", description = "The opacity of the line (from 0 to 1)") Float opacity);
 
-	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a line")
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a gradient line")
+	public Drawable addGradientLine(
+			@Arg(name = "p1", description = "Coordinates of first point") ColorPoint2d p1,
+			@Arg(name = "p2", description = "Coordinate of second point") ColorPoint2d p2);
+
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a line strip")
 	public Drawable addLineList(
 			@Optionals @Arg(name = "color", description = "The color of the line") Integer color,
 			@Arg(name = "opacity", description = "The opacity of the line (from 0 to 1)") Float opacity,
 			@Arg(name = "points", description = "Coordinates of points") Point2d... points);
 
+	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a gradient line strip")
+	public Drawable addGradientLineList(
+			@Arg(name = "points", description = "Coordinates of points") ColorPoint2d... points);
+
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a point")
-	public Drawable addPoint(@Arg(name = "coord", description = "Coordinates of point") Point2d p,
+	public Drawable addPoint(
+			@Arg(name = "coord", description = "Coordinates of point") Point2d p,
 			@Optionals @Arg(name = "color", description = "The color of the point") Integer color,
 			@Arg(name = "opacity", description = "The opacity of the point (from 0 to 1)") Float opacity);
 }

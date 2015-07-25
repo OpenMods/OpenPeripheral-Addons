@@ -7,6 +7,8 @@ import java.util.Set;
 import openmods.structured.IStructureElement;
 import openmods.structured.StructuredDataMaster;
 import openperipheral.addons.glasses.drawable.*;
+import openperipheral.addons.glasses.utils.ColorPoint2d;
+import openperipheral.addons.glasses.utils.Point2d;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -87,22 +89,42 @@ public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElem
 
 	@Override
 	public Drawable addTriangle(Point2d p1, Point2d p2, Point2d p3, Integer color, Float opacity) {
-		return addDrawable(new Triangle(p1, p2, p3, defaultColor(color), defaultOpacity(opacity)));
+		return addDrawable(new SolidTriangle(p1, p2, p3, defaultColor(color), defaultOpacity(opacity)));
+	}
+
+	@Override
+	public Drawable addGradientTriangle(ColorPoint2d p1, ColorPoint2d p2, ColorPoint2d p3) {
+		return addDrawable(new GradientTriangle(p1, p2, p3));
 	}
 
 	@Override
 	public Drawable addQuad(Point2d p1, Point2d p2, Point2d p3, Point2d p4, Integer color, Float opacity) {
-		return addDrawable(new Quad(p1, p2, p3, p4, defaultColor(color), defaultOpacity(opacity)));
+		return addDrawable(new SolidQuad(p1, p2, p3, p4, defaultColor(color), defaultOpacity(opacity)));
+	}
+
+	@Override
+	public Drawable addGradientQuad(ColorPoint2d p1, ColorPoint2d p2, ColorPoint2d p3, ColorPoint2d p4) {
+		return addDrawable(new GradientQuad(p1, p2, p3, p4));
 	}
 
 	@Override
 	public Drawable addLine(Point2d p1, Point2d p2, Integer color, Float opacity) {
-		return addDrawable(new Line(p1, p2, defaultColor(color), defaultOpacity(opacity)));
+		return addDrawable(new SolidLine(p1, p2, defaultColor(color), defaultOpacity(opacity)));
+	}
+
+	@Override
+	public Drawable addGradientLine(ColorPoint2d p1, ColorPoint2d p2) {
+		return addDrawable(new GradientLine(p1, p2));
 	}
 
 	@Override
 	public Drawable addLineList(Integer color, Float opacity, Point2d... points) {
-		return addDrawable(new LineStrip(defaultColor(color), defaultOpacity(opacity), points));
+		return addDrawable(new SolidLineStrip(defaultColor(color), defaultOpacity(opacity), points));
+	}
+
+	@Override
+	public Drawable addGradientLineList(ColorPoint2d... points) {
+		return addDrawable(new GradientLineStrip(points));
 	}
 
 	@Override

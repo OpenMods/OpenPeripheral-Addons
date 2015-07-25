@@ -1,4 +1,4 @@
-package openperipheral.addons.glasses;
+package openperipheral.addons.glasses.utils;
 
 import openmods.serializable.cls.SerializableClass;
 import openmods.serializable.cls.Serialize;

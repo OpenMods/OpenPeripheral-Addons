@@ -1,4 +1,4 @@
-package openperipheral.addons.glasses;
+package openperipheral.addons.glasses.utils;
 
 import org.lwjgl.opengl.GL11;
 
@@ -18,16 +18,11 @@ public class RenderState {
 
 	private float lineWidth;
 
-	private int shadeModel;
-
 	private boolean cullFace;
 
 	private int color;
 
 	public void forceKnownState() {
-		GL11.glShadeModel(GL11.GL_FLAT);
-		this.shadeModel = GL11.GL_FLAT;
-
 		GL11.glDisable(GL11.GL_LIGHTING);
 		this.lighting = false;
 
@@ -62,13 +57,6 @@ public class RenderState {
 		disableCullFace();
 	}
 
-	private void setShadeModel(int newShadeModel) {
-		if (shadeModel != newShadeModel) {
-			shadeModel = newShadeModel;
-			GL11.glShadeModel(shadeModel);
-		}
-	}
-
 	public void setColor(int rgb, float opacity) {
 		final byte scaledOpacity = (byte)(opacity * 255);
 		int newColor = rgb << 8 | (scaledOpacity & 0xFF);
@@ -81,14 +69,6 @@ public class RenderState {
 			GL11.glColor4ub(r, g, b, scaledOpacity);
 			this.color = newColor;
 		}
-	}
-
-	public void setFlatShadeModel() {
-		setShadeModel(GL11.GL_FLAT);
-	}
-
-	public void setSmoothShadeModel() {
-		setShadeModel(GL11.GL_SMOOTH);
 	}
 
 	public void setLineWidth(float lineWidth) {

@@ -1,19 +1,13 @@
 package openperipheral.addons.glasses.drawable;
 
-import java.util.List;
-
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.Point2d;
-import openperipheral.addons.glasses.RenderState;
-import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.addons.glasses.utils.IPointListBuilder;
+import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.Property;
-import openperipheral.api.adapter.method.ScriptObject;
 
 import org.lwjgl.opengl.GL11;
 
-@ScriptObject
-@AdapterSourceName("glasses_line")
-public class Line extends SolidShape {
+public abstract class Line<P> extends BoundedShape<P> {
 
 	@Property
 	@StructureField
@@ -21,16 +15,13 @@ public class Line extends SolidShape {
 
 	@Property
 	@StructureField
-	public Point2d p1 = Point2d.NULL;
+	public P p1;
 
 	@Property
 	@StructureField
-	public Point2d p2 = Point2d.NULL;
+	public P p2;
 
-	Line() {}
-
-	public Line(Point2d p1, Point2d p2, int color, float opacity) {
-		super(color, opacity);
+	public Line(P p1, P p2) {
 		this.p1 = p1;
 		this.p2 = p2;
 
@@ -39,19 +30,16 @@ public class Line extends SolidShape {
 
 	@Override
 	protected void drawContents(RenderState renderState, float partialTicks) {
-		super.drawContents(renderState, partialTicks);
+		if (pointList != null) {
+			super.drawContents(renderState, partialTicks);
 
-		renderState.setLineWidth(width);
+			renderState.setLineWidth(width);
 
-		GL11.glBegin(GL11.GL_LINES);
-		drawPoint(0);
-		drawPoint(1);
-		GL11.glEnd();
-	}
-
-	@Override
-	protected Type getTypeEnum() {
-		return Type.LINE;
+			GL11.glBegin(GL11.GL_LINES);
+			pointList.drawPoint(0);
+			pointList.drawPoint(1);
+			GL11.glEnd();
+		}
 	}
 
 	@Override
@@ -66,7 +54,7 @@ public class Line extends SolidShape {
 	}
 
 	@Override
-	protected void addPoints(List<Point2d> points) {
+	protected void addPoints(IPointListBuilder<P> points) {
 		points.add(p1);
 		points.add(p2);
 	}

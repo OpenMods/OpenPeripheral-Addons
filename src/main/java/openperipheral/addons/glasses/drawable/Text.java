@@ -3,7 +3,7 @@ package openperipheral.addons.glasses.drawable;
 import net.minecraft.client.gui.FontRenderer;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.RenderState;
+import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;

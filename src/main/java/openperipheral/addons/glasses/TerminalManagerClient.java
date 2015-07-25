@@ -14,6 +14,7 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
 import openperipheral.addons.glasses.drawable.Drawable;
+import openperipheral.addons.glasses.utils.RenderState;
 
 import org.lwjgl.opengl.GL11;
 
@@ -54,6 +55,7 @@ public class TerminalManagerClient {
 		SurfaceClient surface = surfaces.get(guid, player);
 		if (surface != null) {
 			GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_ENABLE_BIT);
+			GL11.glShadeModel(GL11.GL_SMOOTH);
 			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 			final RenderState renderState = new RenderState();

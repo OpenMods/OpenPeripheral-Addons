@@ -11,8 +11,8 @@ import openmods.geometry.Box2d;
 import openmods.structured.FieldContainer;
 import openmods.structured.IStructureElement;
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.RenderState;
 import openperipheral.addons.glasses.SurfaceServer;
+import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.Property;
@@ -71,25 +71,49 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 		LINE {
 			@Override
 			public Drawable create() {
-				return new Line();
+				return new SolidLine();
+			}
+		},
+		GRADIENT_LINE {
+			@Override
+			public Drawable create() {
+				return new GradientLine();
 			}
 		},
 		LINE_STRIP {
 			@Override
 			public Drawable create() {
-				return new LineStrip();
+				return new SolidLineStrip();
+			}
+		},
+		GRADIENT_LINE_STRIP {
+			@Override
+			public Drawable create() {
+				return new GradientLineStrip();
 			}
 		},
 		TRIANGLE {
 			@Override
 			public Drawable create() {
-				return new Triangle();
+				return new SolidTriangle();
+			}
+		},
+		GRADIENT_TRIANGLE {
+			@Override
+			public Drawable create() {
+				return new GradientTriangle();
 			}
 		},
 		QUAD {
 			@Override
 			public Drawable create() {
-				return new Quad();
+				return new SolidQuad();
+			}
+		},
+		GRADIENT_QUAD {
+			@Override
+			public Drawable create() {
+				return new GradientQuad();
 			}
 		};
 

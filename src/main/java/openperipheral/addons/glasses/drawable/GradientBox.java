@@ -2,7 +2,7 @@ package openperipheral.addons.glasses.drawable;
 
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.RenderState;
+import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -77,7 +77,6 @@ public class GradientBox extends Drawable {
 	@Override
 	@SideOnly(Side.CLIENT)
 	protected void drawContents(RenderState renderState, float partialTicks) {
-		renderState.setSmoothShadeModel();
 		renderState.setupSolidRender();
 
 		{

@@ -1,4 +1,4 @@
-package openperipheral.addons.glasses;
+package openperipheral.addons.glasses.utils;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;

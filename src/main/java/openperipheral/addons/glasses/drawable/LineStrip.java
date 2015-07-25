@@ -4,34 +4,27 @@ import java.util.Arrays;
 import java.util.List;
 
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.Point2d;
-import openperipheral.addons.glasses.RenderState;
-import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.addons.glasses.utils.IPointListBuilder;
+import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.IndexedProperty;
 import openperipheral.api.adapter.Property;
-import openperipheral.api.adapter.method.ScriptObject;
 
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
 
-@ScriptObject
-@AdapterSourceName("glasses_line_strip")
-public class LineStrip extends SolidShape {
+public abstract class LineStrip<P> extends BoundedShape<P> {
 
 	@Property
 	@IndexedProperty(expandable = true, nullable = true)
 	@StructureField
-	public List<Point2d> points = Lists.newArrayList();
+	public List<P> points = Lists.newArrayList();
 
 	@Property
 	@StructureField
 	public float width = 1;
 
-	LineStrip() {}
-
-	public LineStrip(int color, float opacity, Point2d... points) {
-		super(color, opacity);
+	public LineStrip(P... points) {
 		this.points.addAll(Arrays.asList(points));
 
 		updateBoundingBox();
@@ -39,23 +32,20 @@ public class LineStrip extends SolidShape {
 
 	@Override
 	protected void drawContents(RenderState renderState, float partialTicks) {
-		super.drawContents(renderState, partialTicks);
+		if (points != null) {
+			super.drawContents(renderState, partialTicks);
 
-		renderState.setLineWidth(width);
+			renderState.setLineWidth(width);
 
-		GL11.glBegin(GL11.GL_LINE_STRIP);
-		drawPoints();
-		GL11.glEnd();
-	}
-
-	@Override
-	protected Type getTypeEnum() {
-		return Type.LINE_STRIP;
+			GL11.glBegin(GL11.GL_LINE_STRIP);
+			pointList.drawAllPoints();
+			GL11.glEnd();
+		}
 	}
 
 	@Override
 	protected boolean isVisible() {
-		return relPoints.size() > 1;
+		return pointList.size() > 1;
 	}
 
 	@Override
@@ -65,9 +55,9 @@ public class LineStrip extends SolidShape {
 	}
 
 	@Override
-	protected void addPoints(List<Point2d> result) {
-		for (Point2d p : points)
-			if (p != null) result.add(p);
+	protected void addPoints(IPointListBuilder<P> builder) {
+		for (P p : points)
+			if (p != null) builder.add(p);
 	}
 
 }
