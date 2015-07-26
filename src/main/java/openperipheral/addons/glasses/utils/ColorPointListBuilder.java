@@ -20,7 +20,7 @@ public class ColorPointListBuilder implements IPointListBuilder<ColorPoint2d> {
 		@Override
 		protected void drawPoint(RenderState renderState, ColorPoint2d p) {
 			renderState.setColor(p.rgb, p.opacity);
-			GL11.glVertex2i(p.x, p.y);
+			GL11.glVertex2f(p.x, p.y);
 		}
 
 	}

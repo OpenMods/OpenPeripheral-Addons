@@ -32,11 +32,11 @@ public class ItemIcon extends Drawable {
 
 	@Property
 	@StructureField
-	public short x;
+	public float x;
 
 	@Property
 	@StructureField
-	public short y;
+	public float y;
 
 	@SideOnly(Side.CLIENT)
 	private RenderItem renderItem;
@@ -65,7 +65,7 @@ public class ItemIcon extends Drawable {
 
 	ItemIcon() {}
 
-	public ItemIcon(short x, short y, String itemId, int meta) {
+	public ItemIcon(float x, float y, String itemId, int meta) {
 		this.x = x;
 		this.y = y;
 		this.itemId = itemId;
@@ -86,6 +86,8 @@ public class ItemIcon extends Drawable {
 		renderState.enableDepthTest();
 		renderState.disableLight();
 		renderState.enableCullFace();
+		renderState.disableBlending();
+		renderState.enableAlphaTest();
 		renderState.setColor(0xFFFFFF, 1.0f);
 
 		GL11.glScalef(scale, scale, scale);

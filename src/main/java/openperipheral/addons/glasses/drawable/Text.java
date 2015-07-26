@@ -21,11 +21,11 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class Text extends Drawable {
 	@Property
 	@StructureField
-	public short x;
+	public float x;
 
 	@Property
 	@StructureField
-	public short y;
+	public float y;
 
 	@Property
 	@StructureField
@@ -45,7 +45,7 @@ public class Text extends Drawable {
 
 	Text() {}
 
-	public Text(short x, short y, String text, int color) {
+	public Text(float x, float y, String text, int color) {
 		this.x = x;
 		this.y = y;
 		this.text = text;

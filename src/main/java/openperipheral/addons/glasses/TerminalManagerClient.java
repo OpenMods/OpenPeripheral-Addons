@@ -6,6 +6,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import openmods.Log;
 import openmods.geometry.Box2d;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibility;
@@ -192,8 +193,8 @@ public class TerminalManagerClient {
 		if (surface == null) return null;
 
 		for (Drawable d : Lists.reverse(surface.getSortedDrawables())) {
-			final float scaledX = (float)d.getX(resolution);
-			final float scaledY = (float)d.getY(resolution);
+			final float scaledX = d.getX(resolution);
+			final float scaledY = d.getY(resolution);
 
 			final float dx = x - scaledX;
 			final float dy = y - scaledY;

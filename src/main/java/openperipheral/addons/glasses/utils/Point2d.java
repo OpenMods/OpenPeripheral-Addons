@@ -13,18 +13,18 @@ public class Point2d {
 
 	public Point2d() {}
 
-	public Point2d(int x, int y) {
+	public Point2d(float x, float y) {
 		this.x = x;
 		this.y = y;
 	}
 
 	@Serialize
 	@StructField(index = 0)
-	public int x;
+	public float x;
 
 	@Serialize
 	@StructField(index = 1)
-	public int y;
+	public float y;
 
 	@Override
 	public String toString() {

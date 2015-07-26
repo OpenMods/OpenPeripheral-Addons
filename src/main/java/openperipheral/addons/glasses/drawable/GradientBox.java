@@ -17,19 +17,19 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class GradientBox extends Drawable {
 	@Property
 	@StructureField
-	public short x;
+	public float x;
 
 	@Property
 	@StructureField
-	public short y;
+	public float y;
 
 	@Property
 	@StructureField
-	public short width;
+	public float width;
 
 	@Property
 	@StructureField
-	public short height;
+	public float height;
 
 	@Property
 	@StructureField
@@ -53,7 +53,7 @@ public class GradientBox extends Drawable {
 
 	GradientBox() {}
 
-	public GradientBox(short x, short y, short width, short height, int color1, float opacity1, int color2, float opacity2, int gradient) {
+	public GradientBox(float x, float y, float width, float height, int color1, float opacity1, int color2, float opacity2, int gradient) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -83,22 +83,22 @@ public class GradientBox extends Drawable {
 			renderState.setColor(color1, opacity1);
 			GL11.glBegin(GL11.GL_QUADS);
 			if (gradient == 1) {
-				GL11.glVertex2i(0, height);
-				GL11.glVertex2i(width, height);
+				GL11.glVertex2f(0, height);
+				GL11.glVertex2f(width, height);
 			} else {
-				GL11.glVertex2i(width, height);
-				GL11.glVertex2i(width, 0);
+				GL11.glVertex2f(width, height);
+				GL11.glVertex2f(width, 0);
 			}
 		}
 
 		{
 			renderState.setColor(color2, opacity2);
 			if (gradient == 1) {
-				GL11.glVertex2i(width, 0);
-				GL11.glVertex2i(0, 0);
+				GL11.glVertex2f(width, 0);
+				GL11.glVertex2f(0, 0);
 			} else {
-				GL11.glVertex2i(0, 0);
-				GL11.glVertex2i(0, height);
+				GL11.glVertex2f(0, 0);
+				GL11.glVertex2f(0, height);
 			}
 		}
 

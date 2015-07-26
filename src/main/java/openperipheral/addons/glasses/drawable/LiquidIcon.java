@@ -21,19 +21,19 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class LiquidIcon extends Drawable {
 	@Property
 	@StructureField
-	public short x;
+	public float x;
 
 	@Property
 	@StructureField
-	public short y;
+	public float y;
 
 	@Property
 	@StructureField
-	public short width;
+	public float width;
 
 	@Property
 	@StructureField
-	public short height;
+	public float height;
 
 	@Property
 	@StructureField
@@ -51,7 +51,7 @@ public class LiquidIcon extends Drawable {
 
 	LiquidIcon() {}
 
-	public LiquidIcon(short x, short y, short width, short height, String fluid) {
+	public LiquidIcon(float x, float y, float width, float height, String fluid) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -74,8 +74,8 @@ public class LiquidIcon extends Drawable {
 
 		TextureManager render = FMLClientHandler.instance().getClient().renderEngine;
 		render.bindTexture(TextureMap.locationBlocksTexture);
-		float xIterations = (float)width / iconWidth;
-		float yIterations = (float)height / iconHeight;
+		float xIterations = width / iconWidth;
+		float yIterations = height / iconHeight;
 
 		for (float xIteration = 0; xIteration < xIterations; xIteration += 1) {
 			for (float yIteration = 0; yIteration < yIterations; yIteration += 1) {

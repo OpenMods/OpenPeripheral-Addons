@@ -13,7 +13,7 @@ public class ColorPoint2d {
 
 	public ColorPoint2d() {}
 
-	public ColorPoint2d(int x, int y, int rgb, float opacity) {
+	public ColorPoint2d(float x, float y, int rgb, float opacity) {
 		this.x = x;
 		this.y = y;
 		this.rgb = rgb;
@@ -22,11 +22,11 @@ public class ColorPoint2d {
 
 	@Serialize
 	@StructField(index = 0)
-	public int x;
+	public float x;
 
 	@Serialize
 	@StructField(index = 1)
-	public int y;
+	public float y;
 
 	@Serialize
 	@StructField(index = 2, optional = true)
@@ -38,7 +38,7 @@ public class ColorPoint2d {
 
 	@Override
 	public String toString() {
-		return String.format("(%d,%d %06X:%.2f", x, y, rgb, opacity);
+		return String.format("(%f,%f %06X:%.2f", x, y, rgb, opacity);
 	}
 
 }

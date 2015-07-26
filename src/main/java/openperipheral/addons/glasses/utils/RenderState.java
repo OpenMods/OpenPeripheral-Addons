@@ -127,7 +127,7 @@ public class RenderState {
 		}
 	}
 
-	public void enableAlpha() {
+	public void enableAlphaTest() {
 		if (!alphaTest) {
 			GL11.glEnable(GL11.GL_ALPHA_TEST);
 			alphaTest = true;

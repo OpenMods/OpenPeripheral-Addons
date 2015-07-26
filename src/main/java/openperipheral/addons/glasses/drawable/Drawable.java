@@ -272,12 +272,12 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 	protected Drawable() {}
 
 	@SideOnly(Side.CLIENT)
-	public double getX(ScaledResolution resolution) {
+	public float getX(ScaledResolution resolution) {
 		return alignment.getScreenAnchorX(resolution) + alignment.getObjectAnchorX(boundingBox);
 	}
 
 	@SideOnly(Side.CLIENT)
-	public double getY(ScaledResolution resolution) {
+	public float getY(ScaledResolution resolution) {
 		return alignment.getScreenAnchorY(resolution) + alignment.getObjectAnchorY(boundingBox);
 	}
 

@@ -63,27 +63,27 @@ public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElem
 	}
 
 	@Override
-	public synchronized Drawable addText(short x, short y, String text, Integer color) {
+	public synchronized Drawable addText(float x, float y, String text, Integer color) {
 		return addDrawable(new Text(x, y, text, defaultColor(color)));
 	}
 
 	@Override
-	public synchronized Drawable addBox(short x, short y, short width, short height, Integer color, Float opacity) {
+	public synchronized Drawable addBox(float x, float y, float width, float height, Integer color, Float opacity) {
 		return addDrawable(new SolidBox(x, y, width, height, defaultColor(color), defaultOpacity(opacity)));
 	}
 
 	@Override
-	public synchronized Drawable addGradientBox(short x, short y, short width, short height, int color, float alpha, int color2, float alpha2, int gradient) {
+	public synchronized Drawable addGradientBox(float x, float y, float width, float height, int color, float alpha, int color2, float alpha2, int gradient) {
 		return addDrawable(new GradientBox(x, y, width, height, color, alpha, color2, alpha2, gradient));
 	}
 
 	@Override
-	public synchronized Drawable addIcon(short x, short y, String id, Short meta) {
+	public synchronized Drawable addIcon(float x, float y, String id, Short meta) {
 		return addDrawable(new ItemIcon(x, y, id, meta != null? meta : 0));
 	}
 
 	@Override
-	public synchronized Drawable addLiquid(short x, short y, short width, short height, String id) {
+	public synchronized Drawable addLiquid(float x, float y, float width, float height, String id) {
 		return addDrawable(new LiquidIcon(x, y, width, height, id));
 	}
 
