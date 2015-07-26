@@ -75,7 +75,7 @@ public class Text extends Drawable {
 	}
 
 	@Override
-	protected void onUpdate() {
+	public void onUpdate() {
 		updateBoundingBox();
 	}
 

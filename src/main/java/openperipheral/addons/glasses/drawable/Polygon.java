@@ -47,7 +47,7 @@ public abstract class Polygon<P> extends BoundedShape<P> {
 	protected abstract IPolygonBuilder<P> createPolygonBuilder();
 
 	@Override
-	protected void onUpdate() {
+	public void onUpdate() {
 		super.onUpdate();
 		final IPolygonBuilder<P> builder = createPolygonBuilder();
 

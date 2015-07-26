@@ -67,7 +67,7 @@ public class Point extends Drawable {
 	}
 
 	@Override
-	protected void onUpdate() {
+	public void onUpdate() {
 		if (size <= 0) size = 1;
 		updateBoundingBox();
 	}

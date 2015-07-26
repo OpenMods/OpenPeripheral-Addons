@@ -58,8 +58,8 @@ public class SurfaceClient extends StructuredDataSlave<Drawable, IStructureEleme
 	}
 
 	@Override
-	protected void onElementUpdated(IStructureElement element) {
-		super.onElementUpdated(element);
+	protected void onUpdate() {
+		super.onUpdate();
 		Collections.sort(sortedElements, COMPARATOR);
 	}
 

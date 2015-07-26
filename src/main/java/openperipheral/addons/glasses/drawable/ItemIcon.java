@@ -111,7 +111,7 @@ public class ItemIcon extends Drawable {
 	}
 
 	@Override
-	protected void onUpdate() {
+	public void onUpdate() {
 		this.drawStack = findDrawStack(itemId, meta);
 
 		int damage = (int)(damageBar * Items.diamond_hoe.getMaxDamage());

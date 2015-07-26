@@ -78,7 +78,7 @@ public class SolidBox extends Drawable {
 	}
 
 	@Override
-	protected void onUpdate() {
+	public void onUpdate() {
 		setBoundingBox(Box2d.fromOriginAndSize(x, y, width, height));
 	}
 }

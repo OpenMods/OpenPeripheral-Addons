@@ -20,7 +20,7 @@ public abstract class BoundedShape<P> extends Drawable {
 	protected abstract IPointListBuilder<P> createBuilder();
 
 	@Override
-	protected void onUpdate() {
+	public void onUpdate() {
 		updateBoundingBox();
 	}
 

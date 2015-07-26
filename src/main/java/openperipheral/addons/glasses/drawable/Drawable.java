@@ -429,11 +429,7 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 	public void onElementAdded(IStructureElement element) {}
 
 	@Override
-	public final void onElementUpdated(IStructureElement element) {
-		onUpdate();
-	}
-
-	protected abstract void onUpdate();
+	public final void onElementUpdated(IStructureElement element) {}
 
 	public void onAdded(SurfaceServer owner, int containerId) {
 		this.containerId = containerId;

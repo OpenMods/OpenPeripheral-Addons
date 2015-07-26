@@ -49,7 +49,7 @@ public abstract class LineStrip<P> extends BoundedShape<P> {
 	}
 
 	@Override
-	protected void onUpdate() {
+	public void onUpdate() {
 		super.onUpdate();
 		if (width <= 0) width = 1;
 	}

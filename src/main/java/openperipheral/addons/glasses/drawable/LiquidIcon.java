@@ -106,7 +106,7 @@ public class LiquidIcon extends Drawable {
 	}
 
 	@Override
-	protected void onUpdate() {
+	public void onUpdate() {
 		fluidIcon = findFluidIcon(fluid);
 		if (fluidIcon != null) {
 			iconWidth = fluidIcon.getIconWidth();
