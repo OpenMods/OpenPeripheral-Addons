@@ -38,6 +38,7 @@ import openperipheral.addons.sensors.AdapterSensor;
 import openperipheral.addons.sensors.BlockSensor;
 import openperipheral.addons.sensors.TileEntitySensor;
 import openperipheral.addons.ticketmachine.TileEntityTicketMachine;
+import openperipheral.addons.tracker.*;
 import openperipheral.api.ApiAccess;
 import openperipheral.api.adapter.IPeripheralAdapterRegistry;
 import openperipheral.api.meta.IItemStackMetaBuilder;
@@ -69,6 +70,9 @@ public class OpenPeripheralAddons {
 
 		@RegisterBlock(name = "selector", tileEntity = TileEntitySelector.class)
 		public static BlockSelector selector;
+
+		@RegisterBlock(name = "trackerBox", tileEntity = TileEntityTracker.class)
+		public static BlockTracker tracker;
 	}
 
 	public static class Items implements ItemInstances {
@@ -80,6 +84,9 @@ public class OpenPeripheralAddons {
 
 		@RegisterItem(name = "generic")
 		public static ItemOPGeneric generic;
+
+		@RegisterItem(name = "tracker")
+		public static ItemTracker tracker;
 	}
 
 	public static class Icons {
@@ -154,6 +161,10 @@ public class OpenPeripheralAddons {
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, OpenMods.proxy.wrapHandler(null));
+
+		TrackerManager trackerManager = new TrackerManager();
+		MinecraftForge.EVENT_BUS.register(trackerManager.createForgeListener());
+		FMLCommonHandler.instance().bus().register(trackerManager.createFmlListener());
 
 		proxy.preInit();
 	}

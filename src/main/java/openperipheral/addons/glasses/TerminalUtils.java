@@ -26,7 +26,7 @@ public class TerminalUtils {
 		return Long.toString(terminalId, 36).toUpperCase();
 	}
 
-	static long generateGuid() {
+	public static long generateGuid() {
 		return Long.parseLong(StringUtils.randomString(8), 36);
 	}
 
