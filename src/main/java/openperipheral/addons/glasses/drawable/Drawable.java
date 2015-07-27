@@ -206,12 +206,12 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 		public float getObjectAnchorX(Box2d box) {
 			switch (objectHorizontalAnchor) {
 				case MIDDLE:
-					return box.left - box.width / 2.0f;
+					return -box.width / 2.0f;
 				case RIGHT:
-					return box.left - box.width;
+					return -box.width;
 				case LEFT:
 				default:
-					return box.left;
+					return 0;
 
 			}
 		}
@@ -231,12 +231,12 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 		public float getObjectAnchorY(Box2d box) {
 			switch (objectVerticalAnchor) {
 				case BOTTOM:
-					return box.top - box.height;
+					return -box.height;
 				case MIDDLE:
-					return box.top - box.height / 2.0f;
+					return -box.height / 2.0f;
 				default:
 				case TOP:
-					return box.top;
+					return 0;
 			}
 		}
 	}
@@ -273,29 +273,29 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 
 	@SideOnly(Side.CLIENT)
 	public float getX(ScaledResolution resolution) {
-		return alignment.getScreenAnchorX(resolution) + alignment.getObjectAnchorX(boundingBox);
+		return alignment.getScreenAnchorX(resolution) + boundingBox.left + alignment.getObjectAnchorX(boundingBox);
 	}
 
 	@SideOnly(Side.CLIENT)
 	public float getY(ScaledResolution resolution) {
-		return alignment.getScreenAnchorY(resolution) + alignment.getObjectAnchorY(boundingBox);
+		return alignment.getScreenAnchorY(resolution) + boundingBox.top + alignment.getObjectAnchorY(boundingBox);
 	}
 
 	@SideOnly(Side.CLIENT)
 	public void draw(ScaledResolution resolution, RenderState renderState, float partialTicks) {
-		final float globalX = alignment.getScreenAnchorX(resolution);
-		final float globalY = alignment.getScreenAnchorY(resolution);
+		final float screenX = alignment.getScreenAnchorX(resolution) + boundingBox.left;
+		final float screenY = alignment.getScreenAnchorY(resolution) + boundingBox.top;
 
-		final float localX = alignment.getObjectAnchorX(boundingBox);
-		final float localY = alignment.getObjectAnchorY(boundingBox);
+		final float anchorX = alignment.getObjectAnchorX(boundingBox);
+		final float anchorY = alignment.getObjectAnchorY(boundingBox);
 
 		GL11.glPushMatrix();
 		if (rotation != 0) {
-			GL11.glTranslatef(globalX, globalY, z);
+			GL11.glTranslatef(screenX, screenY, z);
 			GL11.glRotated(rotation, 0, 0, 1);
-			GL11.glTranslatef(localX, localY, 0);
+			GL11.glTranslatef(anchorX, anchorY, 0);
 		} else {
-			GL11.glTranslatef(globalX + localX, globalY + localY, z);
+			GL11.glTranslatef(screenX + anchorX, screenY + anchorY, z);
 		}
 
 		drawContents(renderState, partialTicks);
