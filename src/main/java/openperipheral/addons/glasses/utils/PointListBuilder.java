@@ -13,8 +13,8 @@ public class PointListBuilder implements IPointListBuilder<Point2d> {
 
 	private static class PointListImpl extends PointList<Point2d> {
 
-		public PointListImpl(List<Point2d> points, Box2d boundingBox) {
-			super(points, boundingBox);
+		public PointListImpl(List<Point2d> points) {
+			super(points);
 		}
 
 		@Override
@@ -39,14 +39,19 @@ public class PointListBuilder implements IPointListBuilder<Point2d> {
 	}
 
 	@Override
-	public PointList<Point2d> build() {
+	public PointList<Point2d> buildPointList() {
 		final Box2d bb = bbBuilder.build();
 
 		List<Point2d> relPoints = Lists.newArrayList();
 		for (Point2d p : points)
 			relPoints.add(toBoundingBox(bb, p));
 
-		return new PointListImpl(relPoints, bb);
+		return new PointListImpl(relPoints);
+	}
+
+	@Override
+	public Box2d buildBoundingBox() {
+		return bbBuilder.build();
 	}
 
 }

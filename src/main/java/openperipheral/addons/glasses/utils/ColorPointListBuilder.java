@@ -13,8 +13,8 @@ public class ColorPointListBuilder implements IPointListBuilder<ColorPoint2d> {
 
 	private static class PointListImpl extends PointList<ColorPoint2d> {
 
-		public PointListImpl(List<ColorPoint2d> points, Box2d boundingBox) {
-			super(points, boundingBox);
+		public PointListImpl(List<ColorPoint2d> points) {
+			super(points);
 		}
 
 		@Override
@@ -40,13 +40,18 @@ public class ColorPointListBuilder implements IPointListBuilder<ColorPoint2d> {
 	}
 
 	@Override
-	public IPointList<ColorPoint2d> build() {
+	public IPointList<ColorPoint2d> buildPointList() {
 		final Box2d bb = bbBuilder.build();
 
 		List<ColorPoint2d> relPoints = Lists.newArrayList();
 		for (ColorPoint2d p : points)
 			relPoints.add(toBoundingBox(bb, p));
 
-		return new PointListImpl(relPoints, bb);
+		return new PointListImpl(relPoints);
+	}
+
+	@Override
+	public Box2d buildBoundingBox() {
+		return bbBuilder.build();
 	}
 }
