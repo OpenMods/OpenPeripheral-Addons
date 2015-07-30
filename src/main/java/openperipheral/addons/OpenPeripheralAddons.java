@@ -37,7 +37,6 @@ import openperipheral.addons.selector.TileEntitySelector;
 import openperipheral.addons.sensors.AdapterSensor;
 import openperipheral.addons.sensors.BlockSensor;
 import openperipheral.addons.sensors.TileEntitySensor;
-import openperipheral.addons.ticketmachine.TileEntityTicketMachine;
 import openperipheral.api.ApiAccess;
 import openperipheral.api.adapter.IPeripheralAdapterRegistry;
 import openperipheral.api.meta.IItemStackMetaBuilder;
@@ -52,7 +51,7 @@ import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 
-@Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$,$NEXT-LIB-VERSION$);required-after:OpenPeripheralApi@[3.3,];after:ComputerCraft@[1.70,]")
+@Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$,$NEXT-LIB-VERSION$);required-after:OpenPeripheralApi@[3.3.1,3.4);after:ComputerCraft@[1.70,]")
 public class OpenPeripheralAddons {
 
 	public static final String MODID = "OpenPeripheral";
@@ -143,9 +142,6 @@ public class OpenPeripheralAddons {
 		Items.generic.initRecipes();
 
 		IPeripheralAdapterRegistry adapters = ApiAccess.getApi(IPeripheralAdapterRegistry.class);
-		adapters.registerInline(TileEntityGlassesBridge.class);
-		adapters.registerInline(TileEntityTicketMachine.class);
-		adapters.registerInline(TileEntitySelector.class);
 		adapters.register(new AdapterSensor());
 
 		IItemStackMetaBuilder itemStackBuilder = ApiAccess.getApi(IItemStackMetaBuilder.class);

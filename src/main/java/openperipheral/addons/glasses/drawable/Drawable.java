@@ -13,10 +13,13 @@ import openmods.structured.IStructureElement;
 import openmods.structured.StructureField;
 import openperipheral.addons.glasses.SurfaceServer;
 import openperipheral.addons.glasses.utils.RenderState;
+import openperipheral.api.Constants;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.*;
+import openperipheral.api.architecture.IArchitecture;
+import openperipheral.api.helpers.Index;
 import openperipheral.api.property.IIndexedPropertyListener;
 import openperipheral.api.property.ISinglePropertyListener;
 
@@ -344,9 +347,13 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 	}
 
 	@ScriptCallable(returnTypes = ReturnType.NUMBER, name = "getId")
-	public int getId() {
+	public Index getId(@Env(Constants.ARG_ARCHITECTURE) IArchitecture access) {
 		handleFieldGet();
-		return containerId + 1;
+		return access.createIndex(containerId);
+	}
+
+	public int getId() {
+		return containerId;
 	}
 
 	public VerticalAlignment getScreenVerticalAnchor() {

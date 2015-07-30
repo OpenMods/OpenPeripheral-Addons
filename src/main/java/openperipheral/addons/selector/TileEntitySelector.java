@@ -20,16 +20,15 @@ import openmods.sync.ISyncableObject;
 import openmods.sync.SyncableItemStack;
 import openmods.tileentity.SyncedTileEntity;
 import openperipheral.addons.OpenPeripheralAddons;
+import openperipheral.api.Constants;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.*;
+import openperipheral.api.architecture.IArchitecture;
 import openperipheral.api.architecture.IArchitectureAccess;
 import openperipheral.api.architecture.IAttachable;
 import openperipheral.api.helpers.Index;
 import openperipheral.api.peripheral.PeripheralTypeId;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -165,7 +164,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 		if (slot == null) {
 			openGui(OpenPeripheralAddons.instance, player);
 		} else {
-			if (hasStack(slot.slot)) fireEvent("slot_click", slot.slot + 1);
+			if (hasStack(slot.slot)) signalSlotClick(slot.slot);
 		}
 
 		return true;
@@ -177,10 +176,10 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 
 	@Asynchronous
 	@ScriptCallable(description = "Get the item currently being displayed in a specific slot", returnTypes = ReturnType.TABLE, name = "getSlot")
-	public ItemStack getSlotOneBased(@Arg(name = "slot", description = "The slot you want to get details about") int slot) {
+	public ItemStack getSlotOneBased(@Arg(name = "slot", description = "The slot you want to get details about") Index slot) {
 
-		Preconditions.checkArgument(slot >= 1 && slot <= 9, "slot must be between 1 and 9");
-		return slots[slot - 1].get();
+		slot.checkElementIndex("slot id", 10);
+		return slots[slot.value].get();
 	}
 
 	@Asynchronous
@@ -195,9 +194,11 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	}
 
 	@ScriptCallable(description = "Set the items being displayed in all slots")
-	public void setSlots(@Arg(name = "items", description = "A table containing itemstacks") Map<Index, ItemStack> stacks) {
+	public void setSlots(
+			@Env(Constants.ARG_ARCHITECTURE) IArchitecture access,
+			@Arg(name = "items", description = "A table containing itemstacks") Map<Index, ItemStack> stacks) {
 		for (int slot = 0; slot < 9; slot++) {
-			final ItemStack value = stacks.get(new Index(slot));
+			final ItemStack value = stacks.get(access.wrapObject(slot));
 			if (value != null) value.stackSize = 1;
 
 			this.slots[slot].set(value);
@@ -208,22 +209,21 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 
 	@ScriptCallable(description = "Set the item being displayed on a specific slot")
 	public void setSlot(
-			@Arg(name = "slot", description = "The slot you want to modify") int slot,
+			@Arg(name = "slot", description = "The slot you want to modify") Index slot,
 			@Optionals @Arg(name = "item", description = "The item you want to display. nil to set empty") ItemStack stack) {
 
-		Preconditions.checkArgument(slot >= 1 && slot <= 9, "slot must be between 1 and 9");
-		slot -= 1;
+		slot.checkElementIndex("slot id", 10);
 
 		if (stack != null) stack.stackSize = 1;
 
-		this.slots[slot].set(stack);
+		this.slots[slot.value].set(stack);
 		sync();
 	}
 
-	private void fireEvent(String eventName, Object... args) {
+	private void signalSlotClick(int slot) {
 		for (IArchitectureAccess computer : computers) {
-			Object[] extendedArgs = ArrayUtils.add(args, computer.peripheralName());
-			computer.signal(eventName, extendedArgs);
+			final Object[] args = new Object[] { computer.createIndex(slot), computer.peripheralName() };
+			computer.signal("slot_click", args);
 		}
 	}
 

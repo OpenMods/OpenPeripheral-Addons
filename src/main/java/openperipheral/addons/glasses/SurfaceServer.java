@@ -1,6 +1,5 @@
 package openperipheral.addons.glasses;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,8 +11,12 @@ import openperipheral.addons.glasses.utils.Point2d;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.ScriptObject;
+import openperipheral.api.architecture.IArchitecture;
+import openperipheral.api.helpers.Index;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 @ScriptObject
 @Asynchronous
@@ -27,8 +30,8 @@ public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElem
 	}
 
 	@Override
-	public synchronized Drawable getById(int id) {
-		return containers.get(id - 1);
+	public synchronized Drawable getById(Index id) {
+		return containers.get(id.value);
 	}
 
 	@Override
@@ -39,13 +42,21 @@ public class SurfaceServer extends StructuredDataMaster<Drawable, IStructureElem
 	}
 
 	@Override
-	public synchronized Set<Integer> getAllIds() {
-		return Collections.unmodifiableSet(containers.keySet());
+	public synchronized Set<Index> getAllIds(IArchitecture access) {
+		final Set<Index> indices = Sets.newHashSet();
+		for (int value : containers.keySet())
+			indices.add(access.createIndex(value));
+
+		return indices;
 	}
 
 	@Override
-	public synchronized Map<Integer, Drawable> getAllObjects() {
-		return Collections.unmodifiableMap(containers);
+	public synchronized Map<Index, Drawable> getAllObjects(IArchitecture access) {
+		final Map<Index, Drawable> result = Maps.newHashMap();
+		for (Map.Entry<Integer, Drawable> e : containers.entrySet())
+			result.put(access.createIndex(e.getKey()), e.getValue());
+
+		return result;
 	}
 
 	private synchronized Drawable addDrawable(Drawable drawable) {

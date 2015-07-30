@@ -7,6 +7,7 @@ import openmods.network.event.NetworkEventMeta;
 import openmods.network.event.SerializableNetworkEvent;
 import openmods.serializable.cls.Serialize;
 import openperipheral.addons.utils.GuiUtils.GuiElements;
+import openperipheral.api.architecture.IArchitecture;
 
 public class GlassesEvent extends SerializableNetworkEvent {
 
@@ -32,7 +33,7 @@ public class GlassesEvent extends SerializableNetworkEvent {
 			throw new UnsupportedOperationException(getClass().getName() + " should not be used directly");
 		}
 
-		public Object[] getEventArgs() {
+		public Object[] getEventArgs(IArchitecture access) {
 			throw new UnsupportedOperationException(getClass().getName() + " should not be used directly");
 		}
 	}
@@ -61,7 +62,7 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		}
 
 		@Override
-		public Object[] getEventArgs() {
+		public Object[] getEventArgs(IArchitecture access) {
 			// CC has some problems with chars
 			return wrap(code, Character.toString(ch), isRepeat);
 		}
@@ -84,7 +85,7 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		}
 
 		@Override
-		public Object[] getEventArgs() {
+		public Object[] getEventArgs(IArchitecture access) {
 			return wrap(code);
 		}
 	}
@@ -105,7 +106,7 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		}
 
 		@Override
-		public Object[] getEventArgs() {
+		public Object[] getEventArgs(IArchitecture access) {
 			return wrap(wheel);
 		}
 	}
@@ -130,7 +131,7 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		}
 
 		@Override
-		public Object[] getEventArgs() {
+		public Object[] getEventArgs(IArchitecture access) {
 			return wrap(button);
 		}
 	}
@@ -173,8 +174,8 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		}
 
 		@Override
-		public Object[] getEventArgs() {
-			return wrap(componentId, isPrivate, x, y, wheel);
+		public Object[] getEventArgs(IArchitecture access) {
+			return wrap(access.createIndex(componentId), isPrivate, x, y, wheel);
 		}
 	}
 
@@ -198,8 +199,8 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		}
 
 		@Override
-		public Object[] getEventArgs() {
-			return wrap(componentId, isPrivate, x, y, button);
+		public Object[] getEventArgs(IArchitecture access) {
+			return wrap(access.createIndex(componentId), isPrivate, x, y, button);
 		}
 	}
 
@@ -219,7 +220,7 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		}
 
 		@Override
-		public Object[] getEventArgs() {
+		public Object[] getEventArgs(IArchitecture access) {
 			return NO_EXTRAS;
 		}
 	}

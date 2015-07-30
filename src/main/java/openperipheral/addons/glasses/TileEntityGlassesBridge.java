@@ -164,24 +164,35 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		if (lastSyncPackets != null) NetworkEventManager.INSTANCE.dispatcher().senders.player.sendMessages(lastSyncPackets, player);
 	}
 
-	private void queueEvent(String event, EntityPlayer user, Object... extra) {
+	private static interface IEventArgsSource {
+		public Object[] getArgs(IArchitectureAccess access);
+	}
+
+	private void queueEvent(String event, EntityPlayer user, IEventArgsSource source) {
 		final GameProfile gameProfile = user.getGameProfile();
-
-		final Object[] template = new Object[3 + extra.length];
-		template[1] = gameProfile.getName();
-		final UUID id = gameProfile.getId();
-		template[2] = id != null? id.toString() : null;
-
-		for (int i = 0; i < extra.length; i++) {
-			final Object v = extra[i];
-			template[i + 3] = v;
-		}
+		final UUID userId = gameProfile.getId();
+		final String idString = userId != null? userId.toString() : null;
+		final String userName = gameProfile.getName();
 
 		for (IArchitectureAccess computer : computers) {
-			Object[] args = Arrays.copyOf(template, template.length);
+			final Object[] extra = source.getArgs(computer);
+			final Object[] args = new Object[3 + extra.length];
+			System.arraycopy(extra, 0, args, 3, extra.length);
 			args[0] = computer.peripheralName();
+			args[1] = userName;
+			args[2] = idString;
+
 			computer.signal(event, args);
 		}
+	}
+
+	private void queueEvent(String event, EntityPlayer user, final Object... args) {
+		queueEvent(event, user, new IEventArgsSource() {
+			@Override
+			public Object[] getArgs(IArchitectureAccess access) {
+				return args;
+			}
+		});
 	}
 
 	public void onChatCommand(String event, String content, EntityPlayer player) {
@@ -283,8 +294,13 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		computers.remove(computer);
 	}
 
-	public void handleUserEvent(GlassesClientEvent evt) {
-		queueEvent(evt.getEventName(), evt.sender, evt.getEventArgs());
+	public void handleUserEvent(final GlassesClientEvent evt) {
+		queueEvent(evt.getEventName(), evt.sender, new IEventArgsSource() {
+			@Override
+			public Object[] getArgs(IArchitectureAccess access) {
+				return evt.getEventArgs(access);
+			}
+		});
 	}
 
 	public SurfaceServer getSurface(String username) {
