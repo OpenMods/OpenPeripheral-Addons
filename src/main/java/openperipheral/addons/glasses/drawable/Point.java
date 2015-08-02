@@ -36,8 +36,6 @@ public class Point extends Drawable {
 		this.coord = coord;
 		this.color = color;
 		this.opacity = opacity;
-
-		updateBoundingBox();
 	}
 
 	private void updateBoundingBox() {

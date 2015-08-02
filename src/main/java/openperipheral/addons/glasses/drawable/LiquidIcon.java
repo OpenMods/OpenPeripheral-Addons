@@ -57,8 +57,6 @@ public class LiquidIcon extends Drawable {
 		this.width = width;
 		this.height = height;
 		this.fluid = fluid;
-
-		setBoundingBox(Box2d.fromOriginAndSize(x, y, width, height));
 	}
 
 	@Override

@@ -24,8 +24,6 @@ public abstract class Line<P> extends BoundedShape<P> {
 	public Line(P p1, P p2) {
 		this.p1 = p1;
 		this.p2 = p2;
-
-		updateBoundingBox();
 	}
 
 	@Override

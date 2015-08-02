@@ -59,8 +59,6 @@ public class GradientBox extends Drawable {
 		this.width = width;
 		this.height = height;
 
-		setBoundingBox(Box2d.fromOriginAndSize(x, y, width, height));
-
 		this.color1 = color1;
 		this.opacity1 = opacity1;
 		// compat hack

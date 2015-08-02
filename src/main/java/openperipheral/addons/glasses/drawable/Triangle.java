@@ -25,8 +25,6 @@ public abstract class Triangle<P> extends BoundedShape<P> {
 		this.p1 = p1;
 		this.p2 = p2;
 		this.p3 = p3;
-
-		updateBoundingBox();
 	}
 
 	@Override

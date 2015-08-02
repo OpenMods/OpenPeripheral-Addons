@@ -50,8 +50,6 @@ public class Text extends Drawable {
 		this.y = y;
 		this.text = text;
 		this.color = color;
-
-		updateBoundingBox();
 	}
 
 	@Override

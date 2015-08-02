@@ -47,8 +47,6 @@ public class SolidBox extends Drawable {
 		this.width = width;
 		this.height = height;
 
-		setBoundingBox(Box2d.fromOriginAndSize(x, y, width, height));
-
 		this.color = color;
 		this.opacity = opacity;
 	}

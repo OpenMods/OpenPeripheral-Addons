@@ -34,8 +34,6 @@ public abstract class Quad<P> extends BoundedShape<P> {
 		this.p2 = p2;
 		this.p3 = p3;
 		this.p4 = p4;
-
-		updateBoundingBox();
 	}
 
 	@Override

@@ -70,7 +70,6 @@ public class ItemIcon extends Drawable {
 		this.y = y;
 		this.itemId = itemId;
 		this.meta = meta;
-		setBoundingBox(Box2d.fromOriginAndSize(x, y, BASE_WIDTH, BASE_HEIGHT));
 	}
 
 	@SideOnly(Side.CLIENT)

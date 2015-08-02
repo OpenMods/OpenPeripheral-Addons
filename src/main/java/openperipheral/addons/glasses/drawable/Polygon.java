@@ -21,8 +21,6 @@ public abstract class Polygon<P> extends BoundedShape<P> {
 
 	public Polygon(P... points) {
 		this.points.addAll(Arrays.asList(points));
-
-		updateBoundingBox();
 	}
 
 	@Override

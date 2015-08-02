@@ -26,8 +26,6 @@ public abstract class LineStrip<P> extends BoundedShape<P> {
 
 	public LineStrip(P... points) {
 		this.points.addAll(Arrays.asList(points));
-
-		updateBoundingBox();
 	}
 
 	@Override
