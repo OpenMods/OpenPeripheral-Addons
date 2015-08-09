@@ -205,6 +205,24 @@ public class GlassesEvent extends SerializableNetworkEvent {
 	}
 
 	@NetworkEventMeta(direction = EventDirection.C2S)
+	public static class GlassesComponentMouseDragEvent extends GlassesComponentMouseEvent {
+
+		public GlassesComponentMouseDragEvent(long guid, int componentId, boolean isPrivate, float x, float y) {
+			super(guid, componentId, isPrivate, x, y);
+		}
+
+		@Override
+		public String getEventName() {
+			return "glasses_component_mouse_drag";
+		}
+
+		@Override
+		public Object[] getEventArgs(IArchitecture access) {
+			return wrap(access.createIndex(componentId), isPrivate, x, y);
+		}
+	}
+
+	@NetworkEventMeta(direction = EventDirection.C2S)
 	public static class GlassesSignalCaptureEvent extends GlassesClientEvent {
 		@Serialize
 		public boolean captureState;
@@ -234,36 +252,53 @@ public class GlassesEvent extends SerializableNetworkEvent {
 	}
 
 	@NetworkEventMeta(direction = EventDirection.S2C)
-	public static class GlassesChangeBackground extends GlassesEvent {
+	public static class GlassesChangeBackgroundEvent extends GlassesEvent {
 
 		@Serialize
 		public int backgroundColor;
 
-		public GlassesChangeBackground(long guid, int backgroundColor) {
+		public GlassesChangeBackgroundEvent(long guid, int backgroundColor) {
 			super(guid);
 			this.backgroundColor = backgroundColor;
 		}
 	}
 
 	@NetworkEventMeta(direction = EventDirection.S2C)
-	public static class GlassesSetKeyRepeat extends GlassesEvent {
+	public static class GlassesSetKeyRepeatEvent extends GlassesEvent {
 
 		@Serialize
 		public boolean repeat;
 
-		public GlassesSetKeyRepeat(long guid, boolean repeat) {
+		public GlassesSetKeyRepeatEvent(long guid, boolean repeat) {
 			super(guid);
 			this.repeat = repeat;
 		}
 	}
 
 	@NetworkEventMeta(direction = EventDirection.S2C)
-	public static class GlassesSetGuiVisibility extends GlassesEvent {
+	public static class GlassesSetDragParamsEvent extends GlassesEvent {
+
+		@Serialize
+		public int period;
+
+		@Serialize
+		public int threshold;
+
+		public GlassesSetDragParamsEvent(long guid, int period, int threshold) {
+			super(guid);
+			this.period = period;
+			this.threshold = threshold;
+		}
+
+	}
+
+	@NetworkEventMeta(direction = EventDirection.S2C)
+	public static class GlassesSetGuiVisibilityEvent extends GlassesEvent {
 
 		@Serialize
 		public Map<GuiElements, Boolean> visibility;
 
-		public GlassesSetGuiVisibility(long guid, Map<GuiElements, Boolean> visibility) {
+		public GlassesSetGuiVisibilityEvent(long guid, Map<GuiElements, Boolean> visibility) {
 			super(guid);
 			this.visibility = visibility;
 		}

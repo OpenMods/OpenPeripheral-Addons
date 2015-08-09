@@ -7,9 +7,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import openmods.geometry.Box2d;
-import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
-import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibility;
-import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeat;
+import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackgroundEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSetDragParamsEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibilityEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeatEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
@@ -118,7 +119,7 @@ public class TerminalManagerClient {
 		}
 
 		@SubscribeEvent
-		public void onBackgroundChange(GlassesChangeBackground evt) {
+		public void onBackgroundChange(GlassesChangeBackgroundEvent evt) {
 			GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
 
 			if (gui instanceof GuiCapture) {
@@ -129,7 +130,7 @@ public class TerminalManagerClient {
 		}
 
 		@SubscribeEvent
-		public void onKeyRepeatSet(GlassesSetKeyRepeat evt) {
+		public void onKeyRepeatSet(GlassesSetKeyRepeatEvent evt) {
 			GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
 
 			if (gui instanceof GuiCapture) {
@@ -140,7 +141,18 @@ public class TerminalManagerClient {
 		}
 
 		@SubscribeEvent
-		public void onGuiVisibilitySet(GlassesSetGuiVisibility evt) {
+		public void onDragParamsSet(GlassesSetDragParamsEvent evt) {
+			GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
+
+			if (gui instanceof GuiCapture) {
+				final GuiCapture capture = (GuiCapture)gui;
+				long guid = capture.getGuid();
+				if (guid == evt.guid) capture.setDragParameters(evt.threshold, evt.period);
+			}
+		}
+
+		@SubscribeEvent
+		public void onGuiVisibilitySet(GlassesSetGuiVisibilityEvent evt) {
 			GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
 
 			if (gui instanceof GuiCapture) {
@@ -178,14 +190,14 @@ public class TerminalManagerClient {
 		return new FmlBusListener();
 	}
 
-	public DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, int x, int y) {
+	public DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, float x, float y) {
 		DrawableHitInfo result = findDrawableHit(guid, resolution, x, y, false);
 		if (result != null) return result;
 
 		return findDrawableHit(guid, resolution, x, y, true);
 	}
 
-	private DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, int x, int y, boolean isPrivate) {
+	private DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, float x, float y, boolean isPrivate) {
 		final String surfaceName = getSurfaceName(isPrivate);
 		SurfaceClient surface = surfaces.get(guid, surfaceName);
 

@@ -17,10 +17,12 @@ import openmods.network.event.NetworkEventManager;
 import openmods.network.senders.ITargetedPacketSender;
 import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
-import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackground;
+import openperipheral.addons.Config;
+import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackgroundEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesClientEvent;
-import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibility;
-import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeat;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSetDragParamsEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibilityEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeatEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
 import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
@@ -94,19 +96,27 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 				@Optionals @Arg(name = "alpha") Integer alpha) {
 			EntityPlayer player = getPlayer();
 			final int a = alpha != null? (alpha << 24) : 0x2A000000;
-			new GlassesChangeBackground(guid, background & 0x00FFFFFF | a).sendToPlayer(player);
+			new GlassesChangeBackgroundEvent(guid, background & 0x00FFFFFF | a).sendToPlayer(player);
 		}
 
 		@ScriptCallable(description = "When enabled, holding key down for long time will generate multiple events")
 		public void setKeyRepeat(@Arg(name = "isEnabled") boolean keyRepeat) {
 			EntityPlayer player = getPlayer();
-			new GlassesSetKeyRepeat(guid, keyRepeat).sendToPlayer(player);
+			new GlassesSetKeyRepeatEvent(guid, keyRepeat).sendToPlayer(player);
+		}
+
+		@ScriptCallable(description = "Set minimal distance and minimum period needed for ")
+		public void setDragParameters(@Arg(name = "distance") int threshold, @Arg(name = "delay") int period) {
+			Preconditions.checkArgument(threshold >= Config.minimalDragThreshold, "Distance must be not less than %s", Config.minimalDragThreshold);
+			Preconditions.checkArgument(period >= Config.minimalDragPeriod, "Update period must be not less than %s", Config.minimalDragPeriod);
+			EntityPlayer player = getPlayer();
+			new GlassesSetDragParamsEvent(guid, period, threshold).sendToPlayer(player);
 		}
 
 		@ScriptCallable(description = "Sets visiblity state of various vanilla GUI elements")
 		public void toggleGuiElements(@Arg(name = "visibility") Map<GuiElements, Boolean> visiblity) {
 			EntityPlayer player = getPlayer();
-			new GlassesSetGuiVisibility(guid, visiblity).sendToPlayer(player);
+			new GlassesSetGuiVisibilityEvent(guid, visiblity).sendToPlayer(player);
 		}
 	}
 

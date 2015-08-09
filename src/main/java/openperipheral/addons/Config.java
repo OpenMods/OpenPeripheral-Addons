@@ -20,4 +20,20 @@ public class Config {
 	@ConfigProperty(category = "glasses", comment = "Should glasses listen to all chat (not just prefixed with $$)")
 	public static boolean listenToAllChat = true;
 
+	@OnLineModifiable
+	@ConfigProperty(category = "glasses", comment = "Minimal difference in mouse position (in pixels) needed before drag event is sent to server")
+	public static int minimalDragThreshold = 5;
+
+	@OnLineModifiable
+	@ConfigProperty(category = "glasses", comment = "Minimal time (in ticks) between two drag events")
+	public static int minimalDragPeriod = 10;
+
+	@OnLineModifiable
+	@ConfigProperty(category = "glasses", comment = "Default difference in mouse position (in pixels) needed before drag event is sent to server")
+	public static int defaultDragThreshold = 10;
+
+	@OnLineModifiable
+	@ConfigProperty(category = "glasses", comment = "Default time (in ticks) between two drag events")
+	public static int defaultDragPeriod = 20;
+
 }
