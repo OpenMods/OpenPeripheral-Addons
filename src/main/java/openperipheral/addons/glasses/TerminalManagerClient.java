@@ -192,6 +192,7 @@ public class TerminalManagerClient {
 		if (surface == null) return null;
 
 		for (Drawable d : Lists.reverse(surface.getSortedDrawables())) {
+			if (!d.isClickable()) continue;
 			final float scaledX = d.getX(resolution);
 			final float scaledY = d.getY(resolution);
 

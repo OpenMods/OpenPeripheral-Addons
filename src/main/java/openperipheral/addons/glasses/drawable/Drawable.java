@@ -264,6 +264,10 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 
 	@Property
 	@StructureField
+	public boolean clickable = true;
+
+	@Property
+	@StructureField
 	public float rotation = 0;
 
 	@Property(type = ArgType.OBJECT,
@@ -319,6 +323,10 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 
 	public final boolean shouldRender() {
 		return visible && isVisible();
+	}
+
+	public boolean isClickable() {
+		return clickable;
 	}
 
 	@Override
