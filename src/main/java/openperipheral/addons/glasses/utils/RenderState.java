@@ -48,6 +48,17 @@ public class RenderState {
 		this.lineWidth = 1.0f;
 	}
 
+	public void readState() {
+		this.lighting = GL11.glGetBoolean(GL11.GL_LIGHTING);
+		this.alphaTest = GL11.glGetBoolean(GL11.GL_ALPHA_TEST);
+		this.texture = GL11.glGetBoolean(GL11.GL_TEXTURE_2D);
+		this.depthTest = GL11.glGetBoolean(GL11.GL_DEPTH_TEST);
+		this.blend = GL11.glGetBoolean(GL11.GL_BLEND);
+		this.cullFace = GL11.glGetBoolean(GL11.GL_CULL_FACE);
+		this.lineWidth = GL11.glGetFloat(GL11.GL_LINE_WIDTH);
+		this.pointSize = GL11.glGetFloat(GL11.GL_POINT_SIZE);
+	}
+
 	public void setupSolidRender() {
 		disableLight();
 		disableAlphaTest();

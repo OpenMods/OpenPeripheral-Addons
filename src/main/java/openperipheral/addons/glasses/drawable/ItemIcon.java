@@ -83,10 +83,7 @@ public class ItemIcon extends Drawable {
 	protected void drawContents(RenderState renderState, float partialTicks) {
 		renderState.enableTexture();
 		renderState.enableDepthTest();
-		renderState.disableLight();
 		renderState.enableCullFace();
-		renderState.disableBlending();
-		renderState.enableAlphaTest();
 		renderState.setColor(0xFFFFFF, 1.0f);
 
 		GL11.glScalef(scale, scale, scale);
@@ -99,6 +96,8 @@ public class ItemIcon extends Drawable {
 		if (damageBar > 0 || !Strings.isNullOrEmpty(label)) {
 			renderItem.renderItemOverlayIntoGUI(minecraft.fontRenderer, textureManager, dummyStack, 0, 0, label);
 		}
+
+		renderState.readState();
 	}
 
 	@Override
