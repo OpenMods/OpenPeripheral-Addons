@@ -1,4 +1,4 @@
-package openperipheral.addons.glasses;
+package openperipheral.addons.glasses.server;
 
 import java.util.Map;
 
@@ -7,7 +7,7 @@ import net.minecraftforge.event.ServerChatEvent;
 import openperipheral.addons.Config;
 import openperipheral.addons.api.TerminalRegisterEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesClientEvent;
-import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
+import openperipheral.addons.glasses.*;
 
 import com.google.common.collect.MapMaker;
 
@@ -46,9 +46,15 @@ public class TerminalManagerServer {
 	}
 
 	@SubscribeEvent
-	public void onResetRequest(TerminalResetEvent evt) {
+	public void onResetRequest(TerminalEvent.PrivateDrawableReset evt) {
 		TileEntityGlassesBridge listener = listeners.get(evt.terminalId);
-		if (listener != null) listener.handleResetRequest(evt);
+		if (listener != null) listener.handlePrivateDrawableResetRequest(evt);
+	}
+
+	@SubscribeEvent
+	public void onResetRequest(TerminalEvent.PublicDrawableReset evt) {
+		TileEntityGlassesBridge listener = listeners.get(evt.terminalId);
+		if (listener != null) listener.handlePublicDrawableResetRequest(evt);
 	}
 
 	@SubscribeEvent

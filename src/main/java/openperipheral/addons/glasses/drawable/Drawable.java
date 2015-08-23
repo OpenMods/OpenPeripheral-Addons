@@ -3,25 +3,18 @@ package openperipheral.addons.glasses.drawable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.List;
 
 import net.minecraft.client.gui.ScaledResolution;
 import openmods.geometry.Box2d;
-import openmods.structured.FieldContainer;
+import openmods.structured.IStructureContainerFactory;
 import openmods.structured.IStructureElement;
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.SurfaceServer;
+import openperipheral.addons.glasses.StructuredObjectBase;
 import openperipheral.addons.glasses.utils.RenderState;
-import openperipheral.api.Constants;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.*;
-import openperipheral.api.architecture.IArchitecture;
-import openperipheral.api.helpers.Index;
-import openperipheral.api.property.IIndexedPropertyListener;
-import openperipheral.api.property.ISinglePropertyListener;
 
 import org.lwjgl.opengl.GL11;
 
@@ -32,7 +25,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 @Asynchronous
 @AdapterSourceName("glasses_drawable")
-public abstract class Drawable extends FieldContainer implements ISinglePropertyListener, IIndexedPropertyListener {
+public abstract class Drawable extends StructuredObjectBase {
 
 	enum Type {
 		GRADIENT {
@@ -137,6 +130,14 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 		public static final Type[] TYPES = values();
 	}
 
+	public static final IStructureContainerFactory<Drawable> FACTORY = new IStructureContainerFactory<Drawable>() {
+		@Override
+		public Drawable createContainer(int typeId) {
+			final Type type = Type.TYPES[typeId];
+			return type.create();
+		}
+	};
+
 	public static enum VerticalAlignment {
 		TOP,
 		MIDDLE,
@@ -181,16 +182,6 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 					(objectVerticalAnchor.ordinal() << 4) |
 					(objectHorizontalAnchor.ordinal() << 6));
 			output.writeByte(value);
-		}
-
-		@Override
-		public int getId() {
-			return id;
-		}
-
-		@Override
-		public void setId(int id) {
-			this.id = id;
 		}
 
 		public float getScreenAnchorX(ScaledResolution resolution) {
@@ -246,12 +237,6 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 
 	private Box2d boundingBox = Box2d.NULL;
 
-	private boolean deleted;
-
-	private int containerId;
-
-	private SurfaceServer owner;
-
 	private final Alignment alignment = new Alignment();
 
 	@Property
@@ -270,6 +255,9 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 	@StructureField
 	public float rotation = 0;
 
+	@StructureField
+	public int windowId = 0;
+
 	@Property(type = ArgType.OBJECT,
 			getterDesc = "Get userdata",
 			setterDesc = "Set userdata (no restrictions, not sent to clients)",
@@ -287,6 +275,8 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 	public float getY(ScaledResolution resolution) {
 		return alignment.getScreenAnchorY(resolution) + boundingBox.top + alignment.getObjectAnchorY(boundingBox);
 	}
+	
+	public abstract void onUpdate();
 
 	@SideOnly(Side.CLIENT)
 	public void draw(ScaledResolution resolution, RenderState renderState, float partialTicks) {
@@ -334,34 +324,9 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 		return getTypeEnum().ordinal();
 	}
 
-	public static Drawable createFromTypeId(int containerId, int typeId) {
-		Type type = Type.TYPES[typeId];
-		final Drawable container = type.create();
-		container.containerId = containerId;
-		return container;
-	}
-
 	@ScriptCallable(returnTypes = ReturnType.STRING, name = "getType", description = "Get object type")
 	public String getTypeName() {
 		return getTypeEnum().name().toLowerCase();
-	}
-
-	@ScriptCallable
-	public void delete() {
-		handleFieldGet();
-		Preconditions.checkState(owner != null, "Invalid side");
-		owner.removeContainer(containerId);
-		deleted = true;
-	}
-
-	@ScriptCallable(returnTypes = ReturnType.NUMBER, name = "getId")
-	public Index getId(@Env(Constants.ARG_ARCHITECTURE) IArchitecture access) {
-		handleFieldGet();
-		return access.createIndex(containerId);
-	}
-
-	public int getId() {
-		return containerId;
 	}
 
 	public VerticalAlignment getScreenVerticalAnchor() {
@@ -372,83 +337,30 @@ public abstract class Drawable extends FieldContainer implements ISingleProperty
 	public void setScreenAnchor(@Arg(name = "horizontal") HorizontalAlignment horizontal, @Arg(name = "vertical") VerticalAlignment vertical) {
 		alignment.screenVerticalAnchor = vertical;
 		alignment.screenHorizontalAnchor = horizontal;
-		owner.markElementModified(alignment);
+		markModified(alignment.id);
 	}
 
 	@ScriptCallable
 	public void setObjectAnchor(@Arg(name = "horizontal") HorizontalAlignment horizontal, @Arg(name = "vertical") VerticalAlignment vertical) {
 		alignment.objectVerticalAnchor = vertical;
 		alignment.objectHorizontalAnchor = horizontal;
-		owner.markElementModified(alignment);
+		markModified(alignment.id);
 	}
 
 	@ScriptCallable
 	public void setAlignment(@Arg(name = "horizontal") HorizontalAlignment horizontal, @Arg(name = "vertical") VerticalAlignment vertical) {
 		alignment.objectVerticalAnchor = alignment.screenVerticalAnchor = vertical;
 		alignment.objectHorizontalAnchor = alignment.screenHorizontalAnchor = horizontal;
-		owner.markElementModified(alignment);
-	}
-
-	private void handleFieldSet(Field field) {
-		Preconditions.checkState(!deleted, "Object is already deleted");
-		Preconditions.checkState(owner != null, "Invalid side");
-
-		final IStructureElement fieldWrapper = getElementForField(field);
-		if (fieldWrapper != null) owner.markElementModified(fieldWrapper);
-	}
-
-	private void handleFieldGet() {
-		Preconditions.checkState(!deleted, "Object is already deleted");
+		markModified(alignment.id);
 	}
 
 	@Override
-	public void onPropertySet(Field field, Object value) {
-		handleFieldSet(field);
-	}
-
-	@Override
-	public void onPropertySet(Field field, Object key, Object value) {
-		handleFieldSet(field);
-	}
-
-	@Override
-	public void onPropertyGet(Field field) {
-		handleFieldGet();
-	}
-
-	@Override
-	public void onPropertyGet(Field field, Object key) {
-		handleFieldGet();
-	}
-
-	@Override
-	public List<IStructureElement> createElements() {
-		final List<IStructureElement> result = super.createElements();
-		result.add(alignment);
-		return result;
-	}
-
-	public void setDeleted() {
-		this.deleted = true;
-	}
-
-	public void setOwner(SurfaceServer owner) {
-		this.owner = owner;
+	public void createElements(IElementAddCallback<IStructureElement> callback) {
+		super.createElements(callback);
+		alignment.id = callback.addElement(alignment);
 	}
 
 	public Box2d getBoundingBox() {
 		return boundingBox;
 	}
-
-	@Override
-	public void onElementAdded(IStructureElement element) {}
-
-	@Override
-	public final void onElementUpdated(IStructureElement element) {}
-
-	public void onAdded(SurfaceServer owner, int containerId) {
-		this.containerId = containerId;
-		this.owner = owner;
-	}
-
 }

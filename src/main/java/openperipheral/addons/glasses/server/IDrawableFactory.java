@@ -1,36 +1,15 @@
-package openperipheral.addons.glasses;
-
-import java.util.Map;
-import java.util.Set;
+package openperipheral.addons.glasses.server;
 
 import openperipheral.addons.glasses.drawable.Drawable;
 import openperipheral.addons.glasses.utils.ColorPoint2d;
 import openperipheral.addons.glasses.utils.Point2d;
-import openperipheral.api.Constants;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.*;
-import openperipheral.api.architecture.IArchitecture;
-import openperipheral.api.helpers.Index;
 
 @Asynchronous
-@AdapterSourceName("glasses_container")
-public interface IDrawableContainer {
-
-	@Alias("getObjectById")
-	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get object by id")
-	public Drawable getById(
-			@Arg(name = "id", description = "Id of drawed object") Index id
-			);
-
-	@ScriptCallable(description = "Clear all the objects from the screen")
-	public void clear();
-
-	@ScriptCallable(returnTypes = ReturnType.TABLE, description = "Get the Ids of all the objects on the screen")
-	public Set<Index> getAllIds(@Env(Constants.ARG_ARCHITECTURE) IArchitecture access);
-
-	@ScriptCallable(returnTypes = ReturnType.TABLE, description = "Get all objects on the screen")
-	public Map<Index, Drawable> getAllObjects(@Env(Constants.ARG_ARCHITECTURE) IArchitecture access);
+@AdapterSourceName("drawable_container")
+public interface IDrawableFactory {
 
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Add a new text object to the screen")
 	public Drawable addText(
@@ -148,4 +127,5 @@ public interface IDrawableContainer {
 			@Arg(name = "coord", description = "Coordinates of point") Point2d p,
 			@Optionals @Arg(name = "color", description = "The color of the point") Integer color,
 			@Arg(name = "opacity", description = "The opacity of the point (from 0 to 1)") Float opacity);
+
 }

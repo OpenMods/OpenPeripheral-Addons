@@ -17,21 +17,13 @@ import openmods.network.event.NetworkEventManager;
 import openmods.network.senders.ITargetedPacketSender;
 import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
-import openperipheral.addons.Config;
-import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackgroundEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesClientEvent;
-import openperipheral.addons.glasses.GlassesEvent.GlassesSetDragParamsEvent;
-import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibilityEvent;
-import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeatEvent;
-import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
-import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
-import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
-import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
-import openperipheral.addons.utils.GuiUtils.GuiElements;
-import openperipheral.api.adapter.AdapterSourceName;
+import openperipheral.addons.glasses.server.*;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.Doc;
-import openperipheral.api.adapter.method.*;
+import openperipheral.api.adapter.method.Arg;
+import openperipheral.api.adapter.method.ReturnType;
+import openperipheral.api.adapter.method.ScriptCallable;
 import openperipheral.api.architecture.IArchitectureAccess;
 import openperipheral.api.architecture.IAttachable;
 import openperipheral.api.peripheral.PeripheralTypeId;
@@ -49,7 +41,9 @@ import com.mojang.authlib.GameProfile;
 		"This peripheral signals few events. Full list available here: http://goo.gl/8Hf2yA",
 		"Simple demo: http://goo.gl/n5HPN8" })
 @PeripheralTypeId("openperipheral_bridge")
-public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable, IPlaceAwareTile, ICustomHarvestDrops {
+public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable, IPlaceAwareTile, ICustomHarvestDrops, IClearable {
+
+	private static final String GLOBAL_FAKE_PLAYER_NAME = "$GLOBAL$";
 
 	public static final String TAG_GUID = "guid";
 
@@ -62,61 +56,10 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		public final WeakReference<EntityPlayerMP> player;
 		public SurfaceServer surface;
 
-		public PlayerInfo(EntityPlayerMP player) {
+		public PlayerInfo(long guid, EntityPlayerMP player) {
 			this.player = new WeakReference<EntityPlayerMP>(player);
 			this.profile = player.getGameProfile();
-			this.surface = new SurfaceServer(true);
-		}
-	}
-
-	@ScriptObject
-	@Asynchronous
-	@AdapterSourceName("glasses-capture")
-	public class CaptureControl {
-		private final WeakReference<EntityPlayerMP> player;
-
-		public CaptureControl(WeakReference<EntityPlayerMP> player) {
-			this.player = player;
-		}
-
-		protected EntityPlayer getPlayer() {
-			EntityPlayer player = this.player.get();
-			if (player == null) throw new IllegalStateException("Object is no longer valid");
-			return player;
-		}
-
-		@ScriptCallable(description = "Stops capture for player")
-		public void stopCapturing() {
-			EntityPlayer player = getPlayer();
-			new GlassesStopCaptureEvent(guid).sendToPlayer(player);
-		}
-
-		@ScriptCallable(description = "Set background on capture mode screen")
-		public void setBackground(@Arg(name = "background") int background,
-				@Optionals @Arg(name = "alpha") Integer alpha) {
-			EntityPlayer player = getPlayer();
-			final int a = alpha != null? (alpha << 24) : 0x2A000000;
-			new GlassesChangeBackgroundEvent(guid, background & 0x00FFFFFF | a).sendToPlayer(player);
-		}
-
-		@ScriptCallable(description = "When enabled, holding key down for long time will generate multiple events")
-		public void setKeyRepeat(@Arg(name = "isEnabled") boolean keyRepeat) {
-			EntityPlayer player = getPlayer();
-			new GlassesSetKeyRepeatEvent(guid, keyRepeat).sendToPlayer(player);
-		}
-
-		@ScriptCallable(description = "Set minimal distance and minimum period needed for ")
-		public void setDragParameters(@Arg(name = "distance") int threshold, @Arg(name = "delay") int period) {
-			Preconditions.checkArgument(threshold >= Config.minimalDragThreshold, "Distance must be not less than %s", Config.minimalDragThreshold);
-			Preconditions.checkArgument(period >= Config.minimalDragPeriod, "Update period must be not less than %s", Config.minimalDragPeriod);
-			EntityPlayer player = getPlayer();
-			new GlassesSetDragParamsEvent(guid, period, threshold).sendToPlayer(player);
-		}
-
-		@ScriptCallable(description = "Sets visiblity state of various vanilla GUI elements")
-		public void toggleGuiElements(@Arg(name = "visibility") Map<GuiElements, Boolean> visiblity) {
-			EntityPlayer player = getPlayer();
-			new GlassesSetGuiVisibilityEvent(guid, visiblity).sendToPlayer(player);
+			this.surface = SurfaceServer.createPrivateSurface(guid);
 		}
 	}
 
@@ -126,10 +69,19 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	private Set<IArchitectureAccess> computers = Sets.newIdentityHashSet();
 
-	private long guid;
+	long guid;
 
-	@IncludeInterface(IDrawableContainer.class)
-	private SurfaceServer globalSurface = new SurfaceServer(false);
+	private SurfaceServer globalSurface;
+
+	@IncludeInterface(IMappedContainer.class)
+	private IMappedContainer getDrawablesContainer() {
+		return globalSurface.drawablesContainer;
+	}
+
+	@IncludeInterface(IMappedContainer.class)
+	private IDrawableFactory getDrawablesFactory() {
+		return globalSurface.drawablesFactory;
+	}
 
 	public TileEntityGlassesBridge() {}
 
@@ -147,30 +99,18 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	public void registerTerminal(EntityPlayerMP player) {
 		if (!knownPlayersByUUID.containsKey(player.getGameProfile().getId())) {
-			final PlayerInfo playerInfo = new PlayerInfo(player);
+			final PlayerInfo playerInfo = new PlayerInfo(guid, player);
 			final GameProfile gameProfile = player.getGameProfile();
 
 			knownPlayersByUUID.put(gameProfile.getId(), playerInfo);
 			rebuildPlayerNamesMap();
 			queueEvent(EVENT_PLAYER_ATTACH, player);
 
-			sentFullDataToPlayer(player);
+			sentStoredFullDataToPlayer(player);
 		}
 	}
 
-	private TerminalDataEvent createFullDataEvent(SurfaceServer surface) {
-		TerminalDataEvent result = new TerminalDataEvent(guid, surface.isPrivate);
-		surface.appendFullCommands(result.commands);
-		return result;
-	}
-
-	private TerminalDataEvent createUpdateDataEvent(SurfaceServer surface) {
-		TerminalDataEvent result = new TerminalDataEvent(guid, surface.isPrivate);
-		surface.appendUpdateCommands(result.commands);
-		return result;
-	}
-
-	private void sentFullDataToPlayer(EntityPlayer player) {
+	private void sentStoredFullDataToPlayer(EntityPlayer player) {
 		if (lastSyncPackets != null) NetworkEventManager.INSTANCE.dispatcher().senders.player.sendMessages(lastSyncPackets, player);
 	}
 
@@ -224,7 +164,8 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 			if (!isPlayerValid(player)) {
 				queueEvent(EVENT_PLAYER_DETACH, player);
-				sendCleanPackets(player);
+				sendClearPacketToPlayer(player, globalSurface);
+				sendClearPacketToPlayer(player, info.surface);
 				it.remove();
 				playersRemoved = true;
 			}
@@ -233,9 +174,8 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		if (playersRemoved) rebuildPlayerNamesMap();
 	}
 
-	private void sendCleanPackets(EntityPlayerMP player) {
-		new TerminalClearEvent(guid, false).sendToPlayer(player);
-		new TerminalClearEvent(guid, true).sendToPlayer(player);
+	private static void sendClearPacketToPlayer(EntityPlayerMP player, SurfaceServer surface) {
+		surface.drawablesContainer.createClearPacket().sendToPlayer(player);
 	}
 
 	private boolean isPlayerValid(EntityPlayerMP player) {
@@ -314,7 +254,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	public SurfaceServer getSurface(String username) {
-		if (TerminalUtils.GLOBAL_MARKER.equals(username)) return globalSurface;
+		if (GLOBAL_FAKE_PLAYER_NAME.equals(username)) return globalSurface;
 		PlayerInfo info = knownPlayersByName.get(username);
 		return info != null? info.surface : null;
 	}
@@ -328,59 +268,67 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	// never, ever make this asynchronous
 	@ScriptCallable(description = "Send updates to client. Without it changes won't be visible", name = "sync")
 	public void syncContents() {
-		synchronized (globalSurface) {
-			final boolean globalChanged = globalSurface.hasUpdates();
+		final DrawableContainerMaster drawables = globalSurface.drawablesContainer;
+		synchronized (drawables) {
+			syncDrawables(drawables);
+		}
+	}
 
-			if (globalChanged || lastSyncPackets == null) {
-				final TerminalDataEvent globalFullData = createFullDataEvent(globalSurface);
-				lastSyncPackets = globalFullData.serialize();
-			}
+	private void syncDrawables(final DrawableContainerMaster drawables) {
+		final boolean globalChanged = drawables.hasUpdates();
 
-			List<Object> globalUpdatePackets = null;
+		if (globalChanged || lastSyncPackets == null) {
+			final TerminalEvent.Data globalFullData = drawables.createFullDataEvent();
+			lastSyncPackets = globalFullData.serialize();
+		}
 
-			if (globalChanged) {
-				final TerminalDataEvent globalDelta = createUpdateDataEvent(globalSurface);
-				globalUpdatePackets = globalDelta.serialize();
-			}
+		List<Object> globalUpdatePackets = null;
 
-			final ITargetedPacketSender<EntityPlayer> playerSender = NetworkEventManager.INSTANCE.dispatcher().senders.player;
+		if (globalChanged) {
+			final TerminalEvent.Data globalDelta = drawables.createUpdateDataEvent();
+			globalUpdatePackets = globalDelta.serialize();
+		}
 
-			for (PlayerInfo info : knownPlayersByUUID.values()) {
-				final EntityPlayerMP player = info.player.get();
-				if (isPlayerValid(player)) {
-					if (globalUpdatePackets != null) playerSender.sendMessages(globalUpdatePackets, player);
-					sendPrivateUpdateToPlayer(player, info);
-				}
+		final ITargetedPacketSender<EntityPlayer> playerSender = NetworkEventManager.INSTANCE.dispatcher().senders.player;
+
+		for (PlayerInfo info : knownPlayersByUUID.values()) {
+			final EntityPlayerMP player = info.player.get();
+			if (isPlayerValid(player)) {
+				if (globalUpdatePackets != null) playerSender.sendMessages(globalUpdatePackets, player);
+				sendPrivateUpdateToPlayer(player, info);
 			}
 		}
 	}
 
-	private void sendPrivateUpdateToPlayer(final EntityPlayerMP player, PlayerInfo info) {
+	private static void sendPrivateUpdateToPlayer(EntityPlayerMP player, PlayerInfo info) {
 		final SurfaceServer privateSurface = info.surface;
 
 		if (privateSurface != null) {
-			synchronized (privateSurface) {
-				if (privateSurface.hasUpdates()) {
-					final TerminalDataEvent privateData = createUpdateDataEvent(privateSurface);
-					privateData.sendToPlayer(player);
+			final DrawableContainerMaster drawables = privateSurface.drawablesContainer;
+			synchronized (drawables) {
+				if (drawables.hasUpdates()) {
+					drawables.createUpdateDataEvent().sendToPlayer(player);
 				}
 			}
 		}
 	}
 
-	private void sendPrivateFullToPlayer(EntityPlayer player) {
-		UUID playerUuid = player.getGameProfile().getId();
-		PlayerInfo info = knownPlayersByUUID.get(playerUuid);
-
-		if (info != null) {
-			TerminalDataEvent privateData = createFullDataEvent(info.surface);
-			privateData.sendToPlayer(player);
-		}
+	private static void sendFullDataPacketToPlayer(EntityPlayer player, final SurfaceServer surface) {
+		surface.drawablesContainer.createFullDataEvent().sendToPlayer(player);
 	}
 
-	public void handleResetRequest(TerminalResetEvent evt) {
-		if (evt.isPrivate) sendPrivateFullToPlayer(evt.sender);
-		else sentFullDataToPlayer(evt.sender);
+	private void sendPrivateFullDataToPlayer(EntityPlayer player) {
+		UUID playerUuid = player.getGameProfile().getId();
+		PlayerInfo info = knownPlayersByUUID.get(playerUuid);
+		if (info != null) sendFullDataPacketToPlayer(player, info.surface);
+	}
+
+	public void handlePrivateDrawableResetRequest(TerminalEvent.PrivateDrawableReset evt) {
+		sendPrivateFullDataToPlayer(evt.sender);
+	}
+
+	public void handlePublicDrawableResetRequest(TerminalEvent.PublicDrawableReset evt) {
+		sentStoredFullDataToPlayer(evt.sender);
 	}
 
 	@Asynchronous
@@ -403,6 +351,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		return guid;
 	}
 
+	@Override
 	@IncludeOverride
 	public void clear() {
 		globalSurface.clear();
@@ -413,7 +362,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	@Asynchronous
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
-	public IDrawableContainer getSurfaceByName(@Arg(name = "username", description = "The username of the user to get the draw surface for") String username) {
+	public SurfaceServer getSurfaceByName(@Arg(name = "username", description = "The username of the user to get the draw surface for") String username) {
 		SurfaceServer playerSurface = getSurface(username);
 		Preconditions.checkNotNull(playerSurface, "Invalid player");
 		return playerSurface;
@@ -421,7 +370,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	@Asynchronous
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the surface of a user to draw privately on their screen")
-	public IDrawableContainer getSurfaceByUUID(@Arg(name = "uuid", description = "The uuid of the user to get the draw surface for") UUID uuid) {
+	public SurfaceServer getSurfaceByUUID(@Arg(name = "uuid", description = "The uuid of the user to get the draw surface for") UUID uuid) {
 		SurfaceServer playerSurface = getSurface(uuid);
 		Preconditions.checkNotNull(playerSurface, "Invalid player");
 		return playerSurface;
@@ -429,8 +378,8 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	@Asynchronous
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Returns object used for controlling player capture mode")
-	public CaptureControl getCaptureControl(@Arg(name = "uuid") UUID uuid) {
+	public GuiCaptureControl getCaptureControl(@Arg(name = "uuid") UUID uuid) {
 		PlayerInfo info = knownPlayersByUUID.get(uuid);
-		return info != null? new CaptureControl(info.player) : null;
+		return info != null? new GuiCaptureControl(guid, info.player) : null;
 	}
 }

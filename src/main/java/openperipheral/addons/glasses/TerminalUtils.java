@@ -31,8 +31,6 @@ public class TerminalUtils {
 	}
 
 	public static final UUID GLOBAL_SURFACE_UUID = UUID.fromString("df66eff0-1cae-11e4-8c21-0800200c9a66");
-	public static final String GLOBAL_MARKER = "GLOBAL";
-	public static final String PRIVATE_MARKER = "PRIVATE";
 
 	public static ItemStack getHeadSlot(EntityPlayer player) {
 		return player.inventory.armorItemInSlot(3);

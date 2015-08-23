@@ -1,4 +1,4 @@
-package openperipheral.addons.glasses;
+package openperipheral.addons.glasses.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -12,8 +12,7 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesSetDragParamsEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibilityEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeatEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
-import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
-import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
+import openperipheral.addons.glasses.*;
 import openperipheral.addons.glasses.drawable.Drawable;
 import openperipheral.addons.glasses.utils.RenderState;
 
@@ -32,14 +31,14 @@ public class TerminalManagerClient {
 
 	public static class DrawableHitInfo {
 		public final int id;
-		public final boolean isPrivate;
+		public final SurfaceType surfaceType;
 		public final float dx;
 		public final float dy;
 		public final int z;
 
-		public DrawableHitInfo(int id, boolean isPrivate, float dx, float dy, int z) {
+		public DrawableHitInfo(int id, SurfaceType surfaceType, float dx, float dy, int z) {
 			this.id = id;
-			this.isPrivate = isPrivate;
+			this.surfaceType = surfaceType;
 			this.dx = dx;
 			this.dy = dy;
 			this.z = z;
@@ -50,10 +49,10 @@ public class TerminalManagerClient {
 
 	private TerminalManagerClient() {}
 
-	private final Table<Long, String, SurfaceClient> surfaces = HashBasedTable.create();
+	private final Table<Long, SurfaceType, SurfaceClient> surfaces = HashBasedTable.create();
 
-	private void tryDrawSurface(long guid, String player, float partialTicks, ScaledResolution resolution) {
-		SurfaceClient surface = surfaces.get(guid, player);
+	private void tryDrawSurface(long guid, SurfaceType type, float partialTicks, ScaledResolution resolution) {
+		SurfaceClient surface = surfaces.get(guid, type);
 		if (surface != null) {
 			GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_ENABLE_BIT);
 			GL11.glShadeModel(GL11.GL_SMOOTH);
@@ -66,10 +65,6 @@ public class TerminalManagerClient {
 				if (drawable.shouldRender()) drawable.draw(resolution, renderState, partialTicks);
 			GL11.glPopAttrib();
 		}
-	}
-
-	private static String getSurfaceName(boolean isPrivate) {
-		return isPrivate? TerminalUtils.PRIVATE_MARKER : TerminalUtils.GLOBAL_MARKER;
 	}
 
 	public class ForgeBusListener {
@@ -93,29 +88,51 @@ public class TerminalManagerClient {
 				EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 				Long guid = TerminalUtils.tryGetTerminalGuid(player);
 				if (guid != null) {
-					tryDrawSurface(guid, TerminalUtils.GLOBAL_MARKER, evt.partialTicks, evt.resolution);
-					tryDrawSurface(guid, TerminalUtils.PRIVATE_MARKER, evt.partialTicks, evt.resolution);
+					tryDrawSurface(guid, SurfaceType.PRIVATE, evt.partialTicks, evt.resolution);
+					tryDrawSurface(guid, SurfaceType.GLOBAL, evt.partialTicks, evt.resolution);
 				}
 			}
 		}
 
-		@SubscribeEvent
-		public void onTerminalData(TerminalDataEvent evt) {
-			String surfaceName = getSurfaceName(evt.isPrivate);
-			SurfaceClient surface = surfaces.get(evt.terminalId, surfaceName);
+		private SurfaceClient getOrCreateSurface(TerminalEvent.Data evt) {
+			final SurfaceType surfaceType = evt.getSurfaceType();
+			SurfaceClient surface = surfaces.get(evt.terminalId, surfaceType);
 
 			if (surface == null) {
-				surface = new SurfaceClient(evt.terminalId, evt.isPrivate);
-				surfaces.put(evt.terminalId, surfaceName, surface);
+				surface = evt.createSurface();
+				surfaces.put(evt.terminalId, surfaceType, surface);
 			}
-
-			surface.interpretCommandList(evt.commands);
+			return surface;
 		}
 
 		@SubscribeEvent
-		public void onTerminalClear(TerminalClearEvent evt) {
-			String surfaceName = getSurfaceName(evt.isPrivate);
-			surfaces.remove(evt.terminalId, surfaceName);
+		public void onTerminalData(TerminalEvent.PrivateDrawableData evt) {
+			updateTerminalDrawables(evt);
+		}
+
+		@SubscribeEvent
+		public void onTerminalData(TerminalEvent.PublicDrawableData evt) {
+			updateTerminalDrawables(evt);
+		}
+
+		private void updateTerminalDrawables(TerminalEvent.DrawableData evt) {
+			final SurfaceClient surface = getOrCreateSurface(evt);
+			surface.drawablesContainer.interpretCommandList(evt.commands);
+		}
+
+		@SubscribeEvent
+		public void onTerminalClear(TerminalEvent.PrivateClear evt) {
+			clearTerminal(evt);
+		}
+
+		@SubscribeEvent
+		public void onTerminalClear(TerminalEvent.PublicClear evt) {
+			clearTerminal(evt);
+		}
+
+		private void clearTerminal(TerminalEvent.Clear evt) {
+			final SurfaceType surfaceType = evt.getSurfaceType();
+			surfaces.remove(evt.terminalId, surfaceType);
 		}
 
 		@SubscribeEvent
@@ -191,15 +208,14 @@ public class TerminalManagerClient {
 	}
 
 	public DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, float x, float y) {
-		DrawableHitInfo result = findDrawableHit(guid, resolution, x, y, false);
+		DrawableHitInfo result = findDrawableHit(guid, resolution, x, y, SurfaceType.PRIVATE);
 		if (result != null) return result;
 
-		return findDrawableHit(guid, resolution, x, y, true);
+		return findDrawableHit(guid, resolution, x, y, SurfaceType.GLOBAL);
 	}
 
-	private DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, float x, float y, boolean isPrivate) {
-		final String surfaceName = getSurfaceName(isPrivate);
-		SurfaceClient surface = surfaces.get(guid, surfaceName);
+	private DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, float x, float y, SurfaceType surfaceType) {
+		SurfaceClient surface = surfaces.get(guid, surfaceType);
 
 		if (surface == null) return null;
 
@@ -212,7 +228,7 @@ public class TerminalManagerClient {
 			final float dy = y - scaledY;
 
 			final Box2d bb = d.getBoundingBox();
-			if (0 <= dx && 0 <= dy && dx < bb.width && dy < bb.height) { return new DrawableHitInfo(d.getId(), isPrivate, dx, dy, d.z); }
+			if (0 <= dx && 0 <= dy && dx < bb.width && dy < bb.height) { return new DrawableHitInfo(d.getId(), surfaceType, dx, dy, d.z); }
 		}
 
 		return null;

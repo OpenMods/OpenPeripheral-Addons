@@ -14,7 +14,8 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesKeyUpEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesMouseButtonEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesMouseWheelEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSignalCaptureEvent;
-import openperipheral.addons.glasses.TerminalManagerClient.DrawableHitInfo;
+import openperipheral.addons.glasses.client.TerminalManagerClient;
+import openperipheral.addons.glasses.client.TerminalManagerClient.DrawableHitInfo;
 import openperipheral.addons.utils.GuiUtils;
 import openperipheral.addons.utils.GuiUtils.GuiElements;
 
@@ -113,18 +114,18 @@ public class GuiCapture extends GuiScreen {
 	}
 
 	private NetworkEvent createDragEvent(DrawableHitInfo hit) {
-		return new GlassesComponentMouseDragEvent(guid, hit.id, hit.isPrivate, hit.dx, hit.dy);
+		return new GlassesComponentMouseDragEvent(guid, hit.id, hit.surfaceType, hit.dx, hit.dy);
 	}
 
 	private NetworkEvent createMouseButtonEvent(int button, boolean state, DrawableHitInfo hit) {
 		return hit != null?
-				new GlassesComponentMouseButtonEvent(guid, hit.id, hit.isPrivate, hit.dx, hit.dy, button, state) :
+				new GlassesComponentMouseButtonEvent(guid, hit.id, hit.surfaceType, hit.dx, hit.dy, button, state) :
 				new GlassesMouseButtonEvent(guid, button, state);
 	}
 
 	private NetworkEvent createMouseWheelEvent(int wheel, DrawableHitInfo hit) {
 		return hit != null?
-				new GlassesComponentMouseWheelEvent(guid, hit.id, hit.isPrivate, hit.dx, hit.dy, wheel) :
+				new GlassesComponentMouseWheelEvent(guid, hit.id, hit.surfaceType, hit.dx, hit.dy, wheel) :
 				new GlassesMouseWheelEvent(guid, wheel);
 	}
 
