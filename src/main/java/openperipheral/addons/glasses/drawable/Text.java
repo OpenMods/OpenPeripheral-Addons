@@ -55,8 +55,9 @@ public class Text extends Drawable {
 	@Override
 	@SideOnly(Side.CLIENT)
 	protected void drawContents(RenderState renderState, float partialTicks) {
-		renderState.enableTexture();
+		renderState.setupTexturedRender();
 		renderState.setColor(color, alpha);
+
 		FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
 		GL11.glScalef(scale, scale, scale);
 		fontRenderer.drawString(text, 0, 0, ((int)(alpha * 255) << 24 | color));

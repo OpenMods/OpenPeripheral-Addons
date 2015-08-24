@@ -64,10 +64,7 @@ public class LiquidIcon extends Drawable {
 	protected void drawContents(RenderState renderState, float partialTicks) {
 		if (fluidIcon == null || iconWidth <= 0 || iconHeight <= 0) return;
 
-		renderState.enableBlending();
-		renderState.disableAlphaTest();
-		renderState.disableLight();
-		renderState.enableTexture();
+		renderState.setupTexturedRender();
 		renderState.setColor(0xFFFFFF, alpha);
 
 		TextureManager render = FMLClientHandler.instance().getClient().renderEngine;

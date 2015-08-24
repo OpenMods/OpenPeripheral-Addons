@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
+import openmods.utils.render.RenderUtils;
 import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
@@ -84,6 +85,7 @@ public class ItemIcon extends Drawable {
 		renderState.enableTexture();
 		renderState.enableDepthTest();
 		renderState.enableCullFace();
+		renderState.disableLight();
 		renderState.setColor(0xFFFFFF, 1.0f);
 
 		GL11.glScalef(scale, scale, scale);
@@ -96,6 +98,8 @@ public class ItemIcon extends Drawable {
 		if (damageBar > 0 || !Strings.isNullOrEmpty(label)) {
 			renderItem.renderItemOverlayIntoGUI(minecraft.fontRenderer, textureManager, dummyStack, 0, 0, label);
 		}
+
+		RenderUtils.disableLightmap();
 
 		renderState.readState();
 	}

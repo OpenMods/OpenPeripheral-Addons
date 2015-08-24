@@ -57,7 +57,6 @@ public class TerminalManagerClient {
 		if (surface != null) {
 			GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_ENABLE_BIT);
 			GL11.glShadeModel(GL11.GL_SMOOTH);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
 			final RenderState renderState = new RenderState();
 			renderState.forceKnownState();

@@ -1,8 +1,13 @@
 package openperipheral.addons.glasses.utils;
 
+import java.nio.FloatBuffer;
+
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 public class RenderState {
+
+	private final FloatBuffer colors = BufferUtils.createFloatBuffer(16);
 
 	private boolean lighting;
 
@@ -13,6 +18,10 @@ public class RenderState {
 	private boolean texture;
 
 	private boolean blend;
+
+	private int blendSrc;
+
+	private int blendDst;
 
 	private float pointSize;
 
@@ -38,6 +47,10 @@ public class RenderState {
 		GL11.glEnable(GL11.GL_BLEND);
 		this.blend = true;
 
+		this.blendDst = GL11.GL_ONE_MINUS_SRC_ALPHA;
+		this.blendSrc = GL11.GL_SRC_ALPHA;
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		this.cullFace = false;
 
@@ -49,23 +62,43 @@ public class RenderState {
 	}
 
 	public void readState() {
-		this.lighting = GL11.glGetBoolean(GL11.GL_LIGHTING);
-		this.alphaTest = GL11.glGetBoolean(GL11.GL_ALPHA_TEST);
-		this.texture = GL11.glGetBoolean(GL11.GL_TEXTURE_2D);
-		this.depthTest = GL11.glGetBoolean(GL11.GL_DEPTH_TEST);
-		this.blend = GL11.glGetBoolean(GL11.GL_BLEND);
-		this.cullFace = GL11.glGetBoolean(GL11.GL_CULL_FACE);
+		this.lighting = GL11.glIsEnabled(GL11.GL_LIGHTING);
+		this.alphaTest = GL11.glIsEnabled(GL11.GL_ALPHA_TEST);
+		this.texture = GL11.glIsEnabled(GL11.GL_TEXTURE_2D);
+		this.depthTest = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
+		this.blend = GL11.glIsEnabled(GL11.GL_BLEND);
+		this.blendSrc = GL11.glGetInteger(GL11.GL_BLEND_SRC);
+		this.blendDst = GL11.glGetInteger(GL11.GL_BLEND_DST);
+		this.cullFace = GL11.glIsEnabled(GL11.GL_CULL_FACE);
 		this.lineWidth = GL11.glGetFloat(GL11.GL_LINE_WIDTH);
 		this.pointSize = GL11.glGetFloat(GL11.GL_POINT_SIZE);
+
+		GL11.glGetFloat(GL11.GL_CURRENT_COLOR, colors);
+
+		float r = colors.get();
+		float g = colors.get();
+		float b = colors.get();
+		float a = colors.get();
+		this.color = (((int)(255 * r) & 0xFF) << 24) + (((int)(255 * g) & 0xFF) << 16) + (((int)(255 * b) & 0xFF) << 8) + (((int)(255 * a) & 0xFF) << 0);
+	}
+
+	public void setupCommonRender() {
+		disableLight();
+		disableAlphaTest();
+		disableDepthTest();
+		enableBlending();
+		setBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		disableCullFace();
 	}
 
 	public void setupSolidRender() {
-		disableLight();
-		disableAlphaTest();
+		setupCommonRender();
 		disableTexture();
-		disableDepthTest();
-		enableBlending();
-		disableCullFace();
+	}
+
+	public void setupTexturedRender() {
+		setupCommonRender();
+		enableTexture();
 	}
 
 	public void setColor(int rgb, float opacity) {
@@ -100,6 +133,14 @@ public class RenderState {
 		if (!blend) {
 			GL11.glEnable(GL11.GL_BLEND);
 			blend = true;
+		}
+	}
+
+	public void setBlendFunc(int src, int dst) {
+		if (dst != this.blendDst || src != this.blendSrc) {
+			GL11.glBlendFunc(src, dst);
+			this.blendDst = dst;
+			this.blendSrc = src;
 		}
 	}
 
