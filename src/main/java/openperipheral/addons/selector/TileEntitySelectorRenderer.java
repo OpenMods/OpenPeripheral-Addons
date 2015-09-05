@@ -77,7 +77,7 @@ public class TileEntitySelectorRenderer extends TileEntitySpecialRenderer {
 				EntityItem display = selector.getDisplayEntity();
 
 				GL11.glPushMatrix();
-				GL11.glTranslated(slot.x, slot.y, 0);
+				GL11.glTranslated(slot.x, slot.y, 0.001); // offset for 2d items in fast mode
 				final double scale = slot.size * 5;
 				GL11.glScaled(scale, scale, scale);
 				GL11.glTranslated(0, -0.06, 0);
