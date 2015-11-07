@@ -80,6 +80,7 @@ public class RenderState {
 		float b = colors.get();
 		float a = colors.get();
 		this.color = (((int)(255 * r) & 0xFF) << 24) + (((int)(255 * g) & 0xFF) << 16) + (((int)(255 * b) & 0xFF) << 8) + (((int)(255 * a) & 0xFF) << 0);
+		colors.clear();
 	}
 
 	public void setupCommonRender() {

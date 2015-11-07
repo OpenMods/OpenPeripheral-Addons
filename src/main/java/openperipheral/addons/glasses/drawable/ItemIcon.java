@@ -105,8 +105,8 @@ public class ItemIcon extends Drawable {
 	}
 
 	@Override
-	public Type getTypeEnum() {
-		return Type.ITEM;
+	public DrawableType getTypeEnum() {
+		return DrawableType.ITEM;
 	}
 
 	@Override

@@ -6,7 +6,7 @@ import openmods.api.IProxy;
 import openmods.renderer.BlockRenderingHandler;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
-import openperipheral.addons.glasses.TerminalManagerClient;
+import openperipheral.addons.glasses.client.TerminalManagerClient;
 import openperipheral.addons.pim.BlockPIMRenderer;
 import openperipheral.addons.selector.SelectorHighlightHandler;
 import openperipheral.addons.selector.TileEntitySelector;

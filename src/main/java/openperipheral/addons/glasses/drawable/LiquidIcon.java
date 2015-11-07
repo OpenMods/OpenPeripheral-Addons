@@ -91,8 +91,8 @@ public class LiquidIcon extends Drawable {
 	}
 
 	@Override
-	public Type getTypeEnum() {
-		return Type.LIQUID;
+	public DrawableType getTypeEnum() {
+		return DrawableType.LIQUID;
 	}
 
 	@Override

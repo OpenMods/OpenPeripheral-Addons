@@ -24,8 +24,8 @@ public class GradientQuad extends Quad<ColorPoint2d> {
 	}
 
 	@Override
-	protected Type getTypeEnum() {
-		return Type.GRADIENT_QUAD;
+	protected DrawableType getTypeEnum() {
+		return DrawableType.GRADIENT_QUAD;
 	}
 
 }

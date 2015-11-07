@@ -22,8 +22,8 @@ public class GradientLineStrip extends LineStrip<ColorPoint2d> {
 	}
 
 	@Override
-	protected Type getTypeEnum() {
-		return Type.GRADIENT_LINE_STRIP;
+	protected DrawableType getTypeEnum() {
+		return DrawableType.GRADIENT_LINE_STRIP;
 	}
 
 }

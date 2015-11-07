@@ -41,7 +41,7 @@ public class SolidTriangle extends Triangle<Point2d> {
 	}
 
 	@Override
-	protected Type getTypeEnum() {
-		return Type.TRIANGLE;
+	protected DrawableType getTypeEnum() {
+		return DrawableType.TRIANGLE;
 	}
 }

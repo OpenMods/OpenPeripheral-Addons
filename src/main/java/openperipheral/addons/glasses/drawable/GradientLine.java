@@ -24,8 +24,8 @@ public class GradientLine extends Line<ColorPoint2d> {
 	}
 
 	@Override
-	protected Type getTypeEnum() {
-		return Type.GRADIENT_LINE;
+	protected DrawableType getTypeEnum() {
+		return DrawableType.GRADIENT_LINE;
 	}
 
 }

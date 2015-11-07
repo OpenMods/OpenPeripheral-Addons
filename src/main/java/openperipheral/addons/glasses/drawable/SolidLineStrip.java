@@ -39,8 +39,8 @@ public class SolidLineStrip extends LineStrip<Point2d> {
 	}
 
 	@Override
-	protected Type getTypeEnum() {
-		return Type.LINE_STRIP;
+	protected DrawableType getTypeEnum() {
+		return DrawableType.LINE_STRIP;
 	}
 
 }

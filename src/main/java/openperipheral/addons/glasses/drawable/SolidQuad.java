@@ -41,8 +41,8 @@ public class SolidQuad extends Quad<Point2d> {
 	}
 
 	@Override
-	protected Type getTypeEnum() {
-		return Type.QUAD;
+	protected DrawableType getTypeEnum() {
+		return DrawableType.QUAD;
 	}
 
 }

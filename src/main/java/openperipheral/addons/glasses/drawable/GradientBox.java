@@ -104,8 +104,8 @@ public class GradientBox extends Drawable {
 	}
 
 	@Override
-	public Type getTypeEnum() {
-		return Type.GRADIENT;
+	public DrawableType getTypeEnum() {
+		return DrawableType.GRADIENT;
 	}
 
 	@Override

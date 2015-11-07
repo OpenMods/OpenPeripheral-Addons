@@ -29,9 +29,7 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibilityEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeatEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSignalCaptureEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
-import openperipheral.addons.glasses.TerminalEvent.TerminalClearEvent;
-import openperipheral.addons.glasses.TerminalEvent.TerminalDataEvent;
-import openperipheral.addons.glasses.TerminalEvent.TerminalResetEvent;
+import openperipheral.addons.glasses.server.TerminalManagerServer;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.pim.TileEntityPIM;
 import openperipheral.addons.selector.BlockSelector;
@@ -125,9 +123,18 @@ public class OpenPeripheralAddons {
 
 		NetworkEventManager.INSTANCE
 				.startRegistration()
-				.register(TerminalResetEvent.class)
-				.register(TerminalClearEvent.class)
-				.register(TerminalDataEvent.class)
+				.register(TerminalEvent.PrivateDrawableReset.class)
+				.register(TerminalEvent.PublicDrawableReset.class)
+				.register(TerminalEvent.PrivateStructureReset.class)
+				.register(TerminalEvent.PublicStructureReset.class)
+
+				.register(TerminalEvent.PrivateClear.class)
+				.register(TerminalEvent.PublicClear.class)
+
+				.register(TerminalEvent.PrivateDrawableData.class)
+				.register(TerminalEvent.PublicDrawableData.class)
+				.register(TerminalEvent.PrivateStructureData.class)
+				.register(TerminalEvent.PublicStructureData.class)
 
 				.register(GlassesSignalCaptureEvent.class)
 				.register(GlassesStopCaptureEvent.class)

@@ -55,8 +55,8 @@ public class Point extends Drawable {
 	}
 
 	@Override
-	protected Type getTypeEnum() {
-		return Type.POINT;
+	protected DrawableType getTypeEnum() {
+		return DrawableType.POINT;
 	}
 
 	@Override

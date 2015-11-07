@@ -141,7 +141,7 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		public int componentId;
 
 		@Serialize
-		public boolean isPrivate;
+		public SurfaceType surfaceType;
 
 		@Serialize
 		public float x;
@@ -149,10 +149,10 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		@Serialize
 		public float y;
 
-		public GlassesComponentMouseEvent(long guid, int componentId, boolean isPrivate, float x, float y) {
+		public GlassesComponentMouseEvent(long guid, int componentId, SurfaceType surfaceType, float x, float y) {
 			super(guid);
 			this.componentId = componentId;
-			this.isPrivate = isPrivate;
+			this.surfaceType = surfaceType;
 			this.x = x;
 			this.y = y;
 		}
@@ -163,8 +163,8 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		@Serialize
 		public int wheel;
 
-		public GlassesComponentMouseWheelEvent(long guid, int componentId, boolean isPrivate, float x, float y, int wheel) {
-			super(guid, componentId, isPrivate, x, y);
+		public GlassesComponentMouseWheelEvent(long guid, int componentId, SurfaceType surfaceType, float x, float y, int wheel) {
+			super(guid, componentId, surfaceType, x, y);
 			this.wheel = wheel;
 		}
 
@@ -175,7 +175,7 @@ public class GlassesEvent extends SerializableNetworkEvent {
 
 		@Override
 		public Object[] getEventArgs(IArchitecture access) {
-			return wrap(access.createIndex(componentId), isPrivate, x, y, wheel);
+			return wrap(access.createIndex(componentId), surfaceType.scriptValue, x, y, wheel);
 		}
 	}
 
@@ -187,8 +187,8 @@ public class GlassesEvent extends SerializableNetworkEvent {
 		@Serialize
 		public boolean pressed;
 
-		public GlassesComponentMouseButtonEvent(long guid, int componentId, boolean isPrivate, float x, float y, int button, boolean pressed) {
-			super(guid, componentId, isPrivate, x, y);
+		public GlassesComponentMouseButtonEvent(long guid, int componentId, SurfaceType surfaceType, float x, float y, int button, boolean pressed) {
+			super(guid, componentId, surfaceType, x, y);
 			this.button = button;
 			this.pressed = pressed;
 		}
@@ -200,15 +200,15 @@ public class GlassesEvent extends SerializableNetworkEvent {
 
 		@Override
 		public Object[] getEventArgs(IArchitecture access) {
-			return wrap(access.createIndex(componentId), isPrivate, x, y, button);
+			return wrap(access.createIndex(componentId), surfaceType.scriptValue, x, y, button);
 		}
 	}
 
 	@NetworkEventMeta(direction = EventDirection.C2S)
 	public static class GlassesComponentMouseDragEvent extends GlassesComponentMouseEvent {
 
-		public GlassesComponentMouseDragEvent(long guid, int componentId, boolean isPrivate, float x, float y) {
-			super(guid, componentId, isPrivate, x, y);
+		public GlassesComponentMouseDragEvent(long guid, int componentId, SurfaceType surfaceType, float x, float y) {
+			super(guid, componentId, surfaceType, x, y);
 		}
 
 		@Override
@@ -218,7 +218,7 @@ public class GlassesEvent extends SerializableNetworkEvent {
 
 		@Override
 		public Object[] getEventArgs(IArchitecture access) {
-			return wrap(access.createIndex(componentId), isPrivate, x, y);
+			return wrap(access.createIndex(componentId), surfaceType.scriptValue, x, y);
 		}
 	}
 

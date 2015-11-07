@@ -25,8 +25,8 @@ public class GradientPolygon extends Polygon<ColorPoint2d> {
 	}
 
 	@Override
-	protected Type getTypeEnum() {
-		return Type.GRADIENT_POLYGON;
+	protected DrawableType getTypeEnum() {
+		return DrawableType.GRADIENT_POLYGON;
 	}
 
 	@Override

@@ -24,8 +24,8 @@ public class GradientTriangle extends Triangle<ColorPoint2d> {
 	}
 
 	@Override
-	protected Type getTypeEnum() {
-		return Type.GRADIENT_TRIANGLE;
+	protected DrawableType getTypeEnum() {
+		return DrawableType.GRADIENT_TRIANGLE;
 	}
 
 }

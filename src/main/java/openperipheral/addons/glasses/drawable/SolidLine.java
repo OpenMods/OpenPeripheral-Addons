@@ -41,8 +41,8 @@ public class SolidLine extends Line<Point2d> {
 	}
 
 	@Override
-	protected Type getTypeEnum() {
-		return Type.LINE;
+	protected DrawableType getTypeEnum() {
+		return DrawableType.LINE;
 	}
 
 }

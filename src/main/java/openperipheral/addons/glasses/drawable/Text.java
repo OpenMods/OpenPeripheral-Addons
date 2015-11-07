@@ -64,8 +64,8 @@ public class Text extends Drawable {
 	}
 
 	@Override
-	public Type getTypeEnum() {
-		return Type.TEXT;
+	public DrawableType getTypeEnum() {
+		return DrawableType.TEXT;
 	}
 
 	@Override

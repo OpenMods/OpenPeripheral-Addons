@@ -38,8 +38,8 @@ public class SolidPolygon extends Polygon<Point2d> {
 	}
 
 	@Override
-	protected Type getTypeEnum() {
-		return Type.POLYGON;
+	protected DrawableType getTypeEnum() {
+		return DrawableType.POLYGON;
 	}
 
 	@Override

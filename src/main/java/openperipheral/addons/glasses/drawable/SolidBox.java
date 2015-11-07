@@ -66,8 +66,8 @@ public class SolidBox extends Drawable {
 	}
 
 	@Override
-	public Type getTypeEnum() {
-		return Type.BOX;
+	public DrawableType getTypeEnum() {
+		return DrawableType.BOX;
 	}
 
 	@Override
