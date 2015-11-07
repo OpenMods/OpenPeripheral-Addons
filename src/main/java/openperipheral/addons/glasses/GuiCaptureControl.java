@@ -20,7 +20,7 @@ import com.google.common.base.Preconditions;
 
 @ScriptObject
 @Asynchronous
-@AdapterSourceName("glasses-capture")
+@AdapterSourceName("glasses_capture")
 public class GuiCaptureControl {
 
 	private final long guid;
