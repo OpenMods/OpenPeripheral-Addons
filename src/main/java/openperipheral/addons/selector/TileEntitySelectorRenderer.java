@@ -42,7 +42,7 @@ public class TileEntitySelectorRenderer extends TileEntitySpecialRenderer {
 
 		TileEntitySelector selector = (TileEntitySelector)tileEntity;
 
-		ForgeDirection rotation = selector.getRotation();
+		ForgeDirection rotation = selector.getOrientation().up();
 
 		switch (rotation) {
 			case WEST:

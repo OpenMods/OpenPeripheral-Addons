@@ -321,7 +321,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	}
 
 	public AxisAlignedBB getSelection(Vec3 hitVec, int side) {
-		final ForgeDirection rotation = getRotation();
+		final ForgeDirection rotation = getOrientation().up();
 		if (side == rotation.ordinal()) {
 			int gridSize = getGridSize();
 
@@ -335,7 +335,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	}
 
 	private ItemSlot getClickedSlot(Vec3 hitVec, int side) {
-		final ForgeDirection rotation = getRotation();
+		final ForgeDirection rotation = getOrientation().up();
 		if (side == rotation.ordinal()) {
 			int gridSize = getGridSize();
 

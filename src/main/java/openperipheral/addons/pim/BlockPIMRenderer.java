@@ -5,7 +5,6 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
 import openmods.renderer.IBlockRenderer;
 import openmods.utils.render.RenderUtils;
 
@@ -71,7 +70,7 @@ public class BlockPIMRenderer implements IBlockRenderer<BlockPIM> {
 	public void renderInventoryBlock(BlockPIM block, int metadata, int modelID, RenderBlocks renderer) {
 		GL11.glPushMatrix();
 		GL11.glTranslatef(-0.5F, -0.4F, -0.5F);
-		RenderUtils.renderInventoryBlock(renderer, block, ForgeDirection.EAST);
+		RenderUtils.renderInventoryBlock(renderer, block, 0);
 		Tessellator tes = new Tessellator();
 		tes.startDrawingQuads();
 		renderTop(tes, false, -0.5, -0.5, -0.5);

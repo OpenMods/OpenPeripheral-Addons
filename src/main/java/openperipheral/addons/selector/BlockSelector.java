@@ -2,12 +2,12 @@ package openperipheral.addons.selector;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import openmods.block.BlockRotationMode;
+import openmods.geometry.Orientation;
 import openperipheral.addons.BlockOP;
 
 public class BlockSelector extends BlockOP {
@@ -24,7 +24,7 @@ public class BlockSelector extends BlockOP {
 		setRotationMode(BlockRotationMode.SIX_DIRECTIONS);
 		setPlacementMode(BlockPlacementMode.ENTITY_ANGLE);
 		setRenderMode(RenderMode.BOTH);
-		setInventoryRenderRotation(ForgeDirection.SOUTH);
+		setInventoryRenderOrientation(Orientation.XP_ZP);
 	}
 
 	@Override
@@ -53,12 +53,5 @@ public class BlockSelector extends BlockOP {
 	@Override
 	public boolean isOpaqueCube() {
 		return false;
-	}
-
-	@Override
-	public ForgeDirection calculateSide(EntityPlayer player, ForgeDirection direction) {
-		// Mimic ComputerCraft Monitor placement behaviour, i.e. the screen is
-		// looking at the player when placing the block.
-		return super.calculateSide(player, direction).getOpposite();
 	}
 }

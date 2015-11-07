@@ -40,7 +40,7 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 
 	@Override
 	public IPeripheral createPeripheral(int side) {
-		final ForgeDirection rotation = getRotation();
+		final ForgeDirection rotation = getOrientation().up();
 		if (rotation.getOpposite().ordinal() != side) return null;
 
 		final int targetX = xCoord + rotation.offsetX;
@@ -60,7 +60,7 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 	@Override
 	public void onNeighbourChanged(Block block) {
 		if (!worldObj.isRemote && (block == null || block == attachedBlock)) {
-			ForgeDirection targetDir = getRotation();
+			ForgeDirection targetDir = getOrientation().up();
 			boolean isConnected = isProxyActive(targetDir);
 
 			ForgeDirection modemDir = targetDir.getOpposite();
