@@ -2,7 +2,6 @@ package openperipheral.addons;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraft.util.IIcon;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import openmods.Mods;
@@ -79,11 +78,6 @@ public class OpenPeripheralAddons {
 
 		@RegisterItem(name = "generic")
 		public static ItemOPGeneric generic;
-	}
-
-	public static class Icons {
-		public static IIcon sensorTurtle;
-		public static IIcon narcissiticTurtle;
 	}
 
 	public static int renderId;

@@ -1,6 +1,5 @@
 package openperipheral.addons.proxy;
 
-import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import openmods.api.IProxy;
 import openmods.renderer.BlockRenderingHandler;
@@ -15,26 +14,13 @@ import openperipheral.addons.sensors.TileEntitySensorRenderer;
 import cpw.mods.fml.client.registry.ClientRegistry;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class ClientProxy implements IProxy {
-
-	public static class IconLoader {
-		@SubscribeEvent
-		public void textureHook(TextureStitchEvent.Pre event) {
-			if (event.map.getTextureType() == 0) {
-				OpenPeripheralAddons.Icons.narcissiticTurtle = event.map.registerIcon("computercraft:turtle");
-				OpenPeripheralAddons.Icons.sensorTurtle = event.map.registerIcon("openperipheraladdons:sensorturtle");
-			}
-		}
-	}
 
 	@Override
 	public void preInit() {
 		MinecraftForge.EVENT_BUS.register(TerminalManagerClient.instance.createForgeBusListener());
 		FMLCommonHandler.instance().bus().register(TerminalManagerClient.instance.createFmlBusListener());
-
-		MinecraftForge.EVENT_BUS.register(new IconLoader());
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package openperipheral.addons.narcissistic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import openperipheral.addons.MetasGeneric;
-import openperipheral.addons.OpenPeripheralAddons.Icons;
+import openperipheral.addons.ModuleComputerCraft.Icons;
 import openperipheral.api.ApiAccess;
 import openperipheral.api.architecture.cc.IComputerCraftObjectsFactory;
 import dan200.computercraft.api.peripheral.IPeripheral;
