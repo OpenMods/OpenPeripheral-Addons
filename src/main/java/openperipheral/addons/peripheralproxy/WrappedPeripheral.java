@@ -40,7 +40,7 @@ public class WrappedPeripheral implements IPeripheral {
 
 	@Override
 	public boolean equals(IPeripheral other) {
-		return other == this;
+		return other.equals(peripheral);
 	}
 
 }
