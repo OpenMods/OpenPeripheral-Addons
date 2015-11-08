@@ -6,7 +6,8 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.util.ForgeDirection;
+import openmods.geometry.Orientation;
+import openmods.renderer.rotations.TransformProvider;
 import openperipheral.addons.selector.TileEntitySelector.ItemSlot;
 
 import org.lwjgl.opengl.GL11;
@@ -37,35 +38,13 @@ public class TileEntitySelectorRenderer extends TileEntitySpecialRenderer {
 
 	@Override
 	public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float f) {
+		final TileEntitySelector selector = (TileEntitySelector)tileEntity;
+		final Orientation orientation = selector.getOrientation();
+
 		GL11.glPushMatrix();
 		GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5);
-
-		TileEntitySelector selector = (TileEntitySelector)tileEntity;
-
-		ForgeDirection rotation = selector.getOrientation().up();
-
-		switch (rotation) {
-			case WEST:
-				GL11.glRotatef(270F, 0F, 1F, 0F);
-				break;
-			case EAST:
-				GL11.glRotatef(270F, 0F, -1F, 0F);
-				break;
-			case NORTH:
-				GL11.glRotatef(180F, 0F, 1F, 0F);
-				break;
-			case DOWN:
-				GL11.glRotatef(90F, 1F, 0F, 0F);
-				break;
-			case UP:
-				GL11.glRotatef(90F, -1F, 0F, 0F);
-				break;
-			case SOUTH:
-			default:
-				break;
-		}
-
-		GL11.glTranslated(-0.5, -0.5, 0.5);
+		TransformProvider.instance.multMatrix(orientation);
+		GL11.glTranslated(-0.5, 0.501, -0.5); // 0.001 offset for 2d items in fast mode
 
 		final int gridSize = selector.getGridSize();
 
@@ -77,10 +56,10 @@ public class TileEntitySelectorRenderer extends TileEntitySpecialRenderer {
 				EntityItem display = selector.getDisplayEntity();
 
 				GL11.glPushMatrix();
-				GL11.glTranslated(slot.x, slot.y, 0.001); // offset for 2d items in fast mode
+				GL11.glTranslated(slot.x, 0, slot.y + 0.03); // 0.03, since items are rendered off-center
+				GL11.glRotated(-90, 1, 0, 0);
 				final double scale = slot.size * 5;
 				GL11.glScaled(scale, scale, scale);
-				GL11.glTranslated(0, -0.06, 0);
 				display.setEntityItemStack(stack);
 				RenderItem.renderInFrame = true;
 				renderer.doRender(display, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);

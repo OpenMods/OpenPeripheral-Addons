@@ -8,7 +8,6 @@ import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import openperipheral.addons.glasses.client.TerminalManagerClient;
 import openperipheral.addons.pim.BlockPIMRenderer;
-import openperipheral.addons.selector.SelectorHighlightHandler;
 import openperipheral.addons.selector.TileEntitySelector;
 import openperipheral.addons.selector.TileEntitySelectorRenderer;
 import openperipheral.addons.sensors.TileEntitySensor;
@@ -36,10 +35,6 @@ public class ClientProxy implements IProxy {
 		FMLCommonHandler.instance().bus().register(TerminalManagerClient.instance.createFmlBusListener());
 
 		MinecraftForge.EVENT_BUS.register(new IconLoader());
-
-		if (Blocks.selector != null) {
-			MinecraftForge.EVENT_BUS.register(new SelectorHighlightHandler());
-		}
 	}
 
 	@Override

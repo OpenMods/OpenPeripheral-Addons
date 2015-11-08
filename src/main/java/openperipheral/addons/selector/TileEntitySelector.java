@@ -12,9 +12,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.common.util.ForgeDirection;
 import openmods.api.IActivateAwareTile;
 import openmods.api.IHasGui;
+import openmods.geometry.BlockSpaceTransform;
+import openmods.geometry.Orientation;
 import openmods.sync.ISyncListener;
 import openmods.sync.ISyncableObject;
 import openmods.sync.SyncableItemStack;
@@ -38,37 +39,17 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 
 	public static class ItemSlot {
 		public final int slot;
-		public final double size;
 		public final double x;
 		public final double y;
+		public final AxisAlignedBB box;
+		public final double size;
 
 		public ItemSlot(int absSlot, double size, double x, double y) {
 			this.slot = absSlot;
 			this.size = size;
 			this.x = x;
 			this.y = y;
-		}
-
-		private AxisAlignedBB createCenteredBox(double x, double y, double z) {
-			return AxisAlignedBB.getBoundingBox(x - size, y - size, z - size, x + size, y + size, z + size);
-		}
-
-		public AxisAlignedBB createBox(int originX, int originY, int originZ, ForgeDirection orientation) {
-			switch (orientation) {
-				default:
-				case NORTH:
-					return createCenteredBox(originX + (1 - x), originY + y, originZ);
-				case SOUTH:
-					return createCenteredBox(originX + x, originY + y, originZ + 1);
-				case WEST:
-					return createCenteredBox(originX, originY + y, originZ + x);
-				case EAST:
-					return createCenteredBox(originX + 1, originY + y, originZ + (1 - x));
-				case UP:
-					return createCenteredBox(originX + x, originY + 1, originZ + (1 - y));
-				case DOWN:
-					return createCenteredBox(originX + x, originY, originZ + y);
-			}
+			this.box = AxisAlignedBB.getBoundingBox(x - size, 1 - size, y - size, x + size, 1 + size, y + size);
 		}
 	}
 
@@ -83,10 +64,10 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	private static final double DELTA_2 = SIZE_2 + PADDING_2;
 
 	private static final ImmutableList<ItemSlot> BOXES_2 = ImmutableList.of(
-			new ItemSlot(0, SIZE_2, 0.5 - DELTA_2, 0.5 + DELTA_2),
-			new ItemSlot(1, SIZE_2, 0.5 + DELTA_2, 0.5 + DELTA_2),
-			new ItemSlot(3, SIZE_2, 0.5 - DELTA_2, 0.5 - DELTA_2),
-			new ItemSlot(4, SIZE_2, 0.5 + DELTA_2, 0.5 - DELTA_2));
+			new ItemSlot(3, SIZE_2, 0.5 - DELTA_2, 0.5 + DELTA_2),
+			new ItemSlot(4, SIZE_2, 0.5 + DELTA_2, 0.5 + DELTA_2),
+			new ItemSlot(0, SIZE_2, 0.5 - DELTA_2, 0.5 - DELTA_2),
+			new ItemSlot(1, SIZE_2, 0.5 + DELTA_2, 0.5 - DELTA_2));
 
 	private static final double SIZE_3 = 0.085;
 
@@ -95,15 +76,15 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	private static final double DELTA_3 = SIZE_3 + PADDING_3 + SIZE_3;
 
 	private static final List<ItemSlot> BOXES_3 = ImmutableList.of(
-			new ItemSlot(0, SIZE_3, 0.5 - DELTA_3, 0.5 + DELTA_3),
-			new ItemSlot(1, SIZE_3, 0.5, 0.5 + DELTA_3),
-			new ItemSlot(2, SIZE_3, 0.5 + DELTA_3, 0.5 + DELTA_3),
+			new ItemSlot(6, SIZE_3, 0.5 - DELTA_3, 0.5 + DELTA_3),
+			new ItemSlot(7, SIZE_3, 0.5, 0.5 + DELTA_3),
+			new ItemSlot(8, SIZE_3, 0.5 + DELTA_3, 0.5 + DELTA_3),
 			new ItemSlot(3, SIZE_3, 0.5 - DELTA_3, 0.5),
 			new ItemSlot(4, SIZE_3, 0.5, 0.5),
 			new ItemSlot(5, SIZE_3, 0.5 + DELTA_3, 0.5),
-			new ItemSlot(6, SIZE_3, 0.5 - DELTA_3, 0.5 - DELTA_3),
-			new ItemSlot(7, SIZE_3, 0.5, 0.5 - DELTA_3),
-			new ItemSlot(8, SIZE_3, 0.5 + DELTA_3, 0.5 - DELTA_3));
+			new ItemSlot(0, SIZE_3, 0.5 - DELTA_3, 0.5 - DELTA_3),
+			new ItemSlot(1, SIZE_3, 0.5, 0.5 - DELTA_3),
+			new ItemSlot(2, SIZE_3, 0.5 + DELTA_3, 0.5 - DELTA_3));
 
 	private Set<IArchitectureAccess> computers = Sets.newIdentityHashSet();
 
@@ -321,28 +302,26 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	}
 
 	public AxisAlignedBB getSelection(Vec3 hitVec, int side) {
-		final ForgeDirection rotation = getOrientation().up();
-		if (side == rotation.ordinal()) {
-			int gridSize = getGridSize();
+		final Orientation orientation = getOrientation();
+		final Vec3 mappedVec = BlockSpaceTransform.instance.mapWorldToBlock(orientation, hitVec.xCoord - xCoord, hitVec.yCoord - yCoord, hitVec.zCoord - zCoord);
 
-			for (ItemSlot center : getSlots(gridSize)) {
-				AxisAlignedBB aabb = center.createBox(xCoord, yCoord, zCoord, rotation);
-				if (aabb.isVecInside(hitVec)) return aabb;
-			}
+		final int gridSize = getGridSize();
+
+		for (ItemSlot center : getSlots(gridSize)) {
+			final AxisAlignedBB aabb = center.box;
+			if (aabb.isVecInside(mappedVec)) return BlockSpaceTransform.instance.mapBlockToWorld(orientation, aabb).offset(xCoord, yCoord, zCoord);
 		}
 
 		return null;
 	}
 
 	private ItemSlot getClickedSlot(Vec3 hitVec, int side) {
-		final ForgeDirection rotation = getOrientation().up();
-		if (side == rotation.ordinal()) {
-			int gridSize = getGridSize();
+		final Orientation orientation = getOrientation();
+		final Vec3 mappedVec = BlockSpaceTransform.instance.mapWorldToBlock(orientation, hitVec.xCoord - xCoord, hitVec.yCoord - yCoord, hitVec.zCoord - zCoord);
 
-			for (ItemSlot center : getSlots(gridSize)) {
-				AxisAlignedBB aabb = center.createBox(xCoord, yCoord, zCoord, rotation);
-				if (aabb.isVecInside(hitVec)) return center;
-			}
+		int gridSize = getGridSize();
+		for (ItemSlot center : getSlots(gridSize)) {
+			if (center.box.isVecInside(mappedVec)) return center;
 		}
 
 		return null;
