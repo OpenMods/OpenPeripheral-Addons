@@ -91,12 +91,16 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttach
 
 	@Override
 	public void addComputer(IArchitectureAccess computer) {
-		computers.add(computer);
+		synchronized (computers) {
+			computers.add(computer);
+		}
 	}
 
 	@Override
-	public void removeComputer(IArchitectureAccess computer) {
-		computers.remove(computer);
+	public synchronized void removeComputer(IArchitectureAccess computer) {
+		synchronized (computers) {
+			computers.remove(computer);
+		}
 	}
 
 	public boolean hasPlayer() {
@@ -134,9 +138,11 @@ public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttach
 	}
 
 	private void fireEvent(String eventName, Object... args) {
-		for (IArchitectureAccess computer : computers) {
-			Object[] extendedArgs = ArrayUtils.add(args, computer.peripheralName());
-			computer.signal(eventName, extendedArgs);
+		synchronized (computers) {
+			for (IArchitectureAccess computer : computers) {
+				Object[] extendedArgs = ArrayUtils.add(args, computer.peripheralName());
+				computer.signal(eventName, extendedArgs);
+			}
 		}
 	}
 
