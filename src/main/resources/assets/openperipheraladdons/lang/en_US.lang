@@ -71,3 +71,5 @@ openperipheral.turtle.narcissistic.adjective=Narcissistic
 
 openperipheral.misc.key=Key: %s
 openperipheral.misc.no_glasses=This item can be only used with bound terminal glasses!
+openperipheral.terminal.unbound=§aNo terminal key!§r
+openperipheral.terminal.key=§aTerminal key: %s§r

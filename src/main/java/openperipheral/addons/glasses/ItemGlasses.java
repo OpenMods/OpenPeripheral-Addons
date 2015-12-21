@@ -5,18 +5,14 @@ import java.util.List;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import openmods.utils.ItemUtils;
 import openmods.utils.MiscUtils;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.addons.api.ITerminalItem;
-import openperipheral.addons.api.TerminalRegisterEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -30,6 +26,7 @@ public class ItemGlasses extends ItemArmor implements ITerminalItem {
 		setHasSubtypes(true);
 		setCreativeTab(OpenPeripheralAddons.tabOpenPeripheralAddons);
 		setUnlocalizedName("openperipheral.glasses");
+		setTextureName("openperipheraladdons:glasses");
 	}
 
 	private static Long extractGuid(ItemStack stack) {
@@ -64,15 +61,7 @@ public class ItemGlasses extends ItemArmor implements ITerminalItem {
 
 	@Override
 	public void registerIcons(IIconRegister register) {
-		itemIcon = register.registerIcon("openperipheraladdons:glasses");
-	}
-
-	@Override
-	public void onArmorTick(World world, EntityPlayer player, ItemStack itemStack) {
-		if (player instanceof EntityPlayerMP) {
-			Long guid = extractGuid(itemStack);
-			if (guid != null) MinecraftForge.EVENT_BUS.post(new TerminalRegisterEvent((EntityPlayerMP)player, guid));
-		}
+		this.itemIcon = register.registerIcon(getIconString());
 	}
 
 	@Override

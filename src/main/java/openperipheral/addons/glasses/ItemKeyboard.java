@@ -7,7 +7,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.World;
 import openperipheral.addons.OpenPeripheralAddons;
-import openperipheral.addons.api.ITerminalItem;
+
+import com.google.common.base.Optional;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 
 public class ItemKeyboard extends Item {
@@ -25,22 +27,14 @@ public class ItemKeyboard extends Item {
 	@Override
 	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
 		if (world.isRemote) {
-			ItemStack helmet = TerminalUtils.getHeadSlot(player);
-			if (helmet != null) {
-				Item item = helmet.getItem();
-				if (item instanceof ITerminalItem) {
-					Long guid = ((ITerminalItem)item).getTerminalGuid(helmet);
-					if (guid != null) {
-						FMLCommonHandler.instance().showGuiScreen(new GuiCapture(guid));
-						return stack;
-					}
-				}
+			final Optional<Long> terminalGuid = TerminalIdAccess.instance.getIdFrom(player);
+			if (terminalGuid.isPresent()) {
+				FMLCommonHandler.instance().showGuiScreen(new GuiCapture(terminalGuid.get()));
+			} else {
+				player.addChatMessage(new ChatComponentTranslation("openperipheral.misc.no_glasses"));
 			}
-
-			player.addChatMessage(new ChatComponentTranslation("openperipheral.misc.no_glasses"));
 		}
 
 		return stack;
 	}
-
 }

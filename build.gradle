@@ -110,7 +110,7 @@ ext.gitManifest = manifest {
 // Setup Forge plugin
 minecraft {
     version = mc_ver + "-" + forge_ver
-    assetDir = 'run/assets'
+    runDir = 'run/assets'
 
     replaceIn "openperipheral/addons/OpenPeripheralAddons.java"
     replace '$VERSION$', mod_version
@@ -155,6 +155,33 @@ task deobfJar(type: Jar) {
     }
 }
 
+task apiJar(type: Jar) {
+    classifier 'api'
+
+    from sourceSets.main.output
+    from sourceSets.main.java
+
+    include 'openperipheral/addons/api/**'
+
+    manifest {
+        from jenkinsManifest, gitManifest
+    }
+}
+
+task apiSrcJar(type: Jar) {
+    classifier 'api-sources'
+
+    from sourceSets.main.java
+
+    include 'openperipheral/addons/api/**'
+
+    manifest {
+        from jenkinsManifest, gitManifest
+    }
+}
+
 artifacts {
     archives deobfJar
+    archives apiJar
+    archives apiSrcJar
 }

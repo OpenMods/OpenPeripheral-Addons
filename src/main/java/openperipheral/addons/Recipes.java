@@ -7,9 +7,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import openmods.Mods;
+import openperipheral.addons.glasses.TerminalAddonRecipe;
 import cpw.mods.fml.common.Loader;
 
 public class Recipes {
@@ -39,6 +41,9 @@ public class Recipes {
 		if (OpenPeripheralAddons.Items.glasses != null) {
 			recipeList.add(new ShapedOreRecipe(OpenPeripheralAddons.Items.glasses, "igi", "aei", "prp", 'g', Blocks.glowstone, 'i', Items.iron_ingot, 'e', Items.ender_pearl, 'p', Blocks.glass_pane, 'r', Items.redstone, 'a', duckAntenna.copy()));
 			recipeList.add(new ShapedOreRecipe(OpenPeripheralAddons.Items.glasses, "igi", "iea", "prp", 'g', Blocks.glowstone, 'i', Items.iron_ingot, 'e', Items.ender_pearl, 'p', Blocks.glass_pane, 'r', Items.redstone, 'a', duckAntenna.copy()));
+
+			recipeList.add(new TerminalAddonRecipe());
+			RecipeSorter.register("openperipheraladdons:terminal", TerminalAddonRecipe.class, RecipeSorter.Category.SHAPELESS, "after:minecraft:shapeless");
 		}
 
 		if (OpenPeripheralAddons.Items.keyboard != null) {

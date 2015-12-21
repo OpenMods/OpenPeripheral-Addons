@@ -4,8 +4,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import openmods.geometry.Box2d;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackgroundEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetDragParamsEvent;
@@ -18,6 +20,7 @@ import openperipheral.addons.glasses.utils.RenderState;
 
 import org.lwjgl.opengl.GL11;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
@@ -25,6 +28,8 @@ import com.google.common.collect.Table;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 
 public class TerminalManagerClient {
@@ -50,6 +55,8 @@ public class TerminalManagerClient {
 	private TerminalManagerClient() {}
 
 	private final Table<Long, SurfaceType, SurfaceClient> surfaces = HashBasedTable.create();
+
+	private Optional<Long> terminalGuid = Optional.absent();
 
 	private void tryDrawSurface(long guid, SurfaceType type, float partialTicks, ScaledResolution resolution) {
 		SurfaceClient surface = surfaces.get(guid, type);
@@ -84,11 +91,22 @@ public class TerminalManagerClient {
 		@SubscribeEvent
 		public void onRenderGameOverlay(RenderGameOverlayEvent.Post evt) {
 			if (evt.type == ElementType.HELMET) {
-				EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-				Long guid = TerminalUtils.tryGetTerminalGuid(player);
-				if (guid != null) {
+				if (terminalGuid.isPresent()) {
+					final long guid = terminalGuid.get();
 					tryDrawSurface(guid, SurfaceType.PRIVATE, evt.partialTicks, evt.resolution);
 					tryDrawSurface(guid, SurfaceType.GLOBAL, evt.partialTicks, evt.resolution);
+				}
+			}
+		}
+
+		@SubscribeEvent
+		public void onItemTooltip(ItemTooltipEvent evt) {
+			if (evt.itemStack != null && NbtGuidProviders.hasTerminalCapabilities(evt.itemStack)) {
+				final Optional<Long> guid = NbtGuidProviders.getTerminalGuid(evt.itemStack);
+				if (guid.isPresent()) {
+					evt.toolTip.add(StatCollector.translateToLocalFormatted("openperipheral.terminal.key", TerminalUtils.formatTerminalId(guid.get())));
+				} else {
+					evt.toolTip.add(StatCollector.translateToLocal("openperipheral.terminal.unbound"));
 				}
 			}
 		}
@@ -198,6 +216,14 @@ public class TerminalManagerClient {
 		@SubscribeEvent
 		public void onDisconnect(ClientDisconnectionFromServerEvent evt) {
 			surfaces.clear();
+		}
+
+		@SubscribeEvent
+		public void onClientTick(ClientTickEvent evt) {
+			if (evt.phase == Phase.END) {
+				final EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+				terminalGuid = player != null? TerminalIdAccess.instance.getIdFrom(player) : Optional.<Long> absent();
+			}
 		}
 
 	}

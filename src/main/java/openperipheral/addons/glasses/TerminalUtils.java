@@ -3,12 +3,10 @@ package openperipheral.addons.glasses;
 import java.util.UUID;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.nbt.NBTBase.NBTPrimitive;
 import openmods.utils.StringUtils;
-import openperipheral.addons.api.ITerminalItem;
 
 public class TerminalUtils {
 
@@ -36,16 +34,4 @@ public class TerminalUtils {
 		return player.inventory.armorItemInSlot(3);
 	}
 
-	public static Long tryGetTerminalGuid(ItemStack stack) {
-		if (stack != null) {
-			Item item = stack.getItem();
-			if (item instanceof ITerminalItem) return ((ITerminalItem)item).getTerminalGuid(stack);
-		}
-		return null;
-	}
-
-	public static Long tryGetTerminalGuid(EntityPlayer player) {
-		ItemStack stack = getHeadSlot(player);
-		return tryGetTerminalGuid(stack);
-	}
 }

@@ -6,6 +6,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import openmods.Mods;
 import openmods.OpenMods;
+import openmods.access.ApiFactory;
+import openmods.access.ApiFactory.ApiProviderSetup;
+import openmods.access.ApiProviderRegistry;
 import openmods.api.IProxy;
 import openmods.config.BlockInstances;
 import openmods.config.ItemInstances;
@@ -14,6 +17,8 @@ import openmods.config.game.RegisterBlock;
 import openmods.config.game.RegisterItem;
 import openmods.config.properties.ConfigProcessing;
 import openmods.network.event.NetworkEventManager;
+import openperipheral.addons.api.ApiHolder;
+import openperipheral.addons.api.IApiInterface;
 import openperipheral.addons.glasses.*;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackgroundEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseButtonEvent;
@@ -152,9 +157,24 @@ public class OpenPeripheralAddons {
 		IItemStackMetaBuilder itemStackBuilder = ApiAccess.getApi(IItemStackMetaBuilder.class);
 		itemStackBuilder.register(new ItemTerminalMetaProvider());
 
-		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
+		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance.createForgeListener());
+		FMLCommonHandler.instance().bus().register(TerminalManagerServer.instance.createFmlListener());
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, OpenMods.proxy.wrapHandler(null));
+
+		TerminalIdAccess.instance.register(new TerminalIdAccess.InterfaceGetter());
+		TerminalIdAccess.instance.register(new TerminalIdAccess.InterfaceSetter());
+
+		TerminalIdAccess.instance.register(new NbtGuidProviders.NbtGetter());
+		TerminalIdAccess.instance.register(new NbtGuidProviders.NbtSetter());
+
+		ApiFactory.instance.createApi(ApiHolder.class, IApiInterface.class, evt.getAsmData(),
+				new ApiProviderSetup<IApiInterface>() {
+					@Override
+					public void setup(ApiProviderRegistry<IApiInterface> registry) {
+						registry.registerInstance(TerminalIdAccess.instance);
+					}
+				});
 
 		proxy.preInit();
 	}

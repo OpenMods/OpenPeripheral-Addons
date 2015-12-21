@@ -29,6 +29,7 @@ import openperipheral.api.architecture.IArchitectureAccess;
 import openperipheral.api.architecture.IAttachable;
 import openperipheral.api.peripheral.PeripheralTypeId;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -189,8 +190,8 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 		if (player.isDead && !isPlayerLogged(player)) return false;
 
-		Long guid = TerminalUtils.tryGetTerminalGuid(player);
-		return guid != null && guid == this.guid;
+		final Optional<Long> guid = TerminalIdAccess.instance.getIdFrom(player);
+		return guid.isPresent() && guid.get() == this.guid;
 	}
 
 	private static boolean isPlayerLogged(EntityPlayerMP player) {
