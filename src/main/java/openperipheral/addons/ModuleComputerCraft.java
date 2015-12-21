@@ -41,7 +41,7 @@ public class ModuleComputerCraft {
 	}
 
 	public static class Blocks implements BlockInstances {
-		@RegisterBlock(name = "peripheralproxy", tileEntity = TileEntityPeripheralProxy.class)
+		@RegisterBlock(name = "peripheralproxy", tileEntity = TileEntityPeripheralProxy.class, textureName = "proxy_side")
 		public static BlockPeripheralProxy peripheralProxy;
 	}
 

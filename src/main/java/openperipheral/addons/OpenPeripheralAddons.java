@@ -12,9 +12,7 @@ import openmods.access.ApiProviderRegistry;
 import openmods.api.IProxy;
 import openmods.config.BlockInstances;
 import openmods.config.ItemInstances;
-import openmods.config.game.ModStartupHelper;
-import openmods.config.game.RegisterBlock;
-import openmods.config.game.RegisterItem;
+import openmods.config.game.*;
 import openmods.config.properties.ConfigProcessing;
 import openmods.network.event.NetworkEventManager;
 import openperipheral.addons.api.ApiHolder;
@@ -61,16 +59,16 @@ public class OpenPeripheralAddons {
 	public static final String MODID = "OpenPeripheral";
 
 	public static class Blocks implements BlockInstances {
-		@RegisterBlock(name = "glassesbridge", tileEntity = TileEntityGlassesBridge.class, itemBlock = ItemGlassesBridge.class)
+		@RegisterBlock(name = "glassesbridge", tileEntity = TileEntityGlassesBridge.class, itemBlock = ItemGlassesBridge.class, textureName = "bridge")
 		public static BlockGlassesBridge glassesBridge;
 
-		@RegisterBlock(name = "pim", tileEntity = TileEntityPIM.class, unlocalizedName = "playerinventory")
+		@RegisterBlock(name = "pim", tileEntity = TileEntityPIM.class, unlocalizedName = "playerinventory", textureName = "pim_blue")
 		public static BlockPIM pim;
 
 		@RegisterBlock(name = "sensor", tileEntity = TileEntitySensor.class)
 		public static BlockSensor sensor;
 
-		@RegisterBlock(name = "selector", tileEntity = TileEntitySelector.class)
+		@RegisterBlock(name = "selector", tileEntity = TileEntitySelector.class, textureName = "selector_side")
 		public static BlockSelector selector;
 	}
 
@@ -81,7 +79,7 @@ public class OpenPeripheralAddons {
 		@RegisterItem(name = "keyboard")
 		public static ItemKeyboard keyboard;
 
-		@RegisterItem(name = "generic")
+		@RegisterItem(name = "generic", textureName = RegisterItem.NONE)
 		public static ItemOPGeneric generic;
 	}
 
@@ -101,6 +99,12 @@ public class OpenPeripheralAddons {
 	};
 
 	private final ModStartupHelper startupHelper = new ModStartupHelper("openperipheral") {
+
+		@Override
+		protected void setupIds(GameConfigProvider gameConfig) {
+			gameConfig.setTextureModId("openperipheraladdons");
+		}
+
 		@Override
 		protected void populateConfig(Configuration config) {
 			ConfigProcessing.processAnnotations("OpenPeripheralAddons", config, Config.class);

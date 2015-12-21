@@ -2,7 +2,6 @@ package openperipheral.addons.glasses;
 
 import java.util.List;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArmor;
@@ -25,8 +24,6 @@ public class ItemGlasses extends ItemArmor implements ITerminalItem {
 		setMaxStackSize(1);
 		setHasSubtypes(true);
 		setCreativeTab(OpenPeripheralAddons.tabOpenPeripheralAddons);
-		setUnlocalizedName("openperipheral.glasses");
-		setTextureName("openperipheraladdons:glasses");
 	}
 
 	private static Long extractGuid(ItemStack stack) {
@@ -57,11 +54,6 @@ public class ItemGlasses extends ItemArmor implements ITerminalItem {
 			default:
 				return "openperipheraladdons:textures/models/glasses.png";
 		}
-	}
-
-	@Override
-	public void registerIcons(IIconRegister register) {
-		this.itemIcon = register.registerIcon(getIconString());
 	}
 
 	@Override

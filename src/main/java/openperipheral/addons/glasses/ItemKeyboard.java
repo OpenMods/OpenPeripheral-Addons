@@ -1,6 +1,5 @@
 package openperipheral.addons.glasses;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,11 +16,6 @@ public class ItemKeyboard extends Item {
 	public ItemKeyboard() {
 		setCreativeTab(OpenPeripheralAddons.tabOpenPeripheralAddons);
 		setMaxStackSize(1);
-	}
-
-	@Override
-	public void registerIcons(IIconRegister register) {
-		itemIcon = register.registerIcon("openperipheraladdons:keyboard");
 	}
 
 	@Override

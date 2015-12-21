@@ -14,7 +14,7 @@ import openperipheral.addons.ticketmachine.TileEntityTicketMachine;
 public class ModuleRailcraft {
 
 	public static class Blocks implements BlockInstances {
-		@RegisterBlock(name = "ticketmachine", tileEntity = TileEntityTicketMachine.class)
+		@RegisterBlock(name = "ticketmachine", tileEntity = TileEntityTicketMachine.class, textureName = "ticketmachine_bottom")
 		public static BlockTicketMachine ticketMachine;
 	}
 

@@ -2,18 +2,13 @@ package openperipheral.addons.peripheralproxy;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 import openmods.block.BlockRotationMode;
 import openperipheral.addons.BlockOP;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockPeripheralProxy extends BlockOP {
-
-	public static class Icons {
-		public static IIcon top;
-		public static IIcon bottom;
-		public static IIcon side;
-	}
 
 	public BlockPeripheralProxy() {
 		super(Material.ground);
@@ -23,16 +18,11 @@ public class BlockPeripheralProxy extends BlockOP {
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister registry) {
-		Icons.top = registry.registerIcon("openperipheraladdons:proxy_top");
-		Icons.bottom = registry.registerIcon("openperipheraladdons:proxy_bottom");
-		Icons.side = registry.registerIcon("openperipheraladdons:proxy_side");
-		setTexture(ForgeDirection.UP, Icons.top);
-		setTexture(ForgeDirection.DOWN, Icons.bottom);
-		setTexture(ForgeDirection.EAST, Icons.side);
-		setTexture(ForgeDirection.WEST, Icons.side);
-		setTexture(ForgeDirection.NORTH, Icons.side);
-		setTexture(ForgeDirection.SOUTH, Icons.side);
-		setDefaultTexture(Icons.side);
+		super.registerBlockIcons(registry);
+
+		setTexture(ForgeDirection.UP, registry.registerIcon("openperipheraladdons:proxy_top"));
+		setTexture(ForgeDirection.DOWN, registry.registerIcon("openperipheraladdons:proxy_bottom"));
 	}
 }

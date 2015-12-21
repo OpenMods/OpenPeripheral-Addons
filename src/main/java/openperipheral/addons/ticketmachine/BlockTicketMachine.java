@@ -6,6 +6,8 @@ import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
 import openmods.block.BlockRotationMode;
 import openperipheral.addons.BlockOP;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockTicketMachine extends BlockOP {
 
@@ -19,7 +21,10 @@ public class BlockTicketMachine extends BlockOP {
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister registry) {
+		super.registerBlockIcons(registry);
+
 		iconFrontEmpty = registry.registerIcon("openperipheraladdons:ticketmachine_front_empty");
 		iconFrontTicket = registry.registerIcon("openperipheraladdons:ticketmachine_front_ticket");
 
@@ -29,9 +34,7 @@ public class BlockTicketMachine extends BlockOP {
 		setTexture(ForgeDirection.NORTH, registry.registerIcon("openperipheraladdons:ticketmachine_back"));
 		setTexture(ForgeDirection.UP, registry.registerIcon("openperipheraladdons:ticketmachine_top"));
 
-		IIcon bottom = registry.registerIcon("openperipheraladdons:ticketmachine_bottom");
-		setTexture(ForgeDirection.DOWN, bottom);
-		setDefaultTexture(bottom);
+		setTexture(ForgeDirection.DOWN, registry.registerIcon("openperipheraladdons:ticketmachine_bottom"));
 	}
 
 }

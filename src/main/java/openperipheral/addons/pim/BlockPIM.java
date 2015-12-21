@@ -9,6 +9,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import openperipheral.addons.BlockOP;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockPIM extends BlockOP {
 
@@ -25,10 +27,12 @@ public class BlockPIM extends BlockOP {
 	}
 
 	@Override
+	@SideOnly(Side.CLIENT)
 	public void registerBlockIcons(IIconRegister registry) {
+		super.registerBlockIcons(registry);
+
 		Icons.black = registry.registerIcon("openperipheraladdons:pim_black");
 		Icons.blue = registry.registerIcon("openperipheraladdons:pim_blue");
-		blockIcon = Icons.blue;
 	}
 
 	@Override

@@ -3,7 +3,6 @@ package openperipheral.addons.sensors;
 import java.util.List;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.world.IBlockAccess;
@@ -23,11 +22,6 @@ public class BlockSensor extends BlockOP {
 	@Override
 	public boolean canCollideCheck(int par1, boolean par2) {
 		return true;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister registry) {
-		this.blockIcon = registry.registerIcon("openperipheraladdons:sensor");
 	}
 
 	@Override
