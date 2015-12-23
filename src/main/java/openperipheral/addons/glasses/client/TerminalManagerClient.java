@@ -16,6 +16,7 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeatEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.*;
 import openperipheral.addons.glasses.drawable.Drawable;
+import openperipheral.addons.glasses.utils.Point2d;
 import openperipheral.addons.glasses.utils.RenderState;
 
 import org.lwjgl.opengl.GL11;
@@ -239,21 +240,25 @@ public class TerminalManagerClient {
 		return findDrawableHit(guid, resolution, x, y, SurfaceType.GLOBAL);
 	}
 
-	private DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, float x, float y, SurfaceType surfaceType) {
+	private DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, float clickX, float clickY, SurfaceType surfaceType) {
 		SurfaceClient surface = surfaces.get(guid, surfaceType);
 
 		if (surface == null) return null;
 
+		final int screenWidth = resolution.getScaledWidth();
+		final int screenHeight = resolution.getScaledHeight();
+
 		for (Drawable d : Lists.reverse(surface.getSortedDrawables())) {
 			if (!d.isClickable()) continue;
-			final float scaledX = d.getX(resolution);
-			final float scaledY = d.getY(resolution);
-
-			final float dx = x - scaledX;
-			final float dy = y - scaledY;
 
 			final Box2d bb = d.getBoundingBox();
-			if (0 <= dx && 0 <= dy && dx < bb.width && dy < bb.height) { return new DrawableHitInfo(d.getId(), surfaceType, dx, dy, d.z); }
+			final Point2d localClick = d.transformToLocal(clickX, clickY, screenWidth, screenHeight);
+
+			final float localX = localClick.x;
+			final float localY = localClick.y;
+
+			if (0 <= localX && 0 <= localY &&
+					localX < bb.width && localY < bb.height) { return new DrawableHitInfo(d.getId(), surfaceType, localX, localY, d.z); }
 		}
 
 		return null;

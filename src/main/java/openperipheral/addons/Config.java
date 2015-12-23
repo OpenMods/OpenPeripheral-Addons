@@ -30,10 +30,10 @@ public class Config {
 
 	@OnLineModifiable
 	@ConfigProperty(category = "glasses", comment = "Default difference in mouse position (in pixels) needed before drag event is sent to server")
-	public static int defaultDragThreshold = 10;
+	public static int defaultDragThreshold = 5;
 
 	@OnLineModifiable
 	@ConfigProperty(category = "glasses", comment = "Default time (in ticks) between two drag events")
-	public static int defaultDragPeriod = 20;
+	public static int defaultDragPeriod = 10;
 
 }

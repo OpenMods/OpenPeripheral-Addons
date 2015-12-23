@@ -20,11 +20,11 @@ import openperipheral.addons.api.IApiInterface;
 import openperipheral.addons.glasses.*;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackgroundEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseButtonEvent;
-import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseDragEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseWheelEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesKeyDownEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesKeyUpEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesMouseButtonEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesMouseDragEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesMouseWheelEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetDragParamsEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibilityEvent;
@@ -145,7 +145,7 @@ public class OpenPeripheralAddons {
 				.register(GlassesMouseButtonEvent.class)
 				.register(GlassesComponentMouseWheelEvent.class)
 				.register(GlassesComponentMouseButtonEvent.class)
-				.register(GlassesComponentMouseDragEvent.class)
+				.register(GlassesMouseDragEvent.class)
 				.register(GlassesKeyDownEvent.class)
 				.register(GlassesKeyUpEvent.class)
 				.register(GlassesChangeBackgroundEvent.class)

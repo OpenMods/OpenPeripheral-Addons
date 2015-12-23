@@ -7,11 +7,11 @@ import net.minecraft.client.gui.ScaledResolution;
 import openmods.network.event.NetworkEvent;
 import openperipheral.addons.Config;
 import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseButtonEvent;
-import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseDragEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseWheelEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesKeyDownEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesKeyUpEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesMouseButtonEvent;
+import openperipheral.addons.glasses.GlassesEvent.GlassesMouseDragEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesMouseWheelEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSignalCaptureEvent;
 import openperipheral.addons.glasses.client.TerminalManagerClient;
@@ -29,13 +29,13 @@ public class GuiCapture extends GuiScreen {
 	private int backgroundColor = 0x2A00FF00;
 	private final long guid;
 
-	private int dragCount;
+	private int mouseButtonsDown;
 
-	private int lastDragX;
-	private int lastDragY;
-	private long dragInterval;
+	private float lastDragX;
+	private float lastDragY;
+	private int dragInterval;
 
-	private int dragThresholdSquared = Config.defaultDragThreshold * Config.defaultDragThreshold;
+	private float dragThresholdSquared = Config.defaultDragThreshold * Config.defaultDragThreshold;
 	private int dragPeriod = Config.defaultDragPeriod;
 
 	private final Map<GuiElements, Boolean> originalState;
@@ -57,53 +57,59 @@ public class GuiCapture extends GuiScreen {
 		final int mx = Mouse.getEventX();
 		final int my = Mouse.getEventY();
 
-		final boolean canSendDragEvent = canSendDragEvent(mx, my);
+		final float scaleX = (float)this.width / this.mc.displayWidth;
+		final float scaleY = (float)this.height / this.mc.displayHeight;
 
-		if (button != -1 || wheel != 0 || canSendDragEvent) {
-			final float scaleX = (float)this.width / this.mc.displayWidth;
-			final float scaleY = (float)this.height / this.mc.displayHeight;
+		final float x = mx * scaleX;
+		final float y = this.height - my * scaleY;
 
-			float x = mx * scaleX;
-			float y = this.height - my * scaleY;
-
+		if (button != -1 || wheel != 0) {
 			final ScaledResolution resolution = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
 			final DrawableHitInfo hit = TerminalManagerClient.instance.findDrawableHit(guid, resolution, x, y);
 
 			if (button != -1) {
 				final boolean state = Mouse.getEventButtonState();
 				createMouseButtonEvent(button, state, hit).sendToServer();
-				updateDragging(state, mx, my);
-			} else if (canSendDragEvent && hit != null) {
-				createDragEvent(hit).sendToServer();
-				resetDraggingLimiter(mx, my);
+				final boolean draggingStarted = updateButtonCounter(state);
+				if (draggingStarted) resetDraggingLimiter(x, y);
 			}
 
 			if (wheel != 0) createMouseWheelEvent(wheel, hit).sendToServer();
 		}
-	}
 
-	private void updateDragging(boolean isPressed, int mx, int my) {
-		if (isPressed) {
-			this.dragCount++;
-			resetDraggingLimiter(mx, my);
-		} else {
-			this.dragCount = Math.max(this.dragCount - 1, 0); // first event may be mouse_up, from keyboard click
+		{
+			final float dx = (x - lastDragX);
+			final float dy = (y - lastDragY);
+
+			if (canSendDragEvent(dx, dy)) {
+				createDragEvent(dx, dy).sendToServer();
+				resetDraggingLimiter(x, y);
+			}
 		}
+
 	}
 
-	private void resetDraggingLimiter(int mx, int my) {
-		this.lastDragX = mx;
-		this.lastDragY = my;
+	private boolean updateButtonCounter(boolean isPressed) {
+		if (isPressed) {
+			return ++this.mouseButtonsDown == 1;
+		} else {
+			this.mouseButtonsDown = Math.max(this.mouseButtonsDown - 1, 0); // first event may be mouse_up, from keyboard click
+		}
+
+		return false;
+	}
+
+	private void resetDraggingLimiter(float x, float y) {
+		this.lastDragX = x;
+		this.lastDragY = y;
 		this.dragInterval = dragPeriod;
 	}
 
-	private boolean canSendDragEvent(int mx, int my) {
-		if (dragCount <= 0) return false;
+	private boolean canSendDragEvent(float dx, float dy) {
+		if (mouseButtonsDown <= 0) return false;
 		if (dragInterval >= 0) return false;
-		final int dx = (mx - lastDragX);
-		final int dy = (my - lastDragY);
 
-		final int d = dx * dx + dy * dy;
+		final float d = dx * dx + dy * dy;
 		return d >= dragThresholdSquared;
 	}
 
@@ -113,8 +119,8 @@ public class GuiCapture extends GuiScreen {
 		--dragInterval;
 	}
 
-	private NetworkEvent createDragEvent(DrawableHitInfo hit) {
-		return new GlassesComponentMouseDragEvent(guid, hit.id, hit.surfaceType, hit.dx, hit.dy);
+	private NetworkEvent createDragEvent(float dx, float dy) {
+		return new GlassesMouseDragEvent(guid, dx, dy);
 	}
 
 	private NetworkEvent createMouseButtonEvent(int button, boolean state, DrawableHitInfo hit) {

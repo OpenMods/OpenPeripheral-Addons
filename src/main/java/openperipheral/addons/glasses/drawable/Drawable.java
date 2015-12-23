@@ -9,6 +9,7 @@ import openmods.geometry.Box2d;
 import openmods.structured.IStructureElement;
 import openmods.structured.StructureField;
 import openperipheral.addons.glasses.StructuredObjectBase;
+import openperipheral.addons.glasses.utils.Point2d;
 import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
@@ -72,12 +73,12 @@ public abstract class Drawable extends StructuredObjectBase {
 			output.writeByte(value);
 		}
 
-		public float getScreenAnchorX(ScaledResolution resolution) {
+		public float getScreenAnchorX(float screenWidth) {
 			switch (screenHorizontalAnchor) {
 				case MIDDLE:
-					return resolution.getScaledWidth() / 2.0f;
+					return screenWidth / 2.0f;
 				case RIGHT:
-					return resolution.getScaledWidth();
+					return screenWidth;
 				case LEFT:
 				default:
 					return 0;
@@ -98,12 +99,12 @@ public abstract class Drawable extends StructuredObjectBase {
 			}
 		}
 
-		public float getScreenAnchorY(ScaledResolution resolution) {
+		public float getScreenAnchorY(float screenHeight) {
 			switch (screenVerticalAnchor) {
 				case BOTTOM:
-					return resolution.getScaledHeight();
+					return screenHeight;
 				case MIDDLE:
-					return resolution.getScaledHeight() / 2.0f;
+					return screenHeight / 2.0f;
 				default:
 				case TOP:
 					return 0;
@@ -124,6 +125,10 @@ public abstract class Drawable extends StructuredObjectBase {
 	}
 
 	private Box2d boundingBox = Box2d.NULL;
+
+	private float rotationSin;
+
+	private float rotationCos;
 
 	private final Alignment alignment = new Alignment();
 
@@ -151,22 +156,31 @@ public abstract class Drawable extends StructuredObjectBase {
 
 	protected Drawable() {}
 
-	@SideOnly(Side.CLIENT)
-	public float getX(ScaledResolution resolution) {
-		return alignment.getScreenAnchorX(resolution) + boundingBox.left + alignment.getObjectAnchorX(boundingBox);
+	public void onUpdate() {
+		final double rotationRad = rotation / 180 * Math.PI;
+		rotationCos = (float)Math.cos(rotationRad);
+		rotationSin = (float)Math.sin(rotationRad);
 	}
 
-	@SideOnly(Side.CLIENT)
-	public float getY(ScaledResolution resolution) {
-		return alignment.getScreenAnchorY(resolution) + boundingBox.top + alignment.getObjectAnchorY(boundingBox);
-	}
+	public Point2d transformToLocal(float worldX, float worldY, float screenWidth, float screenHeight) {
+		final float worldLeft = alignment.getScreenAnchorX(screenWidth) + boundingBox.left;
+		final float worldTop = alignment.getScreenAnchorY(screenHeight) + boundingBox.top;
+		worldX -= worldLeft;
+		worldY -= worldTop;
 
-	public abstract void onUpdate();
+		float localX = worldX * +rotationCos + worldY * +rotationSin;
+		float localY = worldX * -rotationSin + worldY * +rotationCos;
+
+		localX -= alignment.getObjectAnchorX(boundingBox);
+		localY -= alignment.getObjectAnchorY(boundingBox);
+
+		return new Point2d(localX, localY);
+	}
 
 	@SideOnly(Side.CLIENT)
 	public void draw(ScaledResolution resolution, RenderState renderState, float partialTicks) {
-		final float screenX = alignment.getScreenAnchorX(resolution) + boundingBox.left;
-		final float screenY = alignment.getScreenAnchorY(resolution) + boundingBox.top;
+		final float screenX = alignment.getScreenAnchorX(resolution.getScaledWidth()) + boundingBox.left;
+		final float screenY = alignment.getScreenAnchorY(resolution.getScaledHeight()) + boundingBox.top;
 
 		final float anchorX = alignment.getObjectAnchorX(boundingBox);
 		final float anchorY = alignment.getObjectAnchorY(boundingBox);

@@ -39,6 +39,7 @@ public class Point extends Drawable {
 	}
 
 	private void updateBoundingBox() {
+		// no point in rotating point
 		setBoundingBox(Box2d.fromOriginAndSize(coord.x, coord.y, 0, 0));
 	}
 

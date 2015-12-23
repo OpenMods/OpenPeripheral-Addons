@@ -58,6 +58,7 @@ public abstract class BoundedShape<P> extends Drawable {
 
 	@Override
 	public void onUpdate() {
+		super.onUpdate();
 		updateBoundingBox();
 	}
 

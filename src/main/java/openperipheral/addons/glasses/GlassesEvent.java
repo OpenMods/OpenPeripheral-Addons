@@ -205,20 +205,28 @@ public class GlassesEvent extends SerializableNetworkEvent {
 	}
 
 	@NetworkEventMeta(direction = EventDirection.C2S)
-	public static class GlassesComponentMouseDragEvent extends GlassesComponentMouseEvent {
+	public static class GlassesMouseDragEvent extends GlassesClientEvent {
 
-		public GlassesComponentMouseDragEvent(long guid, int componentId, SurfaceType surfaceType, float x, float y) {
-			super(guid, componentId, surfaceType, x, y);
+		@Serialize
+		public float dx;
+
+		@Serialize
+		public float dy;
+
+		public GlassesMouseDragEvent(long guid, float dx, float dy) {
+			super(guid);
+			this.dx = dx;
+			this.dy = dy;
 		}
 
 		@Override
 		public String getEventName() {
-			return "glasses_component_mouse_drag";
+			return "glasses_mouse_drag";
 		}
 
 		@Override
 		public Object[] getEventArgs(IArchitecture access) {
-			return wrap(access.createIndex(componentId), surfaceType.scriptValue, x, y);
+			return wrap(dx, dy);
 		}
 	}
 

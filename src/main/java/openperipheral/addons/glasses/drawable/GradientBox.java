@@ -115,6 +115,7 @@ public class GradientBox extends Drawable {
 
 	@Override
 	public void onUpdate() {
+		super.onUpdate();
 		setBoundingBox(Box2d.fromOriginAndSize(x, y, width, height));
 	}
 }
