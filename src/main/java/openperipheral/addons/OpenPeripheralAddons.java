@@ -39,9 +39,6 @@ import openperipheral.addons.selector.TileEntitySelector;
 import openperipheral.addons.sensors.AdapterSensor;
 import openperipheral.addons.sensors.BlockSensor;
 import openperipheral.addons.sensors.TileEntitySensor;
-import openperipheral.api.ApiAccess;
-import openperipheral.api.adapter.IPeripheralAdapterRegistry;
-import openperipheral.api.meta.IItemStackMetaBuilder;
 
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -53,7 +50,7 @@ import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.network.NetworkRegistry;
 
-@Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$,$NEXT-LIB-VERSION$);required-after:OpenPeripheralApi@[3.3.1,3.4);after:ComputerCraft@[1.70,]")
+@Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$,$NEXT-LIB-VERSION$);required-after:OpenPeripheralApi@$OP-API-VERSION$;after:ComputerCraft@[1.70,]")
 public class OpenPeripheralAddons {
 
 	public static final String MODID = "OpenPeripheral";
@@ -155,12 +152,6 @@ public class OpenPeripheralAddons {
 
 		Items.generic.initRecipes();
 
-		IPeripheralAdapterRegistry adapters = ApiAccess.getApi(IPeripheralAdapterRegistry.class);
-		adapters.register(new AdapterSensor());
-
-		IItemStackMetaBuilder itemStackBuilder = ApiAccess.getApi(IItemStackMetaBuilder.class);
-		itemStackBuilder.register(new ItemTerminalMetaProvider());
-
 		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance.createForgeListener());
 		FMLCommonHandler.instance().bus().register(TerminalManagerServer.instance.createFmlListener());
 
@@ -192,6 +183,11 @@ public class OpenPeripheralAddons {
 	public void init(FMLInitializationEvent evt) {
 		proxy.init();
 		proxy.registerRenderInformation();
+
+		OpcAccess.checkApiPresent();
+
+		OpcAccess.adapterRegistry.register(new AdapterSensor());
+		OpcAccess.itemStackMetaBuilder.register(new ItemTerminalMetaProvider());
 
 		if (Loader.isModLoaded(Mods.COMPUTERCRAFT)) ModuleComputerCraft.init();
 	}

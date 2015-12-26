@@ -14,12 +14,11 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import openmods.utils.WorldUtils;
-import openperipheral.api.ApiAccess;
+import openperipheral.addons.OpcAccess;
 import openperipheral.api.adapter.IPeripheralAdapter;
 import openperipheral.api.adapter.method.Arg;
 import openperipheral.api.adapter.method.ReturnType;
 import openperipheral.api.adapter.method.ScriptCallable;
-import openperipheral.api.meta.IEntityPartialMetaBuilder;
 import openperipheral.api.meta.IMetaProviderProxy;
 
 import com.google.common.base.Preconditions;
@@ -98,7 +97,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 		Preconditions.checkArgument(mob.boundingBox.intersectsWith(aabb), DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
 		final Vec3 sensorPos = sensor.getLocation();
-		return ApiAccess.getApi(IEntityPartialMetaBuilder.class).createProxy(mob, sensorPos);
+		return OpcAccess.entityMetaBuilder.createProxy(mob, sensorPos);
 	}
 
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the ids of all the mobs in range. Deprecated, please use getEntityIds('mob')")

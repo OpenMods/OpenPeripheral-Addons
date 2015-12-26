@@ -4,12 +4,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import openperipheral.addons.MetasGeneric;
 import openperipheral.addons.ModuleComputerCraft.Icons;
-import openperipheral.api.ApiAccess;
+import openperipheral.api.ApiHolder;
 import openperipheral.api.architecture.cc.IComputerCraftObjectsFactory;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 
 public class TurtleUpgradeNarcissistic implements ITurtleUpgrade {
+
+	@ApiHolder
+	private static IComputerCraftObjectsFactory ccFactory;
 
 	@Override
 	public int getUpgradeID() {
@@ -33,7 +36,7 @@ public class TurtleUpgradeNarcissistic implements ITurtleUpgrade {
 
 	@Override
 	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
-		return ApiAccess.getApi(IComputerCraftObjectsFactory.class).createPeripheral(new TurtleInventoryDelegate(turtle));
+		return ccFactory.createPeripheral(new TurtleInventoryDelegate(turtle));
 	}
 
 	@Override

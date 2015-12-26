@@ -50,7 +50,7 @@ apply plugin: 'forge'
 dependencies {
     compile project(":OpenModsLib") // Load OpenModsLib from submodule
 
-    compile "openperipheral:OpenPeripheralCore-API:3.3.1"
+    compile "openperipheral:OpenPeripheralCore-API:" + opc_api_version
 }
 
 //================================================
@@ -114,6 +114,7 @@ minecraft {
 
     replaceIn "openperipheral/addons/OpenPeripheralAddons.java"
     replace '$VERSION$', mod_version
+    replace '$OP-API-VERSION$', opc_api_version
     replace '$LIB-VERSION$', project(':OpenModsLib').mod_version
     replace '$NEXT-LIB-VERSION$', project(':OpenModsLib').next_mod_version
 }
@@ -156,7 +157,8 @@ task deobfJar(type: Jar) {
 }
 
 task apiJar(type: Jar) {
-    classifier 'api'
+    baseName "OpenPeripheralAddons-API"
+    version api_version
 
     from sourceSets.main.output
     from sourceSets.main.java
@@ -169,7 +171,9 @@ task apiJar(type: Jar) {
 }
 
 task apiSrcJar(type: Jar) {
-    classifier 'api-sources'
+    baseName "OpenPeripheralAddons-API"
+    version api_version
+    classifier 'sources'
 
     from sourceSets.main.java
 
