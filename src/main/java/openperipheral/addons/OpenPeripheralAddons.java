@@ -187,7 +187,9 @@ public class OpenPeripheralAddons {
 		OpcAccess.checkApiPresent();
 
 		OpcAccess.adapterRegistry.register(new AdapterSensor());
+
 		OpcAccess.itemStackMetaBuilder.register(new ItemTerminalMetaProvider());
+		OpcAccess.itemStackMetaBuilder.register(new NbtTerminalMetaProvider());
 
 		if (Loader.isModLoaded(Mods.COMPUTERCRAFT)) ModuleComputerCraft.init();
 	}

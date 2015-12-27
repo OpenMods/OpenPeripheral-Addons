@@ -6,7 +6,7 @@ import com.google.common.base.Optional;
 
 /**
  * Registry of id storage providers for terminal glasses.
- * 
+ *
  * @see ApiHolder
  */
 public interface ITerminalIdAccess extends IApiInterface {
