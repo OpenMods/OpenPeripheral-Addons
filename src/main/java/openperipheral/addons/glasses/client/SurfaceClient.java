@@ -9,13 +9,14 @@ import openmods.structured.StructureObserver;
 import openperipheral.addons.glasses.drawable.Drawable;
 
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 
 public abstract class SurfaceClient {
 
 	private static final Comparator<Drawable> COMPARATOR = new Comparator<Drawable>() {
 		@Override
 		public int compare(Drawable o1, Drawable o2) {
-			return Integer.compare(o1.z, o2.z);
+			return Ints.compare(o1.z, o2.z);
 		}
 	};
 
