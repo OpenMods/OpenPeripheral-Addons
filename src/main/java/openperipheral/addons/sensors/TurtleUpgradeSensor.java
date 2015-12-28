@@ -8,15 +8,12 @@ import openperipheral.addons.Config;
 import openperipheral.addons.ModuleComputerCraft.Icons;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import openperipheral.addons.utils.CCUtils;
-import openperipheral.api.ApiHolder;
+import openperipheral.api.ApiAccess;
 import openperipheral.api.architecture.cc.IComputerCraftObjectsFactory;
 import dan200.computercraft.api.peripheral.IPeripheral;
 import dan200.computercraft.api.turtle.*;
 
 public class TurtleUpgradeSensor implements ITurtleUpgrade {
-
-	@ApiHolder
-	private static IComputerCraftObjectsFactory ccFactory;
 
 	private static class TurtleSensorEnvironment implements ISensorEnvironment {
 
@@ -76,7 +73,7 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 
 	@Override
 	public IPeripheral createPeripheral(ITurtleAccess turtle, TurtleSide side) {
-		return ccFactory.createPeripheral(new TurtleSensorEnvironment(turtle));
+		return ApiAccess.getApi(IComputerCraftObjectsFactory.class).createPeripheral(new TurtleSensorEnvironment(turtle));
 	}
 
 	@Override
