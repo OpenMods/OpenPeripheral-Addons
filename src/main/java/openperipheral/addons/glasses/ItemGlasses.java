@@ -8,12 +8,11 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.StatCollector;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import openmods.utils.ItemUtils;
 import openmods.utils.MiscUtils;
-import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.addons.api.ITerminalItem;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemGlasses extends ItemArmor implements ITerminalItem {
 	private static final String OPENP_TAG = "openp";
@@ -23,7 +22,6 @@ public class ItemGlasses extends ItemArmor implements ITerminalItem {
 		setMaxDamage(0);
 		setMaxStackSize(1);
 		setHasSubtypes(true);
-		setCreativeTab(OpenPeripheralAddons.tabOpenPeripheralAddons);
 	}
 
 	private static Long extractGuid(ItemStack stack) {
@@ -36,8 +34,7 @@ public class ItemGlasses extends ItemArmor implements ITerminalItem {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void addInformation(ItemStack itemStack, EntityPlayer player, List list, boolean par4) {
+	public void addInformation(ItemStack itemStack, EntityPlayer player, List<String> list, boolean par4) {
 		Long guid = extractGuid(itemStack);
 		if (guid != null) list.add(StatCollector.translateToLocalFormatted("openperipheral.misc.key", TerminalUtils.formatTerminalId(guid)));
 	}
@@ -46,13 +43,13 @@ public class ItemGlasses extends ItemArmor implements ITerminalItem {
 	public String getArmorTexture(ItemStack stack, Entity entity, int slot, String type) {
 		switch (MiscUtils.getHoliday()) {
 			case 1:
-				return "openperipheraladdons:textures/models/glasses_valentines.png";
+				return "openperipheral:textures/models/glasses_valentines.png";
 			case 2:
-				return "openperipheraladdons:textures/models/glasses_halloween.png";
+				return "openperipheral:textures/models/glasses_halloween.png";
 			case 3:
-				return "openperipheraladdons:textures/models/glasses_christmas.png";
+				return "openperipheral:textures/models/glasses_christmas.png";
 			default:
-				return "openperipheraladdons:textures/models/glasses.png";
+				return "openperipheral:textures/models/glasses.png";
 		}
 	}
 

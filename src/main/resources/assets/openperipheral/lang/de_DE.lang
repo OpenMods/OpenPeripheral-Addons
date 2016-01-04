@@ -5,7 +5,7 @@ tile.openperipheral.ticketmachine.name=Ticketmaschine
 tile.openperipheral.sensor.name=Sensor
 tile.openperipheral.robot.name=Roboter-Controller
 
-item.openperipheraladdons.duckantenna.name=Stabantenne
+item.openperipheral.duckantenna.name=Stabantenne
 
 item.openperipheral.glasses.name=Terminalbrille
 item.openperipheral.remote.name=Fernsteuerung

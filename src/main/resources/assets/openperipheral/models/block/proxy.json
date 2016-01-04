@@ -1,0 +1,19 @@
+{
+    parent: "block/cube",
+    textures: {
+        particle : "openperipheral:blocks/proxy_top",
+        down : "openperipheral:blocks/proxy_bottom",
+        up : "openperipheral:blocks/proxy_top",
+        north : "openperipheral:blocks/proxy_side",
+        east : "openperipheral:blocks/proxy_side",
+        south : "openperipheral:blocks/proxy_side",
+        west : "openperipheral:blocks/proxy_side"
+    },
+    display : {
+        thirdperson : {
+            rotation : [ 10, -45, 170 ],
+            translation : [ 0, 1.5, -2.75 ],
+            scale : [ 0.375, 0.375, 0.375 ]
+        }
+    }
+}

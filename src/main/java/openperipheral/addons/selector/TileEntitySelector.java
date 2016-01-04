@@ -10,8 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import openmods.api.IActivateAwareTile;
 import openmods.api.IHasGui;
 import openmods.geometry.BlockSpaceTransform;
@@ -49,7 +48,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 			this.size = size;
 			this.x = x;
 			this.y = y;
-			this.box = AxisAlignedBB.getBoundingBox(x - size, 1 - size, y - size, x + size, 1 + size, y + size);
+			this.box = AxisAlignedBB.fromBounds(x - size, 1 - size, y - size, x + size, 1 + size, y + size);
 		}
 	}
 
@@ -135,12 +134,11 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	}
 
 	@Override
-	public boolean onBlockActivated(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (worldObj.isRemote) return true;
 		if (player.isSneaking()) return true;
 
-		Vec3 vec = Vec3.createVectorHelper(xCoord + hitX, yCoord + hitY, zCoord + hitZ);
-		ItemSlot slot = getClickedSlot(vec, side);
+		final ItemSlot slot = getClickedSlot(hitX, hitY, hitZ);
 
 		if (slot == null) {
 			openGui(OpenPeripheralAddons.instance, player);
@@ -243,17 +241,13 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 			}
 
 			@Override
-			public void openInventory() {}
-
-			@Override
 			public void markDirty() {
 				if (!worldObj.isRemote) sync();
 			}
 
 			@Override
 			public boolean isUseableByPlayer(EntityPlayer player) {
-				return (getWorldObj().getTileEntity(xCoord, yCoord, zCoord) == TileEntitySelector.this)
-						&& (player.getDistanceSq(xCoord + 0.5, yCoord + 0.5, zCoord + 0.5) <= 64.0D);
+				return (getWorld().getTileEntity(pos) == TileEntitySelector.this) && (player.getDistanceSq(pos) <= 64.0D);
 			}
 
 			@Override
@@ -262,12 +256,22 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 			}
 
 			@Override
-			public boolean hasCustomInventoryName() {
+			public boolean hasCustomName() {
 				return false;
 			}
 
 			@Override
-			public ItemStack getStackInSlotOnClosing(int slot) {
+			public String getName() {
+				return "selector";
+			}
+
+			@Override
+			public IChatComponent getDisplayName() {
+				return new ChatComponentText("selector");
+			}
+
+			@Override
+			public ItemStack removeStackFromSlot(int slot) {
 				return null;
 			}
 
@@ -287,37 +291,52 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 			}
 
 			@Override
-			public String getInventoryName() {
-				return "selector";
-			}
-
-			@Override
 			public ItemStack decrStackSize(int p_70298_1_, int p_70298_2_) {
 				throw new UnsupportedOperationException();
 			}
 
 			@Override
-			public void closeInventory() {}
+			public void openInventory(EntityPlayer player) {}
+
+			@Override
+			public void closeInventory(EntityPlayer player) {}
+
+			@Override
+			public int getField(int id) {
+				return 0;
+			}
+
+			@Override
+			public void setField(int id, int value) {}
+
+			@Override
+			public int getFieldCount() {
+				return 0;
+			}
+
+			@Override
+			public void clear() {}
 		};
 	}
 
-	public AxisAlignedBB getSelection(Vec3 hitVec, int side) {
+	public AxisAlignedBB getSelection(Vec3 hitVec) {
 		final Orientation orientation = getOrientation();
-		final Vec3 mappedVec = BlockSpaceTransform.instance.mapWorldToBlock(orientation, hitVec.xCoord - xCoord, hitVec.yCoord - yCoord, hitVec.zCoord - zCoord);
+		final BlockPos pos = getPos();
+		final Vec3 mappedVec = BlockSpaceTransform.instance.mapWorldToBlock(orientation, hitVec.xCoord - pos.getX(), hitVec.yCoord - pos.getY(), hitVec.zCoord - pos.getZ());
 
 		final int gridSize = getGridSize();
 
 		for (ItemSlot center : getSlots(gridSize)) {
 			final AxisAlignedBB aabb = center.box;
-			if (aabb.isVecInside(mappedVec)) return BlockSpaceTransform.instance.mapBlockToWorld(orientation, aabb).offset(xCoord, yCoord, zCoord);
+			if (aabb.isVecInside(mappedVec)) return BlockSpaceTransform.instance.mapBlockToWorld(orientation, aabb).offset(pos.getX(), pos.getY(), pos.getZ());
 		}
 
 		return null;
 	}
 
-	private ItemSlot getClickedSlot(Vec3 hitVec, int side) {
+	private ItemSlot getClickedSlot(double x, double y, double z) {
 		final Orientation orientation = getOrientation();
-		final Vec3 mappedVec = BlockSpaceTransform.instance.mapWorldToBlock(orientation, hitVec.xCoord - xCoord, hitVec.yCoord - yCoord, hitVec.zCoord - zCoord);
+		final Vec3 mappedVec = BlockSpaceTransform.instance.mapWorldToBlock(orientation, x, y, z);
 
 		int gridSize = getGridSize();
 		for (ItemSlot center : getSlots(gridSize)) {
@@ -343,7 +362,7 @@ public class TileEntitySelector extends SyncedTileEntity implements IActivateAwa
 	public EntityItem getDisplayEntity() {
 		EntityItem result = displayEntity.get();
 		if (result == null) {
-			result = new EntityItem(getWorldObj(), 0, 0, 0);
+			result = new EntityItem(getWorld(), 0, 0, 0);
 			result.hoverStart = 0.0F;
 
 			displayEntity = new SoftReference<EntityItem>(result);

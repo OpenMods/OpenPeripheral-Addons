@@ -1,6 +1,9 @@
 package openperipheral.addons.glasses.drawable;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
 import openperipheral.addons.glasses.utils.RenderState;
@@ -11,10 +14,6 @@ import openperipheral.api.adapter.method.ScriptObject;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Strings;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @ScriptObject
 @AdapterSourceName("glasses_text")
@@ -58,7 +57,7 @@ public class Text extends Drawable {
 		renderState.setupTexturedRender();
 		renderState.setColor(color, alpha);
 
-		FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+		FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 		GL11.glScalef(scale, scale, scale);
 		fontRenderer.drawString(text, 0, 0, ((int)(alpha * 255) << 24 | color));
 	}
@@ -87,7 +86,7 @@ public class Text extends Drawable {
 		if (Strings.isNullOrEmpty(text)) {
 			width = 0;
 		} else {
-			FontRenderer fontRenderer = FMLClientHandler.instance().getClient().fontRenderer;
+			FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 			width = Math.round(fontRenderer.getStringWidth(text) * scale);
 		}
 

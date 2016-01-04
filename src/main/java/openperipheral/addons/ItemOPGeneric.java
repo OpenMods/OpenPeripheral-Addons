@@ -6,6 +6,5 @@ public class ItemOPGeneric extends ItemGeneric {
 
 	public ItemOPGeneric() {
 		setMaxStackSize(64);
-		setCreativeTab(OpenPeripheralAddons.tabOpenPeripheralAddons);
 	}
 }

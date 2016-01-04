@@ -2,13 +2,14 @@ package openperipheral.addons.peripheralproxy;
 
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import openmods.Log;
 import openmods.api.INeighbourAwareTile;
 import openmods.reflection.*;
 import openmods.reflection.MethodAccess.Function0;
-import openmods.reflection.MethodAccess.Function5;
+import openmods.reflection.MethodAccess.Function3;
 import openmods.tileentity.OpenTileEntity;
 import openperipheral.api.architecture.cc.ICustomPeripheralProvider;
 
@@ -24,8 +25,8 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 
 		public final FieldAccess<Boolean> isModemConnected = FieldAccess.create(cableClass, "m_peripheralAccessAllowed");
 		public final Function0<Void> togglePeripheral = MethodAccess.create(void.class, cableClass, "togglePeripheralAccess");
-		public final Function5<IPeripheral, World, Integer, Integer, Integer, Integer> getPeripheralAt =
-				MethodAccess.create(IPeripheral.class, ccClass, World.class, int.class, int.class, int.class, int.class, "getPeripheralAt");
+		public final Function3<IPeripheral, World, BlockPos, EnumFacing> getPeripheralAt =
+				MethodAccess.create(IPeripheral.class, ccClass, World.class, BlockPos.class, EnumFacing.class, "getPeripheralAt");
 
 	}
 
@@ -39,17 +40,15 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 	private Block attachedBlock;
 
 	@Override
-	public IPeripheral createPeripheral(int side) {
-		final ForgeDirection rotation = getOrientation().up();
-		if (rotation.getOpposite().ordinal() != side) return null;
+	public IPeripheral createPeripheral(EnumFacing side) {
+		final EnumFacing rotation = getOrientation().up();
+		if (rotation.getOpposite() != side) return null;
 
-		final int targetX = xCoord + rotation.offsetX;
-		final int targetY = yCoord + rotation.offsetY;
-		final int targetZ = zCoord + rotation.offsetZ;
+		final BlockPos pos = getPos().offset(rotation);
 
-		IPeripheral peripheral = access.getPeripheralAt.call(null, worldObj, targetX, targetY, targetZ, 0);
+		IPeripheral peripheral = access.getPeripheralAt.call(null, worldObj, pos, side);
 		if (peripheral != null) {
-			attachedBlock = worldObj.getBlock(targetX, targetY, targetZ);
+			attachedBlock = worldObj.getBlockState(pos).getBlock();
 			return new WrappedPeripheral(peripheral);
 		} else {
 			attachedBlock = null;
@@ -60,28 +59,23 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 	@Override
 	public void onNeighbourChanged(Block block) {
 		if (!worldObj.isRemote && (block == null || block == attachedBlock)) {
-			ForgeDirection targetDir = getOrientation().up();
+			EnumFacing targetDir = getOrientation().up();
 			boolean isConnected = isProxyActive(targetDir);
 
-			ForgeDirection modemDir = targetDir.getOpposite();
+			EnumFacing modemDir = targetDir.getOpposite();
 			updateModem(modemDir, isConnected);
 		}
 	}
 
-	private boolean isProxyActive(ForgeDirection targetDir) {
-		int targetX = xCoord + targetDir.offsetX;
-		int targetY = yCoord + targetDir.offsetY;
-		int targetZ = zCoord + targetDir.offsetZ;
-
-		return worldObj.getTileEntity(targetX, targetY, targetZ) != null;
+	private boolean isProxyActive(EnumFacing targetDir) {
+		final BlockPos pos = getPos().offset(targetDir);
+		return worldObj.getTileEntity(pos) != null;
 	}
 
-	private void updateModem(ForgeDirection modemDir, boolean reactivate) {
-		int attachedX = xCoord + modemDir.offsetX;
-		int attachedY = yCoord + modemDir.offsetY;
-		int attachedZ = zCoord + modemDir.offsetZ;
+	private void updateModem(EnumFacing modemDir, boolean reactivate) {
+		final BlockPos attached = getPos().offset(modemDir);
 
-		TileEntity attachedModem = worldObj.getTileEntity(attachedX, attachedY, attachedZ);
+		final TileEntity attachedModem = worldObj.getTileEntity(attached);
 
 		try {
 			if (attachedModem != null && access.cableClass.isAssignableFrom(attachedModem.getClass())) {
@@ -96,6 +90,6 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 			Log.warn(t, "Failed to update modem %s", attachedModem);
 		}
 
-		worldObj.notifyBlockOfNeighborChange(attachedX, attachedY, attachedZ, getBlockType());
+		worldObj.notifyNeighborsOfStateChange(attached, getBlockType());
 	}
 }

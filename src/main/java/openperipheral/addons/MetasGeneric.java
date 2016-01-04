@@ -5,12 +5,13 @@ import java.util.List;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import openmods.Mods;
 import openmods.item.IMetaItem;
-import cpw.mods.fml.common.Loader;
+import openmods.item.IMetaItemFactory;
 
-public enum MetasGeneric {
+public enum MetasGeneric implements IMetaItemFactory {
 	duckAntenna {
 		@Override
 		public IMetaItem createMetaItem() {
@@ -38,14 +39,14 @@ public enum MetasGeneric {
 		return (stack.getItem() instanceof ItemOPGeneric) && (stack.getItemDamage() == ordinal());
 	}
 
-	protected abstract IMetaItem createMetaItem();
-
-	protected boolean isEnabled() {
+	@Override
+	public boolean isEnabled() {
 		return true;
 	}
 
-	public static void registerItems() {
-		for (MetasGeneric m : values())
-			if (m.isEnabled()) OpenPeripheralAddons.Items.generic.registerItem(m.ordinal(), m.createMetaItem());
+	@Override
+	public int getMeta() {
+		return ordinal();
 	}
+
 }

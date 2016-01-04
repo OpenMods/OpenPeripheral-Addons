@@ -2,24 +2,24 @@ package openperipheral.addons.ticketmachine;
 
 import java.util.Set;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
-import openmods.api.*;
+import net.minecraft.util.EnumFacing;
+import openmods.api.IHasGui;
+import openmods.api.IInventoryCallback;
+import openmods.api.IPlaceAwareTile;
+import openmods.colors.ColorMeta;
 import openmods.include.IncludeInterface;
 import openmods.inventory.GenericInventory;
 import openmods.inventory.IInventoryProvider;
-import openmods.sync.SyncableBoolean;
 import openmods.sync.SyncableString;
 import openmods.tileentity.SyncedTileEntity;
-import openmods.utils.ColorUtils;
-import openmods.utils.ColorUtils.ColorMeta;
 import openmods.utils.ItemUtils;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.*;
@@ -27,16 +27,12 @@ import openperipheral.api.peripheral.PeripheralTypeId;
 
 import com.google.common.base.Preconditions;
 
-import cpw.mods.fml.common.registry.GameRegistry;
-
 @PeripheralTypeId("openperipheral_ticketmachine")
-public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceAwareTile, IHasGui, IIconProvider, IInventoryProvider, IInventoryCallback {
+public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceAwareTile, IHasGui, IInventoryProvider, IInventoryCallback {
 
 	private static final int SLOT_PAPER = 0;
 	private static final int SLOT_INK = 1;
 	private static final int SLOT_OUTPUT = 2;
-
-	private final Item ticketItem;
 
 	private static class CustomInventory extends GenericInventory implements ISidedInventory {
 		private CustomInventory() {
@@ -51,7 +47,7 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 				case SLOT_PAPER:
 					return itemstack.getItem() == Items.paper;
 				case SLOT_INK: {
-					Set<ColorMeta> color = ColorUtils.stackToColor(itemstack);
+					Set<ColorMeta> color = ColorMeta.fromStack(itemstack);
 					return color != null && color.contains(ColorMeta.BLACK);
 				}
 				default:
@@ -60,17 +56,17 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 		}
 
 		@Override
-		public int[] getAccessibleSlotsFromSide(int side) {
+		public int[] getSlotsForFace(EnumFacing side) {
 			return new int[] { SLOT_INK, SLOT_PAPER, SLOT_OUTPUT };
 		}
 
 		@Override
-		public boolean canInsertItem(int slot, ItemStack stack, int side) {
+		public boolean canInsertItem(int slot, ItemStack stack, EnumFacing side) {
 			return isItemValidForSlot(slot, stack);
 		}
 
 		@Override
-		public boolean canExtractItem(int slot, ItemStack stack, int side) {
+		public boolean canExtractItem(int slot, ItemStack stack, EnumFacing side) {
 			return slot == SLOT_OUTPUT;
 		}
 	}
@@ -83,20 +79,14 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 		return inventory;
 	}
 
-	protected SyncableBoolean hasTicket;
 	protected SyncableString owner;
 
 	@Override
 	protected void createSyncedFields() {
-		hasTicket = new SyncableBoolean();
 		owner = new SyncableString();
 	}
 
-	public TileEntityTicketMachine() {
-		ItemStack ticketStack = GameRegistry.findItemStack("Railcraft", "routing.ticket", 1);
-		ticketItem = ticketStack != null? ticketStack.getItem() : null;
-		syncMap.addUpdateListener(createRenderUpdateListener());
-	}
+	public TileEntityTicketMachine() {}
 
 	@ScriptCallable(returnTypes = ReturnType.BOOLEAN, description = "Create a new ticket to the specified destination")
 	public boolean createTicket(@Arg(name = "destination", description = "The destination for the ticket") String destination,
@@ -112,10 +102,10 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 
 		ItemStack output = inventory.getStackInSlot(SLOT_OUTPUT);
 
-		ItemStack newTicket = new ItemStack(ticketItem);
+		ItemStack newTicket = new ItemStack(Items.written_book); // TODO temporary
 		NBTTagCompound tag = ItemUtils.getItemTag(newTicket);
-		tag.setString("owner", owner.getValue());
-		tag.setString("dest", destination);
+		tag.setString("author", owner.getValue());
+		tag.setString("title", destination);
 
 		if (output == null) {
 			inventory.setInventorySlotContents(SLOT_OUTPUT, newTicket);
@@ -126,7 +116,7 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 		inventory.decrStackSize(SLOT_PAPER, amount);
 		inventory.decrStackSize(SLOT_INK, amount);
 
-		worldObj.playSoundEffect(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D, "openperipheraladdons:ticketmachine", 0.3F, 0.6F);
+		worldObj.playSoundEffect(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, "openperipheraladdons:ticketmachine", 0.3F, 0.6F);
 		sync();
 
 		return true;
@@ -141,20 +131,14 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 	@Override
 	public void onInventoryChanged(IInventory inventory, int slotNumber) {
 		if (worldObj.isRemote) return;
-		boolean nowHasTicket = inventory.getStackInSlot(SLOT_OUTPUT) != null;
-		if (nowHasTicket != hasTicket.getValue()) hasTicket.set(nowHasTicket);
-		markUpdated();
+		boolean hasTicket = inventory.getStackInSlot(SLOT_OUTPUT) != null;
+		final IBlockState state = worldObj.getBlockState(pos).withProperty(BlockTicketMachine.HAS_TICKET, hasTicket);
+		worldObj.setBlockState(pos, state);
 	}
 
 	@Override
-	public void onBlockPlacedBy(EntityPlayer player, ForgeDirection side, ItemStack stack, float hitX, float hitY, float hitZ) {
-		owner.setValue(player.getCommandSenderName());
-	}
-
-	@Override
-	public IIcon getIcon(ForgeDirection rotatedDir) {
-		if (rotatedDir == ForgeDirection.SOUTH) return hasTicket.getValue()? BlockTicketMachine.iconFrontTicket : BlockTicketMachine.iconFrontEmpty;
-		return null;
+	public void onBlockPlacedBy(IBlockState state, EntityLivingBase placer, ItemStack stack) {
+		owner.setValue(placer.getName());
 	}
 
 	@Override
@@ -183,4 +167,5 @@ public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceA
 		super.readFromNBT(tag);
 		inventory.readFromNBT(tag);
 	}
+
 }

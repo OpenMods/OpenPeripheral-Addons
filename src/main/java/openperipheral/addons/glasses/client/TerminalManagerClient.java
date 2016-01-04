@@ -8,6 +8,12 @@ import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import openmods.geometry.Box2d;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackgroundEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetDragParamsEvent;
@@ -25,13 +31,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 
 public class TerminalManagerClient {
 
@@ -74,163 +73,148 @@ public class TerminalManagerClient {
 		}
 	}
 
-	public class ForgeBusListener {
-
-		@SubscribeEvent
-		public void onRenderGameOverlay(RenderGameOverlayEvent.Pre evt) {
-			if (evt.type == ElementType.ALL) {
-				GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
-
-				if (gui instanceof GuiCapture) {
-					final GuiCapture capture = (GuiCapture)gui;
-					// this must be here, since there are some elements (like food bar) that are overriden every tick
-					capture.forceGuiElementsState();
-				}
-			}
-		}
-
-		@SubscribeEvent
-		public void onRenderGameOverlay(RenderGameOverlayEvent.Post evt) {
-			if (evt.type == ElementType.HELMET) {
-				if (terminalGuid.isPresent()) {
-					final long guid = terminalGuid.get();
-					tryDrawSurface(guid, SurfaceType.PRIVATE, evt.partialTicks, evt.resolution);
-					tryDrawSurface(guid, SurfaceType.GLOBAL, evt.partialTicks, evt.resolution);
-				}
-			}
-		}
-
-		@SubscribeEvent
-		public void onItemTooltip(ItemTooltipEvent evt) {
-			if (evt.itemStack != null && NbtGuidProviders.hasTerminalCapabilities(evt.itemStack)) {
-				final Optional<Long> guid = NbtGuidProviders.getTerminalGuid(evt.itemStack);
-				if (guid.isPresent()) {
-					evt.toolTip.add(StatCollector.translateToLocalFormatted("openperipheral.terminal.key", TerminalUtils.formatTerminalId(guid.get())));
-				} else {
-					evt.toolTip.add(StatCollector.translateToLocal("openperipheral.terminal.unbound"));
-				}
-			}
-		}
-
-		private SurfaceClient getOrCreateSurface(TerminalEvent.Data evt) {
-			final SurfaceType surfaceType = evt.getSurfaceType();
-			SurfaceClient surface = surfaces.get(evt.terminalId, surfaceType);
-
-			if (surface == null) {
-				surface = evt.createSurface();
-				surfaces.put(evt.terminalId, surfaceType, surface);
-			}
-			return surface;
-		}
-
-		@SubscribeEvent
-		public void onTerminalData(TerminalEvent.PrivateDrawableData evt) {
-			updateTerminalDrawables(evt);
-		}
-
-		@SubscribeEvent
-		public void onTerminalData(TerminalEvent.PublicDrawableData evt) {
-			updateTerminalDrawables(evt);
-		}
-
-		private void updateTerminalDrawables(TerminalEvent.DrawableData evt) {
-			final SurfaceClient surface = getOrCreateSurface(evt);
-			surface.drawablesContainer.interpretCommandList(evt.commands);
-		}
-
-		@SubscribeEvent
-		public void onTerminalClear(TerminalEvent.PrivateClear evt) {
-			clearTerminal(evt);
-		}
-
-		@SubscribeEvent
-		public void onTerminalClear(TerminalEvent.PublicClear evt) {
-			clearTerminal(evt);
-		}
-
-		private void clearTerminal(TerminalEvent.Clear evt) {
-			final SurfaceType surfaceType = evt.getSurfaceType();
-			surfaces.remove(evt.terminalId, surfaceType);
-		}
-
-		@SubscribeEvent
-		public void onBackgroundChange(GlassesChangeBackgroundEvent evt) {
+	@SubscribeEvent
+	public void onRenderGameOverlay(RenderGameOverlayEvent.Pre evt) {
+		if (evt.type == ElementType.ALL) {
 			GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
 
 			if (gui instanceof GuiCapture) {
 				final GuiCapture capture = (GuiCapture)gui;
-				long guid = capture.getGuid();
-				if (guid == evt.guid) capture.setBackground(evt.backgroundColor);
-			}
-		}
-
-		@SubscribeEvent
-		public void onKeyRepeatSet(GlassesSetKeyRepeatEvent evt) {
-			GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
-
-			if (gui instanceof GuiCapture) {
-				final GuiCapture capture = (GuiCapture)gui;
-				long guid = capture.getGuid();
-				if (guid == evt.guid) capture.setKeyRepeat(evt.repeat);
-			}
-		}
-
-		@SubscribeEvent
-		public void onDragParamsSet(GlassesSetDragParamsEvent evt) {
-			GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
-
-			if (gui instanceof GuiCapture) {
-				final GuiCapture capture = (GuiCapture)gui;
-				long guid = capture.getGuid();
-				if (guid == evt.guid) capture.setDragParameters(evt.threshold, evt.period);
-			}
-		}
-
-		@SubscribeEvent
-		public void onGuiVisibilitySet(GlassesSetGuiVisibilityEvent evt) {
-			GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
-
-			if (gui instanceof GuiCapture) {
-				final GuiCapture capture = (GuiCapture)gui;
-				long guid = capture.getGuid();
-				if (guid == evt.guid) capture.updateGuiElementsState(evt.visibility);
-			}
-		}
-
-		@SubscribeEvent
-		public void onCaptureForce(GlassesStopCaptureEvent evt) {
-			GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
-
-			if (gui instanceof GuiCapture) {
-				long guid = ((GuiCapture)gui).getGuid();
-				if (guid == evt.guid) FMLCommonHandler.instance().showGuiScreen(null);
+				// this must be here, since there are some elements (like food bar) that are overriden every tick
+				capture.forceGuiElementsState();
 			}
 		}
 	}
 
-	public Object createForgeBusListener() {
-		return new ForgeBusListener();
-	}
-
-	public class FmlBusListener {
-
-		@SubscribeEvent
-		public void onDisconnect(ClientDisconnectionFromServerEvent evt) {
-			surfaces.clear();
-		}
-
-		@SubscribeEvent
-		public void onClientTick(ClientTickEvent evt) {
-			if (evt.phase == Phase.END) {
-				final EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-				terminalGuid = player != null? TerminalIdAccess.instance.getIdFrom(player) : Optional.<Long> absent();
+	@SubscribeEvent
+	public void onRenderGameOverlay(RenderGameOverlayEvent.Post evt) {
+		if (evt.type == ElementType.HELMET) {
+			if (terminalGuid.isPresent()) {
+				final long guid = terminalGuid.get();
+				tryDrawSurface(guid, SurfaceType.PRIVATE, evt.partialTicks, evt.resolution);
+				tryDrawSurface(guid, SurfaceType.GLOBAL, evt.partialTicks, evt.resolution);
 			}
 		}
-
 	}
 
-	public Object createFmlBusListener() {
-		return new FmlBusListener();
+	@SubscribeEvent
+	public void onItemTooltip(ItemTooltipEvent evt) {
+		if (evt.itemStack != null && NbtGuidProviders.hasTerminalCapabilities(evt.itemStack)) {
+			final Optional<Long> guid = NbtGuidProviders.getTerminalGuid(evt.itemStack);
+			if (guid.isPresent()) {
+				evt.toolTip.add(StatCollector.translateToLocalFormatted("openperipheral.terminal.key", TerminalUtils.formatTerminalId(guid.get())));
+			} else {
+				evt.toolTip.add(StatCollector.translateToLocal("openperipheral.terminal.unbound"));
+			}
+		}
+	}
+
+	private SurfaceClient getOrCreateSurface(TerminalEvent.Data evt) {
+		final SurfaceType surfaceType = evt.getSurfaceType();
+		SurfaceClient surface = surfaces.get(evt.terminalId, surfaceType);
+
+		if (surface == null) {
+			surface = evt.createSurface();
+			surfaces.put(evt.terminalId, surfaceType, surface);
+		}
+		return surface;
+	}
+
+	@SubscribeEvent
+	public void onTerminalData(TerminalEvent.PrivateDrawableData evt) {
+		updateTerminalDrawables(evt);
+	}
+
+	@SubscribeEvent
+	public void onTerminalData(TerminalEvent.PublicDrawableData evt) {
+		updateTerminalDrawables(evt);
+	}
+
+	private void updateTerminalDrawables(TerminalEvent.DrawableData evt) {
+		final SurfaceClient surface = getOrCreateSurface(evt);
+		surface.drawablesContainer.interpretCommandList(evt.commands);
+	}
+
+	@SubscribeEvent
+	public void onTerminalClear(TerminalEvent.PrivateClear evt) {
+		clearTerminal(evt);
+	}
+
+	@SubscribeEvent
+	public void onTerminalClear(TerminalEvent.PublicClear evt) {
+		clearTerminal(evt);
+	}
+
+	private void clearTerminal(TerminalEvent.Clear evt) {
+		final SurfaceType surfaceType = evt.getSurfaceType();
+		surfaces.remove(evt.terminalId, surfaceType);
+	}
+
+	@SubscribeEvent
+	public void onBackgroundChange(GlassesChangeBackgroundEvent evt) {
+		GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
+
+		if (gui instanceof GuiCapture) {
+			final GuiCapture capture = (GuiCapture)gui;
+			long guid = capture.getGuid();
+			if (guid == evt.guid) capture.setBackground(evt.backgroundColor);
+		}
+	}
+
+	@SubscribeEvent
+	public void onKeyRepeatSet(GlassesSetKeyRepeatEvent evt) {
+		GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
+
+		if (gui instanceof GuiCapture) {
+			final GuiCapture capture = (GuiCapture)gui;
+			long guid = capture.getGuid();
+			if (guid == evt.guid) capture.setKeyRepeat(evt.repeat);
+		}
+	}
+
+	@SubscribeEvent
+	public void onDragParamsSet(GlassesSetDragParamsEvent evt) {
+		GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
+
+		if (gui instanceof GuiCapture) {
+			final GuiCapture capture = (GuiCapture)gui;
+			long guid = capture.getGuid();
+			if (guid == evt.guid) capture.setDragParameters(evt.threshold, evt.period);
+		}
+	}
+
+	@SubscribeEvent
+	public void onGuiVisibilitySet(GlassesSetGuiVisibilityEvent evt) {
+		GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
+
+		if (gui instanceof GuiCapture) {
+			final GuiCapture capture = (GuiCapture)gui;
+			long guid = capture.getGuid();
+			if (guid == evt.guid) capture.updateGuiElementsState(evt.visibility);
+		}
+	}
+
+	@SubscribeEvent
+	public void onCaptureForce(GlassesStopCaptureEvent evt) {
+		GuiScreen gui = FMLClientHandler.instance().getClient().currentScreen;
+
+		if (gui instanceof GuiCapture) {
+			long guid = ((GuiCapture)gui).getGuid();
+			if (guid == evt.guid) FMLCommonHandler.instance().showGuiScreen(null);
+		}
+	}
+
+	@SubscribeEvent
+	public void onDisconnect(ClientDisconnectionFromServerEvent evt) {
+		surfaces.clear();
+	}
+
+	@SubscribeEvent
+	public void onClientTick(ClientTickEvent evt) {
+		if (evt.phase == Phase.END) {
+			final EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+			terminalGuid = player != null? TerminalIdAccess.instance.getIdFrom(player) : Optional.<Long> absent();
+		}
 	}
 
 	public DrawableHitInfo findDrawableHit(long guid, ScaledResolution resolution, float x, float y) {

@@ -1,10 +1,9 @@
 package openperipheral.addons.glasses;
 
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
+import net.minecraft.network.PacketBuffer;
 import openmods.network.event.EventDirection;
 import openmods.network.event.NetworkEvent;
 import openmods.network.event.NetworkEventMeta;
@@ -22,12 +21,14 @@ public abstract class TerminalEvent extends NetworkEvent {
 	}
 
 	@Override
-	protected void readFromStream(DataInput input) throws IOException {
+	@SuppressWarnings("unused")
+	protected void readFromStream(PacketBuffer input) throws IOException {
 		terminalId = input.readLong();
 	}
 
 	@Override
-	protected void writeToStream(DataOutput output) throws IOException {
+	@SuppressWarnings("unused")
+	protected void writeToStream(PacketBuffer output) throws IOException {
 		output.writeLong(terminalId);
 	}
 
@@ -166,13 +167,13 @@ public abstract class TerminalEvent extends NetworkEvent {
 		}
 
 		@Override
-		protected void readFromStream(DataInput input) throws IOException {
+		protected void readFromStream(PacketBuffer input) throws IOException {
 			super.readFromStream(input);
 			commands.readFromStream(input);
 		}
 
 		@Override
-		protected void writeToStream(DataOutput output) throws IOException {
+		protected void writeToStream(PacketBuffer output) throws IOException {
 			super.writeToStream(output);
 			commands.writeToStream(output);
 		}
@@ -202,7 +203,7 @@ public abstract class TerminalEvent extends NetworkEvent {
 		}
 	}
 
-	@NetworkEventMeta(direction = EventDirection.S2C, chunked = true, compressed = true)
+	@NetworkEventMeta(direction = EventDirection.S2C, compressed = true)
 	public static class PrivateDrawableData extends DrawableData {
 
 		public PrivateDrawableData() {}
@@ -217,7 +218,7 @@ public abstract class TerminalEvent extends NetworkEvent {
 		}
 	}
 
-	@NetworkEventMeta(direction = EventDirection.S2C, chunked = true, compressed = true)
+	@NetworkEventMeta(direction = EventDirection.S2C, compressed = true)
 	public static class PrivateStructureData extends StructureData {
 		public PrivateStructureData() {}
 
@@ -244,7 +245,7 @@ public abstract class TerminalEvent extends NetworkEvent {
 		}
 	}
 
-	@NetworkEventMeta(direction = EventDirection.S2C, chunked = true, compressed = true)
+	@NetworkEventMeta(direction = EventDirection.S2C, compressed = true)
 	public static class PublicStructureData extends StructureData {
 		public PublicStructureData() {}
 
@@ -258,7 +259,7 @@ public abstract class TerminalEvent extends NetworkEvent {
 		}
 	}
 
-	@NetworkEventMeta(direction = EventDirection.S2C, chunked = true, compressed = true)
+	@NetworkEventMeta(direction = EventDirection.S2C, compressed = true)
 	public static class PublicDrawableData extends DrawableData {
 
 		public PublicDrawableData() {}

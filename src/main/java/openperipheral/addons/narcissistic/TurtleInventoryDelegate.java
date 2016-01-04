@@ -3,6 +3,8 @@ package openperipheral.addons.narcissistic;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
 import openperipheral.addons.utils.CCUtils;
 import openperipheral.api.adapter.IWorldPosProvider;
@@ -43,8 +45,8 @@ public class TurtleInventoryDelegate implements IInventory, IWorldPosProvider {
 	}
 
 	@Override
-	public ItemStack getStackInSlotOnClosing(int i) {
-		return inventory().getStackInSlotOnClosing(i);
+	public ItemStack removeStackFromSlot(int slot) {
+		return inventory().removeStackFromSlot(slot);
 	}
 
 	@Override
@@ -53,13 +55,18 @@ public class TurtleInventoryDelegate implements IInventory, IWorldPosProvider {
 	}
 
 	@Override
-	public String getInventoryName() {
-		return inventory().getInventoryName();
+	public String getName() {
+		return inventory().getName();
 	}
 
 	@Override
-	public boolean hasCustomInventoryName() {
-		return inventory().hasCustomInventoryName();
+	public IChatComponent getDisplayName() {
+		return inventory().getDisplayName();
+	}
+
+	@Override
+	public boolean hasCustomName() {
+		return inventory().hasCustomName();
 	}
 
 	@Override
@@ -78,13 +85,13 @@ public class TurtleInventoryDelegate implements IInventory, IWorldPosProvider {
 	}
 
 	@Override
-	public void openInventory() {
-		inventory().openInventory();
+	public void openInventory(EntityPlayer player) {
+		inventory().openInventory(player);
 	}
 
 	@Override
-	public void closeInventory() {
-		inventory().closeInventory();
+	public void closeInventory(EntityPlayer player) {
+		inventory().closeInventory(player);
 	}
 
 	@Override
@@ -98,18 +105,28 @@ public class TurtleInventoryDelegate implements IInventory, IWorldPosProvider {
 	}
 
 	@Override
-	public int getX() {
-		return wrapped.getPosition().posX;
+	public BlockPos getPos() {
+		return wrapped.getPosition();
 	}
 
 	@Override
-	public int getY() {
-		return wrapped.getPosition().posY;
+	public int getField(int id) {
+		return inventory().getField(id);
 	}
 
 	@Override
-	public int getZ() {
-		return wrapped.getPosition().posZ;
+	public void setField(int id, int value) {
+		inventory().setField(id, value);
+	}
+
+	@Override
+	public int getFieldCount() {
+		return inventory().getFieldCount();
+	}
+
+	@Override
+	public void clear() {
+		inventory().clear();
 	}
 
 }

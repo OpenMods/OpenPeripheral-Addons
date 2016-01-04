@@ -1,6 +1,7 @@
 package openperipheral.addons.selector;
 
 import openmods.gui.BaseGuiContainer;
+import openmods.gui.IComponentParent;
 import openmods.gui.component.BaseComposite;
 import openmods.gui.component.GuiComponentPanel;
 
@@ -11,8 +12,8 @@ public class GuiSelector extends BaseGuiContainer<ContainerSelector> {
 	}
 
 	@Override
-	protected BaseComposite createRoot() {
-		GuiComponentPanel panel = new GuiComponentPanel(0, 0, xSize, ySize, getContainer());
+	protected BaseComposite createRoot(IComponentParent parent) {
+		GuiComponentPanel panel = new GuiComponentPanel(parent, 0, 0, xSize, ySize, getContainer());
 		panel.setSlotRenderer(0, GuiComponentPanel.coloredSlot(0xFFFFFF));
 
 		panel.setSlotRenderer(1, GuiComponentPanel.coloredSlot(0xBBBBBB));

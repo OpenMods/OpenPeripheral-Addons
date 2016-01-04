@@ -1,40 +1,46 @@
 package openperipheral.addons.ticketmachine;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.util.IIcon;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import openmods.block.BlockRotationMode;
-import openperipheral.addons.BlockOP;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import openmods.block.OpenBlock;
+import openmods.geometry.Orientation;
 
-public class BlockTicketMachine extends BlockOP {
+public class BlockTicketMachine extends OpenBlock {
 
-	public static IIcon iconFrontEmpty;
-	public static IIcon iconFrontTicket;
+	public static final PropertyBool HAS_TICKET = PropertyBool.create("ticket");
 
 	public BlockTicketMachine() {
 		super(Material.iron);
-		setRotationMode(BlockRotationMode.FOUR_DIRECTIONS);
-		setRenderMode(RenderMode.BLOCK_ONLY);
+		setDefaultState(blockState.getBaseState().withProperty(HAS_TICKET, false));
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerBlockIcons(IIconRegister registry) {
-		super.registerBlockIcons(registry);
-
-		iconFrontEmpty = registry.registerIcon("openperipheraladdons:ticketmachine_front_empty");
-		iconFrontTicket = registry.registerIcon("openperipheraladdons:ticketmachine_front_ticket");
-
-		setTexture(ForgeDirection.EAST, registry.registerIcon("openperipheraladdons:ticketmachine_left"));
-		setTexture(ForgeDirection.WEST, registry.registerIcon("openperipheraladdons:ticketmachine_right"));
-		setTexture(ForgeDirection.SOUTH, iconFrontEmpty);
-		setTexture(ForgeDirection.NORTH, registry.registerIcon("openperipheraladdons:ticketmachine_back"));
-		setTexture(ForgeDirection.UP, registry.registerIcon("openperipheraladdons:ticketmachine_top"));
-
-		setTexture(ForgeDirection.DOWN, registry.registerIcon("openperipheraladdons:ticketmachine_bottom"));
+	public BlockRotationMode getRotationMode() {
+		return BlockRotationMode.FOUR_DIRECTIONS;
 	}
 
+	@Override
+	protected BlockState createBlockState() {
+		return new BlockState(this, getRotationMode().property, HAS_TICKET);
+	}
+
+	@Override
+	public IBlockState getStateFromMeta(int meta) {
+		final BlockRotationMode rotationMode = getRotationMode();
+		return getDefaultState()
+				.withProperty(getOrientationProperty(), rotationMode.fromValue(meta & rotationMode.mask))
+				.withProperty(HAS_TICKET, ((meta & ~rotationMode.mask) != 0));
+	}
+
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		final BlockRotationMode rotationMode = getRotationMode();
+		final Orientation orientation = state.getValue(rotationMode.property);
+		final int hasTicket = (state.getValue(HAS_TICKET)? 1 : 0) << rotationMode.bitCount;
+		final int meta = getRotationMode().toValue(orientation) | hasTicket;
+		return meta;
+	}
 }

@@ -1,44 +1,23 @@
 package openperipheral.addons.selector;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import openmods.geometry.Orientation;
 import openmods.renderer.rotations.TransformProvider;
 import openperipheral.addons.selector.TileEntitySelector.ItemSlot;
 
 import org.lwjgl.opengl.GL11;
 
-public class TileEntitySelectorRenderer extends TileEntitySpecialRenderer {
-
-	private final RenderItem renderer = new RenderItem() {
-		@Override
-		public boolean shouldSpreadItems() {
-			return false;
-		}
-
-		@Override
-		public boolean shouldBob() {
-			return false;
-		}
-
-		@Override
-		public byte getMiniBlockCount(ItemStack stack, byte original) {
-			return 1;
-		}
-
-		@Override
-		public byte getMiniItemCount(ItemStack stack, byte original) {
-			return 1;
-		}
-	};
+@SuppressWarnings("deprecation")
+public class TileEntitySelectorRenderer extends TileEntitySpecialRenderer<TileEntitySelector> {
 
 	@Override
-	public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float f) {
-		final TileEntitySelector selector = (TileEntitySelector)tileEntity;
+	public void renderTileEntityAt(TileEntitySelector selector, double x, double y, double z, float partialTicks, int destroyState) {
 		final Orientation orientation = selector.getOrientation();
 
 		GL11.glPushMatrix();
@@ -48,26 +27,26 @@ public class TileEntitySelectorRenderer extends TileEntitySpecialRenderer {
 
 		final int gridSize = selector.getGridSize();
 
-		renderer.setRenderManager(RenderManager.instance);
-
+		final RenderItem renderer = Minecraft.getMinecraft().getRenderItem();
 		for (ItemSlot slot : selector.getSlots(gridSize)) {
 			ItemStack stack = selector.getSlot(slot.slot);
 			if (stack != null) {
 				EntityItem display = selector.getDisplayEntity();
 
 				GL11.glPushMatrix();
-				GL11.glTranslated(slot.x, 0, slot.y + 0.03); // 0.03, since items are rendered off-center
+				GL11.glTranslated(slot.x, 0, slot.y);
 				GL11.glRotated(-90, 1, 0, 0);
-				final double scale = slot.size * 5;
+				final double scale = slot.size * 2;
 				GL11.glScaled(scale, scale, scale);
 				display.setEntityItemStack(stack);
-				RenderItem.renderInFrame = true;
-				renderer.doRender(display, 0.0D, 0.0D, 0.0D, 0.0F, 0.0F);
+
+				RenderHelper.enableStandardItemLighting();
+				renderer.renderItem(stack, ItemCameraTransforms.TransformType.NONE);
+				RenderHelper.disableStandardItemLighting();
+
 				GL11.glPopMatrix();
 			}
 		}
-
-		RenderItem.renderInFrame = false;
 
 		GL11.glPopMatrix();
 	}

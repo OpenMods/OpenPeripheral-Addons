@@ -13,9 +13,9 @@ public class TerminalUtils {
 	public static Long extractGuid(NBTTagCompound tag) {
 		NBTBase guidTag = tag.getTag("guid");
 		if (guidTag instanceof NBTTagString) {
-			String value = ((NBTTagString)guidTag).func_150285_a_();
+			String value = ((NBTTagString)guidTag).getString();
 			return Long.parseLong(value.toLowerCase(), 36);
-		} else if (guidTag instanceof NBTTagLong) return ((NBTPrimitive)guidTag).func_150291_c();
+		} else if (guidTag instanceof NBTTagLong) return ((NBTPrimitive)guidTag).getLong();
 
 		return null;
 	}

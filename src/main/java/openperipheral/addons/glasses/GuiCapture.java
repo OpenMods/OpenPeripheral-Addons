@@ -1,5 +1,6 @@
 package openperipheral.addons.glasses;
 
+import java.io.IOException;
 import java.util.Map;
 
 import net.minecraft.client.gui.GuiScreen;
@@ -49,7 +50,7 @@ public class GuiCapture extends GuiScreen {
 	}
 
 	@Override
-	public void handleMouseInput() {
+	public void handleMouseInput() throws IOException {
 		super.handleMouseInput();
 
 		final int button = Mouse.getEventButton();
@@ -64,7 +65,7 @@ public class GuiCapture extends GuiScreen {
 		final float y = this.height - my * scaleY;
 
 		if (button != -1 || wheel != 0) {
-			final ScaledResolution resolution = new ScaledResolution(this.mc, this.mc.displayWidth, this.mc.displayHeight);
+			final ScaledResolution resolution = new ScaledResolution(this.mc);
 			final DrawableHitInfo hit = TerminalManagerClient.instance.findDrawableHit(guid, resolution, x, y);
 
 			if (button != -1) {
@@ -136,7 +137,7 @@ public class GuiCapture extends GuiScreen {
 	}
 
 	@Override
-	public void handleKeyboardInput() {
+	public void handleKeyboardInput() throws IOException {
 		final int key = Keyboard.getEventKey();
 
 		if (key == Keyboard.KEY_ESCAPE) {

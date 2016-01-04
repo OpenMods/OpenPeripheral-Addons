@@ -1,12 +1,13 @@
 package openperipheral.addons.sensors;
 
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import openmods.utils.WorldUtils;
 import openperipheral.addons.Config;
 
-public class TileEntitySensor extends TileEntity implements ISensorEnvironment {
+public class TileEntitySensor extends TileEntity implements ISensorEnvironment, ITickable {
 
 	private static final int ROTATION_SPEED = 3;
 
@@ -19,7 +20,7 @@ public class TileEntitySensor extends TileEntity implements ISensorEnvironment {
 	}
 
 	@Override
-	public void updateEntity() {
+	public void update() {
 		rotation = (rotation + ROTATION_SPEED) % 360;
 	}
 
@@ -30,7 +31,7 @@ public class TileEntitySensor extends TileEntity implements ISensorEnvironment {
 
 	@Override
 	public Vec3 getLocation() {
-		return Vec3.createVectorHelper(xCoord, yCoord, zCoord);
+		return new Vec3(pos.getX(), pos.getY(), pos.getZ());
 	}
 
 	@Override

@@ -1,10 +1,15 @@
 package openperipheral.addons.glasses.drawable;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
 import openperipheral.addons.glasses.utils.GlassesRenderingUtils;
@@ -12,9 +17,8 @@ import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import com.google.common.base.Strings;
 
 @ScriptObject
 @AdapterSourceName("glasses_liquid")
@@ -43,7 +47,7 @@ public class LiquidIcon extends Drawable {
 	@StructureField
 	public float alpha = 1;
 
-	private IIcon fluidIcon;
+	private TextureAtlasSprite fluidIcon;
 
 	private int iconWidth;
 
@@ -113,9 +117,15 @@ public class LiquidIcon extends Drawable {
 		setBoundingBox(Box2d.fromOriginAndSize(x, y, width, height));
 	}
 
-	private static IIcon findFluidIcon(String fluid) {
-		Fluid drawLiquid = FluidRegistry.getFluid(fluid);
-		return drawLiquid != null? drawLiquid.getFlowingIcon() : null;
+	private static TextureAtlasSprite findFluidIcon(String fluid) {
+		if (!Strings.isNullOrEmpty(fluid)) {
+			final Fluid drawLiquid = FluidRegistry.getFluid(fluid);
+			if (drawLiquid != null) {
+				final ResourceLocation textureLocation = drawLiquid.getStill();
+				return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(textureLocation.toString());
+			}
+		}
+		return null;
 	}
 
 }

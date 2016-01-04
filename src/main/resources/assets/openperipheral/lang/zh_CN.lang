@@ -6,7 +6,7 @@ tile.openperipheral.ticketmachine.name=票务机
 tile.openperipheral.sensor.name=传感器
 tile.openperipheral.robot.name=机器人控制器
 
-item.openperipheraladdons.duckantenna.name=天线
+item.openperipheral.duckantenna.name=天线
 
 item.openperipheral.glasses.name=头戴显示器
 item.openperipheral.remote.name=遥控器

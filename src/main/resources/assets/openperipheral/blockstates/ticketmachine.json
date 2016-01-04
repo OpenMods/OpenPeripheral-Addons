@@ -1,0 +1,31 @@
+{
+    forge_marker: 1,
+    defaults : { model : "openperipheral:ticketmachine" },
+    variants: {
+        inventory :  {
+            y : 180,
+            textures : {
+                    front : "openperipheral:blocks/ticketmachine_front_empty"
+            }
+        },
+        ticket : {
+            true : {
+                textures : {
+                    front : "openperipheral:blocks/ticketmachine_front_ticket"
+                }
+            },
+            false : {
+                textures : {
+                    front : "openperipheral:blocks/ticketmachine_front_empty"
+                }
+            }
+        },
+        orientation : {
+            xp_yp : { y : 0 },
+            zp_yp : { y : 90 },
+             xn_yp : { y : 180 },
+            zn_yp : { y : 270 }
+           }
+
+    }
+}

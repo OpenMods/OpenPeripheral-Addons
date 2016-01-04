@@ -1,10 +1,9 @@
 package openperipheral.addons.glasses.drawable;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import openmods.geometry.Box2d;
 import openmods.structured.IStructureElement;
 import openmods.structured.StructureField;
@@ -19,9 +18,6 @@ import openperipheral.api.adapter.method.*;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Preconditions;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @Asynchronous
 @AdapterSourceName("glasses_drawable")
@@ -55,7 +51,7 @@ public abstract class Drawable extends StructuredObjectBase {
 		public HorizontalAlignment objectHorizontalAnchor = HorizontalAlignment.LEFT;
 
 		@Override
-		public void readFromStream(DataInput input) throws IOException {
+		public void readFromStream(PacketBuffer input) {
 			byte value = input.readByte();
 			screenVerticalAnchor = VerticalAlignment.VALUES[(value >> 0) & MASK];
 			screenHorizontalAnchor = HorizontalAlignment.VALUES[(value >> 2) & MASK];
@@ -65,7 +61,7 @@ public abstract class Drawable extends StructuredObjectBase {
 		}
 
 		@Override
-		public void writeToStream(DataOutput output) throws IOException {
+		public void writeToStream(PacketBuffer output) {
 			byte value = (byte)((screenVerticalAnchor.ordinal() << 0) |
 					(screenHorizontalAnchor.ordinal() << 2) |
 					(objectVerticalAnchor.ordinal() << 4) |

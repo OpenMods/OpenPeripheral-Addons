@@ -6,6 +6,7 @@
 *.md    text
 *.txt   text
 *.properties text
+*.json text
 
 *.png   -text
 *.ogg   -text

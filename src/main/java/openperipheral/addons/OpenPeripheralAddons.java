@@ -4,6 +4,13 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.*;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import openmods.Mods;
 import openmods.OpenMods;
 import openmods.access.ApiFactory;
@@ -32,6 +39,7 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeatEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSignalCaptureEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.server.TerminalManagerServer;
+import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.pim.TileEntityPIM;
 import openperipheral.addons.selector.BlockSelector;
@@ -39,16 +47,10 @@ import openperipheral.addons.selector.TileEntitySelector;
 import openperipheral.addons.sensors.AdapterSensor;
 import openperipheral.addons.sensors.BlockSensor;
 import openperipheral.addons.sensors.TileEntitySensor;
+import openperipheral.addons.ticketmachine.BlockTicketMachine;
+import openperipheral.addons.ticketmachine.TileEntityTicketMachine;
 
 import org.apache.commons.lang3.ObjectUtils;
-
-import cpw.mods.fml.common.*;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
 
 @Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$,$NEXT-LIB-VERSION$);required-after:OpenPeripheralApi@$OP-API-VERSION$;after:ComputerCraft@[1.70,]")
 public class OpenPeripheralAddons {
@@ -56,17 +58,24 @@ public class OpenPeripheralAddons {
 	public static final String MODID = "OpenPeripheral";
 
 	public static class Blocks implements BlockInstances {
-		@RegisterBlock(name = "glassesbridge", tileEntity = TileEntityGlassesBridge.class, itemBlock = ItemGlassesBridge.class, textureName = "bridge")
+		@RegisterBlock(name = "glassesbridge", tileEntity = TileEntityGlassesBridge.class, itemBlock = ItemGlassesBridge.class)
 		public static BlockGlassesBridge glassesBridge;
 
-		@RegisterBlock(name = "pim", tileEntity = TileEntityPIM.class, unlocalizedName = "playerinventory", textureName = "pim_blue")
+		@RegisterBlock(name = "pim", tileEntity = TileEntityPIM.class, unlocalizedName = "playerinventory")
 		public static BlockPIM pim;
 
 		@RegisterBlock(name = "sensor", tileEntity = TileEntitySensor.class)
 		public static BlockSensor sensor;
 
-		@RegisterBlock(name = "selector", tileEntity = TileEntitySelector.class, textureName = "selector_side")
+		@RegisterBlock(name = "selector", tileEntity = TileEntitySelector.class)
 		public static BlockSelector selector;
+
+		// TODO remove when this can be tested with actual mods
+		@RegisterBlock(name = "peripheralproxy")
+		public static BlockPeripheralProxy peripheralProxy;
+
+		@RegisterBlock(name = "ticketmachine", tileEntity = TileEntityTicketMachine.class)
+		public static BlockTicketMachine ticketMachine;
 	}
 
 	public static class Items implements ItemInstances {
@@ -76,11 +85,9 @@ public class OpenPeripheralAddons {
 		@RegisterItem(name = "keyboard")
 		public static ItemKeyboard keyboard;
 
-		@RegisterItem(name = "generic", textureName = RegisterItem.NONE)
+		@RegisterItem(name = "generic", registerDefaultModel = false)
 		public static ItemOPGeneric generic;
 	}
-
-	public static int renderId;
 
 	@Instance(MODID)
 	public static OpenPeripheralAddons instance;
@@ -98,8 +105,8 @@ public class OpenPeripheralAddons {
 	private final ModStartupHelper startupHelper = new ModStartupHelper("openperipheral") {
 
 		@Override
-		protected void setupIds(GameConfigProvider gameConfig) {
-			gameConfig.setTextureModId("openperipheraladdons");
+		protected void setupConfigPre(GameConfigProvider gameConfig) {
+			gameConfig.setCreativeTab(tabOpenPeripheralAddons);
 		}
 
 		@Override
@@ -119,7 +126,7 @@ public class OpenPeripheralAddons {
 		startupHelper.preInit(evt.getSuggestedConfigurationFile());
 
 		Recipes.register();
-		MetasGeneric.registerItems();
+		Items.generic.registerItems(MetasGeneric.values());
 
 		NetworkEventManager.INSTANCE
 				.startRegistration()
@@ -152,8 +159,7 @@ public class OpenPeripheralAddons {
 
 		Items.generic.initRecipes();
 
-		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance.createForgeListener());
-		FMLCommonHandler.instance().bus().register(TerminalManagerServer.instance.createFmlListener());
+		MinecraftForge.EVENT_BUS.register(TerminalManagerServer.instance);
 
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, OpenMods.proxy.wrapHandler(null));
 
@@ -183,6 +189,8 @@ public class OpenPeripheralAddons {
 	public void init(FMLInitializationEvent evt) {
 		proxy.init();
 		proxy.registerRenderInformation();
+
+		startupHelper.init();
 
 		OpcAccess.checkApiPresent();
 

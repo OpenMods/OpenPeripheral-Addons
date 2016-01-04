@@ -5,43 +5,30 @@ import java.util.List;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fml.common.Loader;
 import openmods.Mods;
-import openperipheral.addons.*;
-import cpw.mods.fml.common.Loader;
+import openmods.block.OpenBlock;
+import openperipheral.addons.Config;
+import openperipheral.addons.ModuleComputerCraft;
 
-public class BlockSensor extends BlockOP {
+public class BlockSensor extends OpenBlock {
 
 	public BlockSensor() {
 		super(Material.iron);
 		setHardness(0.5F);
-		setRenderMode(RenderMode.TESR_ONLY);
 	}
 
 	@Override
-	public boolean canCollideCheck(int par1, boolean par2) {
-		return true;
-	}
-
-	@Override
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
-
-	@Override
-	public boolean isSideSolid(IBlockAccess world, int x, int y, int z, ForgeDirection side) {
-		return side == ForgeDirection.DOWN;
+	public boolean isSideSolid(IBlockAccess world, BlockPos blockPos, EnumFacing side) {
+		return side == EnumFacing.DOWN;
 	}
 
 	@Override
 	public boolean isOpaqueCube() {
 		return false;
-	}
-
-	@Override
-	public int getRenderType() {
-		return OpenPeripheralAddons.renderId;
 	}
 
 	@Override

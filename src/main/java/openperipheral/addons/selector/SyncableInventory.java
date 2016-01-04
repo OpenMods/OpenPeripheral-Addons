@@ -1,11 +1,9 @@
 package openperipheral.addons.selector;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import openmods.inventory.GenericInventory;
 import openmods.sync.ISyncableObject;
 
@@ -33,16 +31,16 @@ public class SyncableInventory extends GenericInventory implements ISyncableObje
 	}
 
 	@Override
-	public void readFromStream(DataInputStream stream) throws IOException {
-		NBTTagCompound tag = CompressedStreamTools.readCompressed(stream);
+	public void readFromStream(PacketBuffer stream) throws IOException {
+		NBTTagCompound tag = stream.readNBTTagCompoundFromBuffer();
 		readFromNBT(tag);
 	}
 
 	@Override
-	public void writeToStream(DataOutputStream stream) throws IOException {
+	public void writeToStream(PacketBuffer stream) {
 		NBTTagCompound tag = new NBTTagCompound();
 		writeToNBT(tag);
-		CompressedStreamTools.writeCompressed(tag, stream);
+		stream.writeNBTTagCompoundToBuffer(tag);
 	}
 
 	@Override

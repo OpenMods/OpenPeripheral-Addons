@@ -2,10 +2,12 @@ package openperipheral.addons.glasses.drawable;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
 import openmods.utils.render.RenderUtils;
@@ -17,10 +19,6 @@ import openperipheral.api.adapter.method.ScriptObject;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.base.Strings;
-
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @ScriptObject
 @AdapterSourceName("glasses_icon")
@@ -38,9 +36,6 @@ public class ItemIcon extends Drawable {
 	@Property
 	@StructureField
 	public float y;
-
-	@SideOnly(Side.CLIENT)
-	private RenderItem renderItem;
 
 	private ItemStack drawStack;
 
@@ -73,12 +68,6 @@ public class ItemIcon extends Drawable {
 		this.meta = meta;
 	}
 
-	@SideOnly(Side.CLIENT)
-	private RenderItem getRenderItem() {
-		if (renderItem == null) renderItem = new RenderItem();
-		return renderItem;
-	}
-
 	@Override
 	@SideOnly(Side.CLIENT)
 	protected void drawContents(RenderState renderState, float partialTicks) {
@@ -89,14 +78,13 @@ public class ItemIcon extends Drawable {
 		renderState.setColor(0xFFFFFF, 1.0f);
 
 		GL11.glScalef(scale, scale, scale);
-		final RenderItem renderItem = getRenderItem();
 		final Minecraft minecraft = Minecraft.getMinecraft();
-		final TextureManager textureManager = minecraft.getTextureManager();
+		final RenderItem renderItem = minecraft.getRenderItem();
 
-		renderItem.renderItemAndEffectIntoGUI(minecraft.fontRenderer, textureManager, drawStack, 0, 0);
+		renderItem.renderItemAndEffectIntoGUI(drawStack, 0, 0);
 
 		if (damageBar > 0 || !Strings.isNullOrEmpty(label)) {
-			renderItem.renderItemOverlayIntoGUI(minecraft.fontRenderer, textureManager, dummyStack, 0, 0, label);
+			renderItem.renderItemOverlayIntoGUI(minecraft.fontRendererObj, dummyStack, 0, 0, label);
 		}
 
 		RenderUtils.disableLightmap();

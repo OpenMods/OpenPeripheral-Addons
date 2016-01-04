@@ -3,12 +3,14 @@ package openperipheral.addons.glasses;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.ITickable;
 import openmods.api.ICustomHarvestDrops;
 import openmods.api.IPlaceAwareTile;
 import openmods.include.IncludeInterface;
@@ -43,7 +45,7 @@ import com.mojang.authlib.GameProfile;
 		"This peripheral signals few events. Full list available here: http://goo.gl/8Hf2yA",
 		"Simple demo: http://goo.gl/n5HPN8" })
 @PeripheralTypeId("openperipheral_bridge")
-public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable, IPlaceAwareTile, ICustomHarvestDrops, IClearable {
+public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable, IPlaceAwareTile, ICustomHarvestDrops, IClearable, ITickable {
 
 	private static final String GLOBAL_FAKE_PLAYER_NAME = "$GLOBAL$";
 
@@ -154,8 +156,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Override
-	public void updateEntity() {
-		super.updateEntity();
+	public void update() {
 		if (worldObj.isRemote) return;
 
 		Preconditions.checkState(guidSet, "Something went terribly wrong");
@@ -196,7 +197,6 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	private static boolean isPlayerLogged(EntityPlayerMP player) {
 		final GameProfile gameProfile = player.getGameProfile();
-		@SuppressWarnings("unchecked")
 		List<EntityPlayerMP> players = MinecraftServer.getServer().getConfigurationManager().playerEntityList;
 		for (EntityPlayerMP p : players) {
 			if (p.getGameProfile().equals(gameProfile)) return true;
@@ -223,7 +223,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Override
-	public void onBlockPlacedBy(EntityPlayer player, ForgeDirection side, ItemStack stack, float hitX, float hitY, float hitZ) {
+	public void onBlockPlacedBy(IBlockState state, EntityLivingBase placer, ItemStack stack) {
 		NBTTagCompound tag = stack.getTagCompound();
 
 		if (tag != null && tag.hasKey(TAG_GUID)) this.guid = tag.getLong(TAG_GUID);
@@ -233,7 +233,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Override
-	public void addHarvestDrops(EntityPlayer player, List<ItemStack> drops) {
+	public void addHarvestDrops(EntityPlayer player, List<ItemStack> drops, int fortune, boolean isSilkTouch) {
 		ItemStack result = new ItemStack(getBlockType());
 		NBTTagCompound tag = ItemUtils.getItemTag(result);
 		tag.setLong(TAG_GUID, guid);
@@ -241,7 +241,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	}
 
 	@Override
-	public boolean suppressNormalHarvestDrops() {
+	public boolean suppressBlockHarvestDrops() {
 		return true;
 	}
 

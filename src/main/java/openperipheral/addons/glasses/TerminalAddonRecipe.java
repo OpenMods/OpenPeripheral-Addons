@@ -75,4 +75,9 @@ public class TerminalAddonRecipe implements IRecipe {
 		return null;
 	}
 
+	@Override
+	public ItemStack[] getRemainingItems(InventoryCrafting inv) {
+		return new ItemStack[inv.getSizeInventory()];
+	}
+
 }

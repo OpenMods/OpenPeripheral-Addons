@@ -16,8 +16,7 @@ public class ItemGlassesBridge extends ItemOpenBlock {
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public void addInformation(ItemStack stack, EntityPlayer player, List result, boolean extended) {
+	public void addInformation(ItemStack stack, EntityPlayer player, List<String> result, boolean extended) {
 		NBTTagCompound tag = stack.getTagCompound();
 
 		if (tag != null && tag.hasKey(TileEntityGlassesBridge.TAG_GUID)) {

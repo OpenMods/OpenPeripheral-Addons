@@ -1,0 +1,6 @@
+{
+    variants: {
+        inventory : { model: "openperipheral:glassesbridge" },
+        "orientation=xp_yp": { model: "openperipheral:glassesbridge" }
+    }
+}

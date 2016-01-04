@@ -1,22 +1,24 @@
 package openperipheral.addons.glasses;
 
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
-import openperipheral.addons.BlockOP;
+import openmods.block.OpenBlock;
 
-public class BlockGlassesBridge extends BlockOP {
+public class BlockGlassesBridge extends OpenBlock {
 
 	public BlockGlassesBridge() {
 		super(Material.ground);
-		setRenderMode(RenderMode.BLOCK_ONLY);
 	}
 
 	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(World world, BlockPos blockPos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
 		if (player.isSneaking() || world.isRemote) return false;
 
-		final TileEntityGlassesBridge te = getTileEntity(world, x, y, z, TileEntityGlassesBridge.class);
+		final TileEntityGlassesBridge te = getTileEntity(world, blockPos, TileEntityGlassesBridge.class);
 		if (te == null) return false;
 
 		return TerminalIdAccess.instance.setIdFor(player, te.getGuid());

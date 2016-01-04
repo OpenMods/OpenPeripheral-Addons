@@ -1,0 +1,12 @@
+{
+    forge_marker: 1,
+    variants: {
+        inventory : {
+            model : "openperipheral:sensor",
+            submodel : {
+                test : { model : "openperipheral:sensor_stalk" }
+               }
+           },
+        "orientation=xp_yp": { model: "openperipheral:sensor" }
+    }
+}
