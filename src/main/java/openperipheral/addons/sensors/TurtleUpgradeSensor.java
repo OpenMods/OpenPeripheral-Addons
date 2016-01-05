@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import openperipheral.addons.Config;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
-import openperipheral.addons.utils.CCUtils;
+import openperipheral.addons.api.ISensorEnvironment;
 import openperipheral.api.ApiAccess;
 import openperipheral.api.architecture.cc.IComputerCraftObjectsFactory;
 
@@ -35,29 +35,19 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 		}
 
 		@Override
-		public boolean isTurtle() {
-			return true;
-		}
-
-		@Override
 		public Vec3 getLocation() {
 			return turtle.getVisualPosition(0);
 		}
 
 		@Override
-		public World getWorld() {
+		public World getSensorWorld() {
 			return turtle.getWorld();
 		}
 
 		@Override
 		public int getSensorRange() {
-			final World world = getWorld();
+			final World world = turtle.getWorld();
 			return (world.isRaining() && world.isThundering())? Config.sensorRangeInStorm : Config.sensorRange;
-		}
-
-		@Override
-		public boolean isValid() {
-			return CCUtils.isTurtleValid(turtle);
 		}
 
 	}

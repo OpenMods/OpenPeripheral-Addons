@@ -12,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 import openperipheral.addons.OpcAccess;
+import openperipheral.addons.api.ISensorEnvironment;
 import openperipheral.api.adapter.IPeripheralAdapter;
 import openperipheral.api.adapter.method.Arg;
 import openperipheral.api.adapter.method.ReturnType;
@@ -66,25 +67,25 @@ public class AdapterSensor implements IPeripheralAdapter {
 		List<Integer> ids = Lists.newArrayList();
 
 		final AxisAlignedBB aabb = getBoundingBox(env);
-		for (Entity entity : env.getWorld().getEntitiesWithinAABB(entityClass, aabb))
+		for (Entity entity : env.getSensorWorld().getEntitiesWithinAABB(entityClass, aabb))
 			ids.add(entity.getEntityId());
 
 		return ids;
 	}
 
 	private static IMetaProviderProxy getEntityInfoById(ISensorEnvironment sensor, int mobId, Class<? extends Entity> cls) {
-		Entity mob = sensor.getWorld().getEntityByID(mobId);
+		Entity mob = sensor.getSensorWorld().getEntityByID(mobId);
 		Preconditions.checkArgument(cls.isInstance(mob), DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING);
 		return getEntityInfo(sensor, mob);
 	}
 
 	private static IMetaProviderProxy getPlayerInfo(ISensorEnvironment sensor, String username) {
-		EntityPlayer player = sensor.getWorld().getPlayerEntityByName(username);
+		EntityPlayer player = sensor.getSensorWorld().getPlayerEntityByName(username);
 		return getEntityInfo(sensor, player);
 	}
 
 	private static IMetaProviderProxy getPlayerInfo(ISensorEnvironment sensor, UUID uuid) {
-		EntityPlayer player = sensor.getWorld().getPlayerEntityByUUID(uuid);
+		EntityPlayer player = sensor.getSensorWorld().getPlayerEntityByUUID(uuid);
 		return getEntityInfo(sensor, player);
 	}
 
@@ -133,7 +134,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the usernames of all the players in range")
 	public List<GameProfile> getPlayers(ISensorEnvironment env) {
-		List<EntityPlayer> players = env.getWorld().getEntitiesWithinAABB(EntityPlayer.class, getBoundingBox(env));
+		List<EntityPlayer> players = env.getSensorWorld().getEntitiesWithinAABB(EntityPlayer.class, getBoundingBox(env));
 
 		List<GameProfile> names = Lists.newArrayList();
 		for (EntityPlayer player : players)
@@ -158,7 +159,7 @@ public class AdapterSensor implements IPeripheralAdapter {
 	public Map<Integer, Map<String, Object>> sonicScan(ISensorEnvironment env) {
 
 		int range = 1 + env.getSensorRange() / 2;
-		World world = env.getWorld();
+		World world = env.getSensorWorld();
 		Map<Integer, Map<String, Object>> results = Maps.newHashMap();
 		Vec3 sensorPos = env.getLocation();
 		int sx = MathHelper.floor_double(sensorPos.xCoord);

@@ -4,8 +4,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import openmods.utils.WorldUtils;
 import openperipheral.addons.Config;
+import openperipheral.addons.api.ISensorEnvironment;
 
 public class TileEntitySensor extends TileEntity implements ISensorEnvironment, ITickable {
 
@@ -25,8 +25,8 @@ public class TileEntitySensor extends TileEntity implements ISensorEnvironment, 
 	}
 
 	@Override
-	public boolean isTurtle() {
-		return false;
+	public World getSensorWorld() {
+		return worldObj;
 	}
 
 	@Override
@@ -44,10 +44,4 @@ public class TileEntitySensor extends TileEntity implements ISensorEnvironment, 
 		final World world = getWorld();
 		return (world.isRaining() && world.isThundering())? Config.sensorRangeInStorm : Config.sensorRange;
 	}
-
-	@Override
-	public boolean isValid() {
-		return WorldUtils.isTileEntityValid(this);
-	}
-
 }
