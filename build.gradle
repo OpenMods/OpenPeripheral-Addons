@@ -157,7 +157,7 @@ task deobfJar(type: Jar) {
     }
 }
 
-ext.sourcesPath = new File(new File(buildDir, "sources"), "java")
+ext.sourcesPath = new File(new File(new File(buildDir, "sources"), "main"), "java")
 
 task apiJar(type: Jar) {
     baseName "OpenPeripheralAddons-API"
