@@ -7,6 +7,8 @@
 *.txt   text
 *.properties text
 *.json text
+*.obj
+*.mtl
 
 *.png   -text
 *.ogg   -text

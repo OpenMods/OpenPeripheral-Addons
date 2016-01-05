@@ -1,7 +1,7 @@
 {
-    variants : {
-        inventory : { model: "openperipheral:pim_up" },
-        "active=false,orientation=xp_yp" : { model: "openperipheral:pim_up" },
-        "active=true,orientation=xp_yp" : { model: "openperipheral:pim_down" }
+    "variants" : {
+        "inventory" : { "model" : "openperipheral:pim_up" },
+        "active=false,orientation=xp_yp" : { "model" : "openperipheral:pim_up" },
+        "active=true,orientation=xp_yp" : { "model" : "openperipheral:pim_down" }
     }
 }

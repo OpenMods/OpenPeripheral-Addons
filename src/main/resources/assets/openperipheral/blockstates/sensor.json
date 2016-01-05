@@ -1,12 +1,25 @@
 {
-    forge_marker: 1,
-    variants: {
-        inventory : {
-            model : "openperipheral:sensor",
-            submodel : {
-                test : { model : "openperipheral:sensor_stalk" }
-               }
-           },
-        "orientation=xp_yp": { model: "openperipheral:sensor" }
+    "forge_marker": 1,
+    "variants": {
+        "inventory" : {
+            "model" : "openperipheral:sensor",
+            "submodel" : {
+                "radar" : {
+                            "model" : "openperipheral:radar.obj",
+                            "custom": { "flip-v": true },
+                            "transform" : { "scale" : [ 0.0625, 0.0625, 0.0625 ] }
+                }
+            }
+        },
+        "orientation" : {
+            "xp_yp": { }     
+        },
+        "static" : {
+            "true" :  { "model" : "openperipheral:sensor" },
+            "false" : { "model" : "openperipheral:radar.obj",
+                        "transform" : { "scale" : [ 0.0625, 0.0625, 0.0625 ] },
+                        "custom" : { "flip-v" : true }
+            }    
+        }
     }
 }

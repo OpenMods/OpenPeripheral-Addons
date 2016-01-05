@@ -1,19 +1,19 @@
 {
-    parent: "block/cube",
+    "parent" : "block/cube",
     textures: {
-        particle : "openperipheral:blocks/selector_side",
-        down : "openperipheral:blocks/selector_bottom",
-        up : "openperipheral:blocks/selector_front",
-        north : "openperipheral:blocks/selector_side",
-        east : "openperipheral:blocks/selector_side",
-        south : "openperipheral:blocks/selector_side",
-        west : "openperipheral:blocks/selector_side"
+        "particle" : "openperipheral:blocks/selector_side",
+        "down" : "openperipheral:blocks/selector_bottom",
+        "up" : "openperipheral:blocks/selector_front",
+        "north" : "openperipheral:blocks/selector_side",
+        "east" : "openperipheral:blocks/selector_side",
+        "south" : "openperipheral:blocks/selector_side",
+        "west" : "openperipheral:blocks/selector_side"
     },
-    display : {
-        thirdperson : {
-            rotation : [ 10, -45, 170 ],
-            translation : [ 0, 1.5, -2.75 ],
-            scale : [ 0.375, 0.375, 0.375 ]
+    "display" : {
+        "thirdperson" : {
+            "rotation" : [ 10, -45, 170 ],
+            "translation" : [ 0, 1.5, -2.75 ],
+            "scale" : [ 0.375, 0.375, 0.375 ]
         }
     }
 }
