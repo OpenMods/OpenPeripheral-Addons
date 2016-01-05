@@ -6,7 +6,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.utils.RenderState;
+import openperipheral.addons.glasses.utils.RenderStateHelper;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -53,9 +53,9 @@ public class Text extends Drawable {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	protected void drawContents(RenderState renderState, float partialTicks) {
-		renderState.setupTexturedRender();
-		renderState.setColor(color, alpha);
+	protected void drawContents(float partialTicks) {
+		RenderStateHelper.setupTexturedRender();
+		RenderStateHelper.color(color, alpha);
 
 		FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
 		GL11.glScalef(scale, scale, scale);

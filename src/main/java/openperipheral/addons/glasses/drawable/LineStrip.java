@@ -5,7 +5,7 @@ import java.util.List;
 
 import openmods.structured.StructureField;
 import openperipheral.addons.glasses.utils.IPointListBuilder;
-import openperipheral.addons.glasses.utils.RenderState;
+import openperipheral.addons.glasses.utils.RenderStateHelper;
 import openperipheral.api.adapter.IndexedProperty;
 import openperipheral.api.adapter.Property;
 
@@ -29,14 +29,14 @@ public abstract class LineStrip<P> extends BoundedShape<P> {
 	}
 
 	@Override
-	protected void drawContents(RenderState renderState, float partialTicks) {
+	protected void drawContents(float partialTicks) {
 		if (points != null) {
-			super.drawContents(renderState, partialTicks);
+			super.drawContents(partialTicks);
 
-			renderState.setLineWidth(width);
+			RenderStateHelper.setLineWidth(width);
 
 			GL11.glBegin(GL11.GL_LINE_STRIP);
-			pointList.drawAllPoints(renderState);
+			pointList.drawAllPoints();
 			GL11.glEnd();
 		}
 	}

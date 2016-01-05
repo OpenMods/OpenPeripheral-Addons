@@ -19,18 +19,18 @@ class PointData {
 
 public class GradientPolygonBuilder extends PolygonBuilderBase<ColorPoint2d, PointData> {
 
-	private static IRenderCommand createVertexCommand(final double x, final double y, final int rgb, final float opacity) {
-		return new IRenderCommand() {
+	private static Runnable createVertexCommand(final double x, final double y, final int rgb, final float opacity) {
+		return new Runnable() {
 			@Override
-			public void execute(RenderState renderState) {
-				renderState.setColor(rgb, opacity);
+			public void run() {
+				RenderStateHelper.color(rgb, opacity);
 				GL11.glVertex2d(x, y);
 			}
 		};
 	}
 
 	@Override
-	protected IRenderCommand createVertexCommand(PointData v) {
+	protected Runnable createVertexCommand(PointData v) {
 		return createVertexCommand(v.coords[0], v.coords[1], v.rgb, v.opacity);
 	}
 

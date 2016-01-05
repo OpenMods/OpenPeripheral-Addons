@@ -12,21 +12,21 @@ import com.google.common.collect.Lists;
 
 public abstract class PolygonBuilderBase<P, D> implements IPolygonBuilder<P> {
 
-	private static final IRenderCommand NULL_COMMAND = new IRenderCommand() {
+	private static final Runnable NULL_COMMAND = new Runnable() {
 		@Override
-		public void execute(RenderState renderState) {}
+		public void run() {}
 	};
 
-	private static final IRenderCommand RENDER_END_COMMAND = new IRenderCommand() {
+	private static final Runnable RENDER_END_COMMAND = new Runnable() {
 		@Override
-		public void execute(RenderState renderState) {
+		public void run() {
 			GL11.glEnd();
 		}
 	};
 
 	private final GLUtessellator tesselator = GLU.gluNewTess();
 
-	private final List<IRenderCommand> commands = Lists.newArrayList();
+	private final List<Runnable> commands = Lists.newArrayList();
 
 	private boolean failed = false;
 
@@ -81,7 +81,7 @@ public abstract class PolygonBuilderBase<P, D> implements IPolygonBuilder<P> {
 
 	};
 
-	protected abstract IRenderCommand createVertexCommand(D vertexData);
+	protected abstract Runnable createVertexCommand(D vertexData);
 
 	protected abstract D onCombine(double[] coords, List<CombineData<D>> objects);
 
@@ -112,27 +112,27 @@ public abstract class PolygonBuilderBase<P, D> implements IPolygonBuilder<P> {
 
 	protected abstract D convertToData(P point);
 
-	private static IRenderCommand createCompositeCommand(final List<IRenderCommand> commands) {
-		return new IRenderCommand() {
+	private static Runnable createCompositeCommand(final List<Runnable> commands) {
+		return new Runnable() {
 			@Override
-			public void execute(RenderState renderState) {
-				for (IRenderCommand command : commands)
-					command.execute(renderState);
+			public void run() {
+				for (Runnable command : commands)
+					command.run();
 			}
 		};
 	}
 
-	private static IRenderCommand createRenderBeginCommand(final int type) {
-		return new IRenderCommand() {
+	private static Runnable createRenderBeginCommand(final int type) {
+		return new Runnable() {
 			@Override
-			public void execute(RenderState renderState) {
+			public void run() {
 				GL11.glBegin(type);
 			}
 		};
 	}
 
 	@Override
-	public IRenderCommand build() {
+	public Runnable build() {
 		Preconditions.checkState(started, "Builder already finished");
 		tesselator.gluEndPolygon();
 		started = failed;

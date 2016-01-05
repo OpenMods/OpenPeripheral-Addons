@@ -3,7 +3,7 @@ package openperipheral.addons.glasses.drawable;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
 import openperipheral.addons.glasses.utils.Point2d;
-import openperipheral.addons.glasses.utils.RenderState;
+import openperipheral.addons.glasses.utils.RenderStateHelper;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -44,11 +44,11 @@ public class Point extends Drawable {
 	}
 
 	@Override
-	protected void drawContents(RenderState renderState, float partialTicks) {
-		renderState.setColor(color, opacity);
+	protected void drawContents(float partialTicks) {
+		RenderStateHelper.color(color, opacity);
 
-		renderState.setupSolidRender();
-		renderState.setPointSize(size);
+		RenderStateHelper.setupSolidRender();
+		RenderStateHelper.setPointSize(size);
 
 		GL11.glBegin(GL11.GL_POINTS);
 		GL11.glVertex2i(0, 0);

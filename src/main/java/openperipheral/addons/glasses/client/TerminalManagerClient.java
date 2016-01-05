@@ -23,7 +23,6 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.*;
 import openperipheral.addons.glasses.drawable.Drawable;
 import openperipheral.addons.glasses.utils.Point2d;
-import openperipheral.addons.glasses.utils.RenderState;
 
 import org.lwjgl.opengl.GL11;
 
@@ -64,11 +63,8 @@ public class TerminalManagerClient {
 			GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_ENABLE_BIT);
 			GL11.glShadeModel(GL11.GL_SMOOTH);
 
-			final RenderState renderState = new RenderState();
-			renderState.forceKnownState();
-
 			for (Drawable drawable : surface.getSortedDrawables())
-				if (drawable.shouldRender()) drawable.draw(resolution, renderState, partialTicks);
+				if (drawable.shouldRender()) drawable.draw(resolution, partialTicks);
 			GL11.glPopAttrib();
 		}
 	}

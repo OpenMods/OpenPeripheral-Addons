@@ -2,7 +2,6 @@ package openperipheral.addons.glasses.drawable;
 
 import openmods.structured.StructureField;
 import openperipheral.addons.glasses.utils.IPointListBuilder;
-import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.Property;
 
 import org.lwjgl.opengl.GL11;
@@ -28,14 +27,14 @@ public abstract class Triangle<P> extends BoundedShape<P> {
 	}
 
 	@Override
-	protected void drawContents(RenderState renderState, float partialTicks) {
+	protected void drawContents(float partialTicks) {
 		if (pointList != null) {
-			super.drawContents(renderState, partialTicks);
+			super.drawContents(partialTicks);
 
 			GL11.glBegin(GL11.GL_TRIANGLES);
-			pointList.drawPoint(renderState, 0);
-			pointList.drawPoint(renderState, 1);
-			pointList.drawPoint(renderState, 2);
+			pointList.drawPoint(0);
+			pointList.drawPoint(1);
+			pointList.drawPoint(2);
 			GL11.glEnd();
 		}
 	}

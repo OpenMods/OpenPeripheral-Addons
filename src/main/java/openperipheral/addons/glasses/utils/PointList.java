@@ -14,17 +14,17 @@ public abstract class PointList<T> implements IPointList<T> {
 	}
 
 	@Override
-	public void drawAllPoints(RenderState renderState) {
+	public void drawAllPoints() {
 		for (T p : points)
-			drawPoint(renderState, p);
+			drawPoint(p);
 	}
 
-	protected abstract void drawPoint(RenderState renderState, T p);
+	protected abstract void drawPoint(T p);
 
 	@Override
-	public void drawPoint(RenderState renderState, int index) {
+	public void drawPoint(int index) {
 		final T p = points.get(index);
-		drawPoint(renderState, p);
+		drawPoint(p);
 	}
 
 	@Override

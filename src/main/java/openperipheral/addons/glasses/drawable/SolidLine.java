@@ -30,9 +30,9 @@ public class SolidLine extends Line<Point2d> {
 	}
 
 	@Override
-	protected void drawContents(RenderState renderState, float partialTicks) {
-		renderState.setColor(color, opacity);
-		super.drawContents(renderState, partialTicks);
+	protected void drawContents(float partialTicks) {
+		RenderStateHelper.color(color, opacity);
+		super.drawContents(partialTicks);
 	}
 
 	@Override

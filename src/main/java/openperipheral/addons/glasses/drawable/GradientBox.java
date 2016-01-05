@@ -4,7 +4,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.utils.RenderState;
+import openperipheral.addons.glasses.utils.RenderStateHelper;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -73,11 +73,11 @@ public class GradientBox extends Drawable {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	protected void drawContents(RenderState renderState, float partialTicks) {
-		renderState.setupSolidRender();
+	protected void drawContents(float partialTicks) {
+		RenderStateHelper.setupSolidRender();
 
 		{
-			renderState.setColor(color1, opacity1);
+			RenderStateHelper.color(color1, opacity1);
 			GL11.glBegin(GL11.GL_QUADS);
 			if (gradient == 1) {
 				GL11.glVertex2f(0, height);
@@ -89,7 +89,7 @@ public class GradientBox extends Drawable {
 		}
 
 		{
-			renderState.setColor(color2, opacity2);
+			RenderStateHelper.color(color2, opacity2);
 			if (gradient == 1) {
 				GL11.glVertex2f(width, 0);
 				GL11.glVertex2f(0, 0);

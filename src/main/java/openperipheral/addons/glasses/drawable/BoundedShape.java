@@ -1,9 +1,9 @@
 package openperipheral.addons.glasses.drawable;
 
+import net.minecraft.client.renderer.GlStateManager;
 import openmods.geometry.Box2d;
 import openperipheral.addons.glasses.utils.IPointList;
 import openperipheral.addons.glasses.utils.IPointListBuilder;
-import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.method.ReturnType;
 import openperipheral.api.adapter.method.ScriptCallable;
@@ -16,8 +16,11 @@ public abstract class BoundedShape<P> extends Drawable {
 	protected IPointList<P> pointList;
 
 	@Override
-	protected void drawContents(RenderState renderState, float partialTicks) {
-		renderState.setupSolidRender();
+	protected void drawContents(float partialTicks) {
+		GlStateManager.disableLighting();
+		GlStateManager.disableAlpha();
+		GlStateManager.disableDepth();
+		GlStateManager.disableTexture2D();
 	}
 
 	protected abstract void addPoints(IPointListBuilder<P> builder);

@@ -43,11 +43,11 @@ public class SolidPolygon extends Polygon<Point2d> {
 	}
 
 	@Override
-	protected void drawContents(RenderState renderState, float partialTicks) {
+	protected void drawContents(float partialTicks) {
 		if (canRender()) {
-			super.drawContents(renderState, partialTicks);
-			renderState.setColor(color, opacity);
-			renderPolygon(renderState);
+			super.drawContents(partialTicks);
+			RenderStateHelper.color(color, opacity);
+			renderPolygon();
 		}
 	}
 

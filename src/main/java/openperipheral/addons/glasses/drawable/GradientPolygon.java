@@ -30,10 +30,10 @@ public class GradientPolygon extends Polygon<ColorPoint2d> {
 	}
 
 	@Override
-	protected void drawContents(RenderState renderState, float partialTicks) {
+	protected void drawContents(float partialTicks) {
 		if (canRender()) {
-			super.drawContents(renderState, partialTicks);
-			renderPolygon(renderState);
+			super.drawContents(partialTicks);
+			renderPolygon();
 		}
 	}
 

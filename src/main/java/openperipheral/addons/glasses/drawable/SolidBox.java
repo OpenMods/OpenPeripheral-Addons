@@ -4,7 +4,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.utils.RenderState;
+import openperipheral.addons.glasses.utils.RenderStateHelper;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -52,9 +52,9 @@ public class SolidBox extends Drawable {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	protected void drawContents(RenderState renderState, float partialTicks) {
-		renderState.setupSolidRender();
-		renderState.setColor(color, opacity);
+	protected void drawContents(float partialTicks) {
+		RenderStateHelper.setupSolidRender();
+		RenderStateHelper.color(color, opacity);
 
 		GL11.glBegin(GL11.GL_QUADS);
 		GL11.glVertex2f(0, 0);

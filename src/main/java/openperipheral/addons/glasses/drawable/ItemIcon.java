@@ -1,6 +1,8 @@
 package openperipheral.addons.glasses.drawable;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -11,7 +13,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
 import openmods.utils.render.RenderUtils;
-import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
@@ -70,12 +71,13 @@ public class ItemIcon extends Drawable {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	protected void drawContents(RenderState renderState, float partialTicks) {
-		renderState.enableTexture();
-		renderState.enableDepthTest();
-		renderState.enableCullFace();
-		renderState.disableLight();
-		renderState.setColor(0xFFFFFF, 1.0f);
+	protected void drawContents(float partialTicks) {
+		GlStateManager.enableTexture2D();
+		GlStateManager.enableDepth();
+		GlStateManager.enableCull();
+		GlStateManager.disableLighting();
+		RenderHelper.enableGUIStandardItemLighting();
+		GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 
 		GL11.glScalef(scale, scale, scale);
 		final Minecraft minecraft = Minecraft.getMinecraft();
@@ -87,9 +89,8 @@ public class ItemIcon extends Drawable {
 			renderItem.renderItemOverlayIntoGUI(minecraft.fontRendererObj, dummyStack, 0, 0, label);
 		}
 
+		RenderHelper.disableStandardItemLighting();
 		RenderUtils.disableLightmap();
-
-		renderState.readState();
 	}
 
 	@Override

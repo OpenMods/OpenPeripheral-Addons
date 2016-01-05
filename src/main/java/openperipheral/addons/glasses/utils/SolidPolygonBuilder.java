@@ -6,17 +6,17 @@ import org.lwjgl.opengl.GL11;
 
 public class SolidPolygonBuilder extends PolygonBuilderBase<Point2d, double[]> {
 
-	private static IRenderCommand createVertexCommand(final double x, final double y) {
-		return new IRenderCommand() {
+	private static Runnable createVertexCommand(final double x, final double y) {
+		return new Runnable() {
 			@Override
-			public void execute(RenderState renderState) {
+			public void run() {
 				GL11.glVertex2d(x, y);
 			}
 		};
 	}
 
 	@Override
-	protected IRenderCommand createVertexCommand(double[] vertexData) {
+	protected Runnable createVertexCommand(double[] vertexData) {
 		return createVertexCommand(vertexData[0], vertexData[1]);
 	}
 

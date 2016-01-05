@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.utils.*;
+import openperipheral.addons.glasses.utils.IPointListBuilder;
+import openperipheral.addons.glasses.utils.IPolygonBuilder;
 import openperipheral.api.adapter.IndexedProperty;
 import openperipheral.api.adapter.Property;
 
@@ -17,7 +18,7 @@ public abstract class Polygon<P> extends BoundedShape<P> {
 	@IndexedProperty(expandable = true, nullable = true)
 	public List<P> points = Lists.newArrayList();
 
-	private IRenderCommand renderCommands;
+	private Runnable renderCommands;
 
 	public Polygon(P... points) {
 		this.points.addAll(Arrays.asList(points));
@@ -38,8 +39,8 @@ public abstract class Polygon<P> extends BoundedShape<P> {
 		return renderCommands != null;
 	}
 
-	protected final void renderPolygon(RenderState renderState) {
-		renderCommands.execute(renderState);
+	protected final void renderPolygon() {
+		renderCommands.run();
 	}
 
 	protected abstract IPolygonBuilder<P> createPolygonBuilder();
