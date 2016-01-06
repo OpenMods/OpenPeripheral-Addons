@@ -1,6 +1,6 @@
 {
     "parent" : "block/cube",
-    textures: {
+    "textures" : {
         "particle" : "openperipheral:blocks/selector_side",
         "down" : "openperipheral:blocks/selector_bottom",
         "up" : "openperipheral:blocks/selector_front",
@@ -8,12 +8,5 @@
         "east" : "openperipheral:blocks/selector_side",
         "south" : "openperipheral:blocks/selector_side",
         "west" : "openperipheral:blocks/selector_side"
-    },
-    "display" : {
-        "thirdperson" : {
-            "rotation" : [ 10, -45, 170 ],
-            "translation" : [ 0, 1.5, -2.75 ],
-            "scale" : [ 0.375, 0.375, 0.375 ]
-        }
     }
 }

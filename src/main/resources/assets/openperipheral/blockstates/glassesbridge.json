@@ -1,6 +1,19 @@
 {
+    "forge_marker" : 1,
+    "defaults" : {
+        "model" : "openperipheral:glassesbridge"
+    },
     "variants" : {
-        "inventory" : { "model" : "openperipheral:glassesbridge" },
-        "orientation=xp_yp": { "model" : "openperipheral:glassesbridge" }
+        "inventory" : [{
+            "transform" : {
+                "thirdperson" : {
+                    "rotation" : [ { "z": 170 }, { "y": -45 }, { "z": 20 } ],
+                    "translation": [ 0, 0.09375, -0.171875 ],
+                    "scale": 0.375
+                }
+            }
+        }],
+
+        "orientation=xp_yp": [{}]
     }
 }

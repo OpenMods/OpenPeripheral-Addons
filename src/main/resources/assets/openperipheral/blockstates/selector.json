@@ -2,7 +2,17 @@
     "forge_marker" : 1,
     "defaults" : { "model": "openperipheral:selector" },
     "variants" : {
-        "inventory" :  { "x" : 90 },
+        "inventory" : [{
+            "transform" : {
+                "rotation" : [{"z" : 90}, {"y" : 270}],
+                "thirdperson" : {
+                    "rotation" : [ { "z": 170 }, { "y": -45 }, { "z": 20 } ],
+                    "translation": [ 0, 0.09375, -0.171875 ],
+                    "scale": 0.375
+                }
+            }
+        }],
+
         "orientation=xp_yp" : { "y" : 0 },
         "orientation=zp_yp" : { "y" : 90 },
         "orientation=xn_yp" : { "y" : 180 },

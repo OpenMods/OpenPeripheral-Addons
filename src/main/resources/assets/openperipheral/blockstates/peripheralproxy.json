@@ -2,7 +2,16 @@
     "forge_marker" : 1,
     "defaults" : { "model" : "openperipheral:proxy" },
     "variants" : {
-        "inventory" : { "y" : 0 },
+        "inventory" : [{
+            "transform" : {
+                "thirdperson" : {
+                    "rotation" : [ { "z": 170 }, { "y": -45 }, { "z": 20 } ],
+                    "translation": [ 0, 0.09375, -0.171875 ],
+                    "scale": 0.375
+                }
+            }
+        }],
+
         "orientation=xn_yn" : { "x" : 180, "y" : 180 },
         "orientation=xp_yp" : { "x" : 0 },
         "orientation=xp_zn" : { "x" : 90 },

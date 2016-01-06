@@ -2,10 +2,18 @@
     "forge_marker" : 1,
     "defaults" : { "model" : "openperipheral:ticketmachine" },
     "variants" : {
-        "inventory" : {
-            "y" : 180,
-            "textures" : { "front" : "openperipheral:blocks/ticketmachine_front_empty" }
-        },
+        "inventory" : [{
+            "textures" : { "front" : "openperipheral:blocks/ticketmachine_front_empty" },
+            "transform" : {
+                "rotation" : {"y" : 90},
+                "thirdperson" : {
+                    "rotation" : [ { "z": 170 }, { "y": -45 }, { "z": 20 } ],
+                    "translation": [ 0, 0.09375, -0.171875 ],
+                    "scale": 0.375
+                }
+            }
+        }],
+
         "ticket" : {
             "true" : {
                 "textures" : { "front" : "openperipheral:blocks/ticketmachine_front_ticket" }
@@ -14,6 +22,7 @@
                 "textures" : { "front" : "openperipheral:blocks/ticketmachine_front_empty" }
             }
         },
+
         "orientation" : {
             "xp_yp" : { "y" :   0 },
             "zp_yp" : { "y" :  90 },
