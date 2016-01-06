@@ -8,18 +8,13 @@ import openmods.block.BlockRotationMode;
 import openmods.block.OpenBlock;
 import openmods.geometry.Orientation;
 
-public class BlockTicketMachine extends OpenBlock {
+public class BlockTicketMachine extends OpenBlock.FourDirections {
 
 	public static final PropertyBool HAS_TICKET = PropertyBool.create("ticket");
 
 	public BlockTicketMachine() {
 		super(Material.iron);
 		setDefaultState(blockState.getBaseState().withProperty(HAS_TICKET, false));
-	}
-
-	@Override
-	public BlockRotationMode getRotationMode() {
-		return BlockRotationMode.FOUR_DIRECTIONS;
 	}
 
 	@Override

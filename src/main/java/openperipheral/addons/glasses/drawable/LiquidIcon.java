@@ -1,11 +1,9 @@
 package openperipheral.addons.glasses.drawable;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.client.FMLClientHandler;
@@ -13,6 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
+import openmods.utils.TextureUtils;
 import openperipheral.addons.glasses.utils.GlassesRenderingUtils;
 import openperipheral.addons.glasses.utils.RenderStateHelper;
 import openperipheral.api.adapter.AdapterSourceName;
@@ -121,10 +120,7 @@ public class LiquidIcon extends Drawable {
 	private static TextureAtlasSprite findFluidIcon(String fluid) {
 		if (!Strings.isNullOrEmpty(fluid)) {
 			final Fluid drawLiquid = FluidRegistry.getFluid(fluid);
-			if (drawLiquid != null) {
-				final ResourceLocation textureLocation = drawLiquid.getStill();
-				return Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(textureLocation.toString());
-			}
+			if (drawLiquid != null) return TextureUtils.getFluidTexture(drawLiquid);
 		}
 		return null;
 	}
