@@ -26,16 +26,15 @@ public class BlockTicketMachine extends OpenBlock.FourDirections {
 	public IBlockState getStateFromMeta(int meta) {
 		final BlockRotationMode rotationMode = getRotationMode();
 		return getDefaultState()
-				.withProperty(getOrientationProperty(), rotationMode.fromValue(meta & rotationMode.mask))
+				.withProperty(propertyOrientation, getOrientationFromMeta(meta))
 				.withProperty(HAS_TICKET, ((meta & ~rotationMode.mask) != 0));
 	}
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		final BlockRotationMode rotationMode = getRotationMode();
-		final Orientation orientation = state.getValue(rotationMode.property);
+		final Orientation orientation = state.getValue(propertyOrientation);
 		final int hasTicket = (state.getValue(HAS_TICKET)? 1 : 0) << rotationMode.bitCount;
-		final int meta = getRotationMode().toValue(orientation) | hasTicket;
+		final int meta = getMetaFromOrientation(orientation) | hasTicket;
 		return meta;
 	}
 }

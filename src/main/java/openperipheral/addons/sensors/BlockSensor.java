@@ -29,8 +29,8 @@ public class BlockSensor extends OpenBlock {
 	}
 
 	@Override
-	public BlockState createBlockState() {
-		return new BlockState(this, new IProperty[] { getRotationMode().property, STATIC });
+	protected BlockState createBlockState() {
+		return new BlockState(this, new IProperty[] { propertyOrientation, STATIC });
 	}
 
 	@Override
