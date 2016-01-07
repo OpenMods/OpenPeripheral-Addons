@@ -19,7 +19,7 @@ public class BlockTicketMachine extends OpenBlock.FourDirections {
 
 	@Override
 	protected BlockState createBlockState() {
-		return new BlockState(this, getRotationMode().property, HAS_TICKET);
+		return new BlockState(this, getPropertyOrientation(), HAS_TICKET);
 	}
 
 	@Override

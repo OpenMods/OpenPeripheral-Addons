@@ -25,7 +25,7 @@ public class BlockPIM extends OpenBlock {
 
 	@Override
 	protected BlockState createBlockState() {
-		return new BlockState(this, propertyOrientation, ACTIVE);
+		return new BlockState(this, getPropertyOrientation(), ACTIVE);
 	}
 
 	@Override
