@@ -203,7 +203,7 @@ public abstract class TerminalEvent extends NetworkEvent {
 		}
 	}
 
-	@NetworkEventMeta(direction = EventDirection.S2C, compressed = true)
+	@NetworkEventMeta(direction = EventDirection.S2C)
 	public static class PrivateDrawableData extends DrawableData {
 
 		public PrivateDrawableData() {}
@@ -218,7 +218,7 @@ public abstract class TerminalEvent extends NetworkEvent {
 		}
 	}
 
-	@NetworkEventMeta(direction = EventDirection.S2C, compressed = true)
+	@NetworkEventMeta(direction = EventDirection.S2C)
 	public static class PrivateStructureData extends StructureData {
 		public PrivateStructureData() {}
 
@@ -245,7 +245,7 @@ public abstract class TerminalEvent extends NetworkEvent {
 		}
 	}
 
-	@NetworkEventMeta(direction = EventDirection.S2C, compressed = true)
+	@NetworkEventMeta(direction = EventDirection.S2C)
 	public static class PublicStructureData extends StructureData {
 		public PublicStructureData() {}
 
@@ -259,7 +259,7 @@ public abstract class TerminalEvent extends NetworkEvent {
 		}
 	}
 
-	@NetworkEventMeta(direction = EventDirection.S2C, compressed = true)
+	@NetworkEventMeta(direction = EventDirection.S2C)
 	public static class PublicDrawableData extends DrawableData {
 
 		public PublicDrawableData() {}
