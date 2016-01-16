@@ -3,6 +3,7 @@ package openperipheral.addons.glasses.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -61,7 +62,7 @@ public class TerminalManagerClient {
 		SurfaceClient surface = surfaces.get(guid, type);
 		if (surface != null) {
 			GL11.glPushAttrib(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_ENABLE_BIT);
-			GL11.glShadeModel(GL11.GL_SMOOTH);
+			GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
 			for (Drawable drawable : surface.getSortedDrawables())
 				if (drawable.shouldRender()) drawable.draw(resolution, partialTicks);
