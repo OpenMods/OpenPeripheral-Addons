@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 
 import openmods.structured.FieldContainer;
 import openperipheral.api.Constants;
+import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.Env;
 import openperipheral.api.adapter.method.ReturnType;
 import openperipheral.api.adapter.method.ScriptCallable;
@@ -14,6 +15,7 @@ import openperipheral.api.property.ISinglePropertyListener;
 
 import com.google.common.base.Preconditions;
 
+@Asynchronous
 public abstract class StructuredObjectBase extends FieldContainer implements ISinglePropertyListener, IIndexedPropertyListener {
 
 	private boolean deleted;
