@@ -6,7 +6,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.world.World;
-import openperipheral.addons.utils.CCUtils;
 import openperipheral.api.adapter.IWorldPosProvider;
 import dan200.computercraft.api.turtle.ITurtleAccess;
 
@@ -101,7 +100,10 @@ public class TurtleInventoryDelegate implements IInventory, IWorldPosProvider {
 
 	@Override
 	public boolean isValid() {
-		return CCUtils.isTurtleValid(wrapped);
+		World world = wrapped.getWorld();
+		if (world == null) return false;
+		BlockPos pos = wrapped.getPosition();
+		return world.isBlockLoaded(pos);
 	}
 
 	@Override

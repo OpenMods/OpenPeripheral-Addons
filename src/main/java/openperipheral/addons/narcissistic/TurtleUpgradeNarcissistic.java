@@ -12,6 +12,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import openperipheral.addons.MetasGeneric;
+import openperipheral.addons.ModuleComputerCraft;
+import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.api.ApiAccess;
 import openperipheral.api.architecture.cc.IComputerCraftObjectsFactory;
 
@@ -24,7 +26,7 @@ public class TurtleUpgradeNarcissistic implements ITurtleUpgrade {
 
 	@Override
 	public ResourceLocation getUpgradeID() {
-		return new ResourceLocation("openperipheral", "narcissistic");
+		return OpenPeripheralAddons.location("narcissistic");
 	}
 
 	@Override
@@ -66,8 +68,7 @@ public class TurtleUpgradeNarcissistic implements ITurtleUpgrade {
 		final Minecraft mc = Minecraft.getMinecraft();
 		final ModelManager modelManager = mc.getRenderItem().getItemModelMesher().getModelManager();
 
-		// TODO: actual models
-		ModelResourceLocation location = new ModelResourceLocation(side == TurtleSide.Left? "computercraft:turtle_crafting_table_left" : "computercraft:turtle_crafting_table_right", "inventory");
+		ModelResourceLocation location = new ModelResourceLocation(ModuleComputerCraft.getNarcissisticTurtleModel(side), "inventory");
 		return Pair.of(modelManager.getModel(location), null);
 	}
 }

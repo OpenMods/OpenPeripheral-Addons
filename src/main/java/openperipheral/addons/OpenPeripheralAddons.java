@@ -2,6 +2,7 @@ package openperipheral.addons;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.*;
@@ -39,7 +40,6 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeatEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSignalCaptureEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.glasses.server.TerminalManagerServer;
-import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.pim.TileEntityPIM;
 import openperipheral.addons.selector.BlockSelector;
@@ -52,10 +52,14 @@ import openperipheral.addons.ticketmachine.TileEntityTicketMachine;
 
 import org.apache.commons.lang3.ObjectUtils;
 
-@Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$,$NEXT-LIB-VERSION$);required-after:OpenPeripheralApi@$OP-API-VERSION$;after:ComputerCraft@[1.70,]")
+@Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$,$NEXT-LIB-VERSION$);required-after:OpenPeripheralApi@$OP-API-VERSION$;after:ComputerCraft@[1.77,]")
 public class OpenPeripheralAddons {
 
 	public static final String MODID = "OpenPeripheral";
+
+	public static ResourceLocation location(String path) {
+		return new ResourceLocation("openperipheral", path);
+	}
 
 	public static class Blocks implements BlockInstances {
 		@RegisterBlock(name = "glassesbridge", tileEntity = TileEntityGlassesBridge.class, itemBlock = ItemGlassesBridge.class)
@@ -71,9 +75,6 @@ public class OpenPeripheralAddons {
 		public static BlockSelector selector;
 
 		// TODO remove when this can be tested with actual mods
-		@RegisterBlock(name = "peripheralproxy")
-		public static BlockPeripheralProxy peripheralProxy;
-
 		@RegisterBlock(name = "ticketmachine", tileEntity = TileEntityTicketMachine.class)
 		public static BlockTicketMachine ticketMachine;
 	}

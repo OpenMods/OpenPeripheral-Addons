@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import openperipheral.addons.Config;
+import openperipheral.addons.ModuleComputerCraft;
 import openperipheral.addons.OpenPeripheralAddons.Blocks;
 import openperipheral.addons.api.ISensorEnvironment;
 import openperipheral.api.ApiAccess;
@@ -96,8 +97,7 @@ public class TurtleUpgradeSensor implements ITurtleUpgrade {
 		final Minecraft mc = Minecraft.getMinecraft();
 		final ModelManager modelManager = mc.getRenderItem().getItemModelMesher().getModelManager();
 
-		// TODO: actual models
-		ModelResourceLocation location = new ModelResourceLocation(side == TurtleSide.Left? "computercraft:turtle_crafting_table_left" : "computercraft:turtle_crafting_table_right", "inventory");
+		ModelResourceLocation location = new ModelResourceLocation(ModuleComputerCraft.getSensorTurtleModel(side), "inventory");
 		return Pair.of(modelManager.getModel(location), null);
 	}
 
