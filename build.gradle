@@ -84,17 +84,8 @@ if (!in_jenkins) {
     branch = env.GIT_BRANCH.minus("origin/")
 }
 
-// If not on master, add branch to jar name
-if (branch != null && !branch.equals("master")) {
-    version += "-" + branch
-} else {
-    //version += "-" + hash
-}
-
 // Version tag for jar file name
-if (env.BUILD_NUMBER != null) {
-    version += "-snapshot-" + env.BUILD_NUMBER
-}
+version += "." + (env.BUILD_NUMBER ?: 'dev')
 
 // Get Git metadata (if in Jenkins)
 ext.gitManifest = manifest {
@@ -148,15 +139,6 @@ jar {
     }
 }
 
-// Dev jar
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
-    manifest {
-        from jenkinsManifest, gitManifest, fmlManifest
-    }
-}
-
 ext.sourcesPath = new File(new File(new File(buildDir, "sources"), "main"), "java")
 
 task apiJar(type: Jar) {
@@ -164,8 +146,6 @@ task apiJar(type: Jar) {
     version api_version
 
     from sourceSets.main.output
-    from sourcesPath
-
     include 'openperipheral/addons/api/**'
 
     manifest {
@@ -179,7 +159,6 @@ task apiSrcJar(type: Jar) {
     classifier 'sources'
 
     from sourcesPath
-
     include 'openperipheral/addons/api/**'
 
     manifest {
@@ -188,7 +167,6 @@ task apiSrcJar(type: Jar) {
 }
 
 artifacts {
-    archives deobfJar
     archives apiJar
     archives apiSrcJar
 }
