@@ -3,10 +3,12 @@ tile.openperipheral.peripheralproxy.name=Peripheral-Proxy
 tile.openperipheral.playerinventory.name=PIM
 tile.openperipheral.ticketmachine.name=Ticketmaschine
 tile.openperipheral.sensor.name=Sensor
+#tile.openperipheral.selector.name=Item Selector ## NEEDS TRANSLATION ##
 tile.openperipheral.robot.name=Roboter-Controller
 
 item.openperipheraladdons.duckantenna.name=Stabantenne
 
+#item.openperipheral.keyboard.name=Wireless Keyboard ## NEEDS TRANSLATION ##
 item.openperipheral.glasses.name=Terminalbrille
 item.openperipheral.remote.name=Fernsteuerung
 item.openperipheral.capacitor.name=Kondensator
@@ -63,7 +65,11 @@ item.openperipheral.robot.name=OpenMech: Krieger
 itemGroup.tabOpenPeripheralAddons=OpenPeripheral 
 
 openperipheral.gui.ticketmachine=Ticketmaschine
+#openperipheral.gui.selector=Item Selector ## NEEDS TRANSLATION ##
 openperipheral.turtle.sensor.adjective=Sensor
 openperipheral.turtle.narcissistic.adjective=Narzisstische
 
 openperipheral.misc.key=Taste: %s
+#openperipheral.misc.no_glasses=This item can be only used with bound terminal glasses! ## NEEDS TRANSLATION ##
+#openperipheral.terminal.unbound=§aNo terminal key!§r ## NEEDS TRANSLATION ##
+#openperipheral.terminal.key=§aTerminal key: %s§r ## NEEDS TRANSLATION ##
