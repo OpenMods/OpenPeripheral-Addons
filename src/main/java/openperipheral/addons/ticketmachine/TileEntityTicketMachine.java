@@ -23,6 +23,7 @@ import openmods.utils.ColorUtils.ColorMeta;
 import openmods.utils.ItemUtils;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.*;
+import openperipheral.api.architecture.FeatureGroup;
 import openperipheral.api.peripheral.PeripheralTypeId;
 
 import com.google.common.base.Preconditions;
@@ -30,6 +31,7 @@ import com.google.common.base.Preconditions;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 @PeripheralTypeId("openperipheral_ticketmachine")
+@FeatureGroup("openperipheral-ticketmachine")
 public class TileEntityTicketMachine extends SyncedTileEntity implements IPlaceAwareTile, IHasGui, IIconProvider, IInventoryProvider, IInventoryCallback {
 
 	private static final int SLOT_PAPER = 0;

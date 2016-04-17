@@ -25,6 +25,7 @@ import openperipheral.api.adapter.Doc;
 import openperipheral.api.adapter.method.Arg;
 import openperipheral.api.adapter.method.ReturnType;
 import openperipheral.api.adapter.method.ScriptCallable;
+import openperipheral.api.architecture.FeatureGroup;
 import openperipheral.api.architecture.IArchitectureAccess;
 import openperipheral.api.architecture.IAttachable;
 import openperipheral.api.peripheral.PeripheralTypeId;
@@ -43,6 +44,7 @@ import com.mojang.authlib.GameProfile;
 		"This peripheral signals few events. Full list available here: http://goo.gl/8Hf2yA",
 		"Simple demo: http://goo.gl/n5HPN8" })
 @PeripheralTypeId("openperipheral_bridge")
+@FeatureGroup("openperipheral-glasses")
 public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachable, IPlaceAwareTile, ICustomHarvestDrops, IClearable {
 
 	private static final String GLOBAL_FAKE_PLAYER_NAME = "$GLOBAL$";

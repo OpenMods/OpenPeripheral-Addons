@@ -24,9 +24,7 @@ import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.api.Constants;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.method.*;
-import openperipheral.api.architecture.IArchitecture;
-import openperipheral.api.architecture.IArchitectureAccess;
-import openperipheral.api.architecture.IAttachable;
+import openperipheral.api.architecture.*;
 import openperipheral.api.helpers.Index;
 import openperipheral.api.peripheral.PeripheralTypeId;
 
@@ -35,6 +33,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 @PeripheralTypeId("openperipheral_selector")
+@FeatureGroup("openperipheral-selector")
 public class TileEntitySelector extends SyncedTileEntity implements IActivateAwareTile, IAttachable, IHasGui {
 
 	public static class ItemSlot {

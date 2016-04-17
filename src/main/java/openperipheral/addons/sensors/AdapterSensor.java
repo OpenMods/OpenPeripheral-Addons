@@ -19,6 +19,7 @@ import openperipheral.api.adapter.IPeripheralAdapter;
 import openperipheral.api.adapter.method.Arg;
 import openperipheral.api.adapter.method.ReturnType;
 import openperipheral.api.adapter.method.ScriptCallable;
+import openperipheral.api.architecture.FeatureGroup;
 import openperipheral.api.meta.IMetaProviderProxy;
 
 import com.google.common.base.Preconditions;
@@ -26,6 +27,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
 
+@FeatureGroup("openperipheral-sensor")
 public class AdapterSensor implements IPeripheralAdapter {
 
 	private static final String DONT_EVER_CHANGE_THIS_TEXT_OTHERWISE_YOU_WILL_RUIN_EVERYTHING = "Entity not found";
