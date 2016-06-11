@@ -1,11 +1,13 @@
 package openperipheral.addons.glasses;
 
 import java.util.UUID;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTBase.NBTPrimitive;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagLong;
+import net.minecraft.nbt.NBTTagString;
 import openmods.utils.StringUtils;
 
 public class TerminalUtils {

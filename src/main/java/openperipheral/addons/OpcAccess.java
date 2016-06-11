@@ -1,11 +1,10 @@
 package openperipheral.addons;
 
+import com.google.common.base.Preconditions;
 import openperipheral.api.ApiHolder;
 import openperipheral.api.adapter.IPeripheralAdapterRegistry;
 import openperipheral.api.meta.IEntityPartialMetaBuilder;
 import openperipheral.api.meta.IItemStackMetaBuilder;
-
-import com.google.common.base.Preconditions;
 
 public class OpcAccess {
 

@@ -1,19 +1,19 @@
 package openperipheral.addons.glasses;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
 import java.util.Arrays;
 import java.util.Comparator;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import openmods.access.ApiSingleton;
-import openperipheral.addons.api.*;
-
+import openperipheral.addons.api.ITerminalIdAccess;
+import openperipheral.addons.api.ITerminalIdGetter;
+import openperipheral.addons.api.ITerminalIdSetter;
+import openperipheral.addons.api.ITerminalItem;
 import org.apache.commons.lang3.ArrayUtils;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.primitives.Ints;
 
 @ApiSingleton
 public class TerminalIdAccess implements ITerminalIdAccess {

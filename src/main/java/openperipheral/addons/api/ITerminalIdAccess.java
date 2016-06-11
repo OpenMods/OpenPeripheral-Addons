@@ -1,8 +1,7 @@
 package openperipheral.addons.api;
 
-import net.minecraft.entity.player.EntityPlayer;
-
 import com.google.common.base.Optional;
+import net.minecraft.entity.player.EntityPlayer;
 
 /**
  * Registry of id storage providers for terminal glasses.

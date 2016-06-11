@@ -1,15 +1,17 @@
 package openperipheral.addons.sensors;
 
+import cpw.mods.fml.common.Loader;
 import java.util.List;
-
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.common.util.ForgeDirection;
 import openmods.Mods;
-import openperipheral.addons.*;
-import cpw.mods.fml.common.Loader;
+import openperipheral.addons.BlockOP;
+import openperipheral.addons.Config;
+import openperipheral.addons.ModuleComputerCraft;
+import openperipheral.addons.OpenPeripheralAddons;
 
 public class BlockSensor extends BlockOP {
 

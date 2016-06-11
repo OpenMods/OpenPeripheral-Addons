@@ -1,12 +1,12 @@
 package openperipheral.addons.narcissistic;
 
+import dan200.computercraft.api.turtle.ITurtleAccess;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import openperipheral.addons.utils.CCUtils;
 import openperipheral.api.adapter.IWorldPosProvider;
-import dan200.computercraft.api.turtle.ITurtleAccess;
 
 public class TurtleInventoryDelegate implements IInventory, IWorldPosProvider {
 

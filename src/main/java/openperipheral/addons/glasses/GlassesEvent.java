@@ -1,7 +1,6 @@
 package openperipheral.addons.glasses;
 
 import java.util.Map;
-
 import openmods.network.event.EventDirection;
 import openmods.network.event.NetworkEventMeta;
 import openmods.network.event.SerializableNetworkEvent;

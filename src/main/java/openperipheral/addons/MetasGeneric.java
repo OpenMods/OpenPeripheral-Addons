@@ -1,14 +1,13 @@
 package openperipheral.addons;
 
+import cpw.mods.fml.common.Loader;
 import java.util.List;
-
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import openmods.Mods;
 import openmods.item.IMetaItem;
-import cpw.mods.fml.common.Loader;
 
 public enum MetasGeneric {
 	duckAntenna {

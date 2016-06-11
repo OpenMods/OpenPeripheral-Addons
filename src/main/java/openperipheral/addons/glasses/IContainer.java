@@ -2,11 +2,14 @@ package openperipheral.addons.glasses;
 
 import java.util.Map;
 import java.util.Set;
-
 import openperipheral.api.Constants;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
-import openperipheral.api.adapter.method.*;
+import openperipheral.api.adapter.method.Alias;
+import openperipheral.api.adapter.method.Arg;
+import openperipheral.api.adapter.method.Env;
+import openperipheral.api.adapter.method.ReturnType;
+import openperipheral.api.adapter.method.ScriptCallable;
 import openperipheral.api.architecture.IArchitecture;
 import openperipheral.api.helpers.Index;
 

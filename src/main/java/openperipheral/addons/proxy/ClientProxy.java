@@ -1,5 +1,8 @@
 package openperipheral.addons.proxy;
 
+import cpw.mods.fml.client.registry.ClientRegistry;
+import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraftforge.common.MinecraftForge;
 import openmods.api.IProxy;
 import openmods.renderer.BlockRenderingHandler;
@@ -11,9 +14,6 @@ import openperipheral.addons.selector.TileEntitySelector;
 import openperipheral.addons.selector.TileEntitySelectorRenderer;
 import openperipheral.addons.sensors.TileEntitySensor;
 import openperipheral.addons.sensors.TileEntitySensorRenderer;
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
 
 public class ClientProxy implements IProxy {
 

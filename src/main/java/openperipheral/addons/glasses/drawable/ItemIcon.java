@@ -1,5 +1,9 @@
 package openperipheral.addons.glasses.drawable;
 
+import com.google.common.base.Strings;
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -13,14 +17,7 @@ import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
-
 import org.lwjgl.opengl.GL11;
-
-import com.google.common.base.Strings;
-
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @ScriptObject
 @AdapterSourceName("glasses_icon")

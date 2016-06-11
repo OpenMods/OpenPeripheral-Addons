@@ -1,7 +1,10 @@
 package openperipheral.addons;
 
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import dan200.computercraft.api.ComputerCraftAPI;
 import java.util.List;
-
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -17,10 +20,6 @@ import openperipheral.addons.peripheralproxy.BlockPeripheralProxy;
 import openperipheral.addons.peripheralproxy.TileEntityPeripheralProxy;
 import openperipheral.addons.sensors.TurtleUpgradeSensor;
 import openperipheral.addons.utils.CCUtils;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import dan200.computercraft.api.ComputerCraftAPI;
 
 public class ModuleComputerCraft {
 

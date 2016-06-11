@@ -1,7 +1,6 @@
 package openperipheral.addons;
 
 import java.util.List;
-
 import net.minecraft.init.Items;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraftforge.oredict.ShapedOreRecipe;

@@ -1,12 +1,10 @@
 package openperipheral.addons.glasses;
 
+import com.google.common.collect.Maps;
 import java.util.Map;
-
 import net.minecraft.item.ItemStack;
 import openperipheral.addons.api.ITerminalItem;
 import openperipheral.api.helpers.ItemStackMetaProviderSimple;
-
-import com.google.common.collect.Maps;
 
 public class ItemTerminalMetaProvider extends ItemStackMetaProviderSimple<ITerminalItem> {
 

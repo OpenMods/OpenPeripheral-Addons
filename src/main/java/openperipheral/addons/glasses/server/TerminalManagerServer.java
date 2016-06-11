@@ -1,21 +1,20 @@
 package openperipheral.addons.glasses.server;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.MapMaker;
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import java.util.Map;
-
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.event.ServerChatEvent;
 import openperipheral.addons.Config;
 import openperipheral.addons.api.TerminalRegisterEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesClientEvent;
-import openperipheral.addons.glasses.*;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.MapMaker;
-
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import openperipheral.addons.glasses.TerminalEvent;
+import openperipheral.addons.glasses.TerminalIdAccess;
+import openperipheral.addons.glasses.TileEntityGlassesBridge;
 
 public class TerminalManagerServer {
 	private TerminalManagerServer() {}

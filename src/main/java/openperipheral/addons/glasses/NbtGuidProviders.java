@@ -1,13 +1,12 @@
 package openperipheral.addons.glasses;
 
+import com.google.common.base.Optional;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.Constants;
 import openmods.utils.ItemUtils;
 import openperipheral.addons.glasses.TerminalIdAccess.HandSetterAdapter;
 import openperipheral.addons.glasses.TerminalIdAccess.HelmetGetterAdapter;
-
-import com.google.common.base.Optional;
 
 public class NbtGuidProviders {
 

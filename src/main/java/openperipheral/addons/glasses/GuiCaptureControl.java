@@ -1,8 +1,8 @@
 package openperipheral.addons.glasses;
 
+import com.google.common.base.Preconditions;
 import java.lang.ref.WeakReference;
 import java.util.Map;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import openperipheral.addons.Config;
@@ -14,9 +14,10 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
 import openperipheral.addons.utils.GuiUtils.GuiElements;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
-import openperipheral.api.adapter.method.*;
-
-import com.google.common.base.Preconditions;
+import openperipheral.api.adapter.method.Arg;
+import openperipheral.api.adapter.method.Optionals;
+import openperipheral.api.adapter.method.ScriptCallable;
+import openperipheral.api.adapter.method.ScriptObject;
 
 @ScriptObject
 @Asynchronous

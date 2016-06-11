@@ -1,14 +1,14 @@
 package openperipheral.addons.glasses.utils;
 
-import java.util.List;
-
-import openmods.Log;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.*;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import java.util.List;
+import openmods.Log;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.glu.GLUtessellator;
+import org.lwjgl.util.glu.GLUtessellatorCallback;
+import org.lwjgl.util.glu.GLUtessellatorCallbackAdapter;
 
 public abstract class PolygonBuilderBase<P, D> implements IPolygonBuilder<P> {
 

@@ -1,7 +1,6 @@
 package openperipheral.addons.glasses.utils;
 
 import java.util.List;
-
 import org.lwjgl.opengl.GL11;
 
 class PointData {

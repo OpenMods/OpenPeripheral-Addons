@@ -9,7 +9,6 @@ import net.minecraft.tileentity.TileEntity;
 import openmods.geometry.Orientation;
 import openmods.renderer.rotations.TransformProvider;
 import openperipheral.addons.selector.TileEntitySelector.ItemSlot;
-
 import org.lwjgl.opengl.GL11;
 
 public class TileEntitySelectorRenderer extends TileEntitySpecialRenderer {

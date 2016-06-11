@@ -1,8 +1,17 @@
 package openperipheral.addons.glasses;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.mojang.authlib.GameProfile;
 import java.lang.ref.WeakReference;
-import java.util.*;
-
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -19,7 +28,10 @@ import openmods.tileentity.OpenTileEntity;
 import openmods.utils.ItemUtils;
 import openperipheral.addons.glasses.GlassesEvent.GlassesClientEvent;
 import openperipheral.addons.glasses.drawable.Drawable;
-import openperipheral.addons.glasses.server.*;
+import openperipheral.addons.glasses.server.DrawableContainerMaster;
+import openperipheral.addons.glasses.server.IDrawableFactory;
+import openperipheral.addons.glasses.server.SurfaceServer;
+import openperipheral.addons.glasses.server.TerminalManagerServer;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.Doc;
 import openperipheral.api.adapter.method.Arg;
@@ -29,13 +41,6 @@ import openperipheral.api.architecture.FeatureGroup;
 import openperipheral.api.architecture.IArchitectureAccess;
 import openperipheral.api.architecture.IAttachable;
 import openperipheral.api.peripheral.PeripheralTypeId;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.mojang.authlib.GameProfile;
 
 @Doc({ "This peripheral is used to control terminal glasses and wireless keyboard.",
 		"There is one global surface and one private surface for every glasses user.",

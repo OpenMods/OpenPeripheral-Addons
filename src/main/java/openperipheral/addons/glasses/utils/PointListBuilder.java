@@ -1,13 +1,10 @@
 package openperipheral.addons.glasses.utils;
 
+import com.google.common.collect.Lists;
 import java.util.List;
-
 import openmods.geometry.BoundingBoxBuilder;
 import openmods.geometry.Box2d;
-
 import org.lwjgl.opengl.GL11;
-
-import com.google.common.collect.Lists;
 
 public class PointListBuilder implements IPointListBuilder<Point2d> {
 

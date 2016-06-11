@@ -5,7 +5,11 @@ import openperipheral.addons.glasses.utils.ColorPoint2d;
 import openperipheral.addons.glasses.utils.Point2d;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
-import openperipheral.api.adapter.method.*;
+import openperipheral.api.adapter.method.Alias;
+import openperipheral.api.adapter.method.Arg;
+import openperipheral.api.adapter.method.Optionals;
+import openperipheral.api.adapter.method.ReturnType;
+import openperipheral.api.adapter.method.ScriptCallable;
 
 @Asynchronous
 @AdapterSourceName("drawable_container")

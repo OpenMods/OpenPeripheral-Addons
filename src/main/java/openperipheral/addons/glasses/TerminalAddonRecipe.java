@@ -1,13 +1,12 @@
 package openperipheral.addons.glasses;
 
+import com.google.common.base.Optional;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
 import openmods.utils.InventoryUtils;
-
-import com.google.common.base.Optional;
 
 public class TerminalAddonRecipe implements IRecipe {
 

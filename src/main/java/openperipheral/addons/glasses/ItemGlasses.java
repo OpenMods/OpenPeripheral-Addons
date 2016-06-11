@@ -1,7 +1,8 @@
 package openperipheral.addons.glasses;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import java.util.List;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArmor;
@@ -12,8 +13,6 @@ import openmods.utils.ItemUtils;
 import openmods.utils.MiscUtils;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.addons.api.ITerminalItem;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemGlasses extends ItemArmor implements ITerminalItem {
 	private static final String OPENP_TAG = "openp";

@@ -1,5 +1,15 @@
 package openperipheral.addons.glasses.client;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -14,24 +24,16 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesSetDragParamsEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibilityEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeatEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
-import openperipheral.addons.glasses.*;
+import openperipheral.addons.glasses.GuiCapture;
+import openperipheral.addons.glasses.NbtGuidProviders;
+import openperipheral.addons.glasses.SurfaceType;
+import openperipheral.addons.glasses.TerminalEvent;
+import openperipheral.addons.glasses.TerminalIdAccess;
+import openperipheral.addons.glasses.TerminalUtils;
 import openperipheral.addons.glasses.drawable.Drawable;
 import openperipheral.addons.glasses.utils.Point2d;
 import openperipheral.addons.glasses.utils.RenderState;
-
 import org.lwjgl.opengl.GL11;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Table;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
 
 public class TerminalManagerClient {
 

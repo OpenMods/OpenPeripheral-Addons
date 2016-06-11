@@ -1,7 +1,7 @@
 package openperipheral.addons;
 
+import cpw.mods.fml.common.Loader;
 import java.util.List;
-
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -12,7 +12,6 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 import openmods.Mods;
 import openperipheral.addons.glasses.TerminalAddonRecipe;
-import cpw.mods.fml.common.Loader;
 
 public class Recipes {
 

@@ -1,13 +1,19 @@
 package openperipheral.addons.sensors;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.mojang.authlib.GameProfile;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.item.*;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityItemFrame;
+import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.entity.item.EntityPainting;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
@@ -21,11 +27,6 @@ import openperipheral.api.adapter.method.ReturnType;
 import openperipheral.api.adapter.method.ScriptCallable;
 import openperipheral.api.architecture.FeatureGroup;
 import openperipheral.api.meta.IMetaProviderProxy;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.mojang.authlib.GameProfile;
 
 @FeatureGroup("openperipheral-sensor")
 public class AdapterSensor implements IPeripheralAdapter {

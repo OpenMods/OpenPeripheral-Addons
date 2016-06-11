@@ -1,9 +1,8 @@
 package openperipheral.addons.glasses.utils;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Iterator;
 import java.util.List;
-
-import com.google.common.collect.ImmutableList;
 
 public abstract class PointList<T> implements IPointList<T> {
 

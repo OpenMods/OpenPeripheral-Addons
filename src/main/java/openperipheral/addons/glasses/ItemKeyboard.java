@@ -1,15 +1,13 @@
 package openperipheral.addons.glasses;
 
+import com.google.common.base.Optional;
+import cpw.mods.fml.common.FMLCommonHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.World;
 import openperipheral.addons.OpenPeripheralAddons;
-
-import com.google.common.base.Optional;
-
-import cpw.mods.fml.common.FMLCommonHandler;
 
 public class ItemKeyboard extends Item {
 

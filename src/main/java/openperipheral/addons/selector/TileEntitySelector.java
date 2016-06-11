@@ -1,10 +1,12 @@
 package openperipheral.addons.selector;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import java.lang.ref.SoftReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -23,14 +25,17 @@ import openmods.tileentity.SyncedTileEntity;
 import openperipheral.addons.OpenPeripheralAddons;
 import openperipheral.api.Constants;
 import openperipheral.api.adapter.Asynchronous;
-import openperipheral.api.adapter.method.*;
-import openperipheral.api.architecture.*;
+import openperipheral.api.adapter.method.Arg;
+import openperipheral.api.adapter.method.Env;
+import openperipheral.api.adapter.method.Optionals;
+import openperipheral.api.adapter.method.ReturnType;
+import openperipheral.api.adapter.method.ScriptCallable;
+import openperipheral.api.architecture.FeatureGroup;
+import openperipheral.api.architecture.IArchitecture;
+import openperipheral.api.architecture.IArchitectureAccess;
+import openperipheral.api.architecture.IAttachable;
 import openperipheral.api.helpers.Index;
 import openperipheral.api.peripheral.PeripheralTypeId;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 @PeripheralTypeId("openperipheral_selector")
 @FeatureGroup("openperipheral-selector")

@@ -1,8 +1,9 @@
 package openperipheral.addons.glasses.server;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import java.util.Map;
 import java.util.Set;
-
 import openmods.structured.IStructureElement;
 import openmods.structured.StructuredDataMaster;
 import openperipheral.addons.glasses.IContainer;
@@ -11,9 +12,6 @@ import openperipheral.addons.glasses.TerminalEvent;
 import openperipheral.addons.glasses.drawable.Drawable;
 import openperipheral.api.architecture.IArchitecture;
 import openperipheral.api.helpers.Index;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 public abstract class DrawableContainerMaster extends StructuredDataMaster<Drawable, IStructureElement> implements IContainer<Drawable> {
 

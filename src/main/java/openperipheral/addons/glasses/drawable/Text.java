@@ -1,5 +1,9 @@
 package openperipheral.addons.glasses.drawable;
 
+import com.google.common.base.Strings;
+import cpw.mods.fml.client.FMLClientHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.FontRenderer;
 import openmods.geometry.Box2d;
 import openmods.structured.StructureField;
@@ -7,14 +11,7 @@ import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
-
 import org.lwjgl.opengl.GL11;
-
-import com.google.common.base.Strings;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @ScriptObject
 @AdapterSourceName("glasses_text")

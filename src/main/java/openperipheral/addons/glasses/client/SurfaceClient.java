@@ -1,15 +1,13 @@
 package openperipheral.addons.glasses.client;
 
+import com.google.common.collect.Lists;
+import com.google.common.primitives.Ints;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
 import openmods.structured.IStructureElement;
 import openmods.structured.StructureObserver;
 import openperipheral.addons.glasses.drawable.Drawable;
-
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
 
 public abstract class SurfaceClient {
 

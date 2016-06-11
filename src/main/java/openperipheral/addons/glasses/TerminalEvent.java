@@ -4,7 +4,6 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
-
 import openmods.network.event.EventDirection;
 import openmods.network.event.NetworkEvent;
 import openmods.network.event.NetworkEventMeta;

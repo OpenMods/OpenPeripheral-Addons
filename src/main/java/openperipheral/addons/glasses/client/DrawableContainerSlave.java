@@ -1,6 +1,9 @@
 package openperipheral.addons.glasses.client;
 
-import openmods.structured.*;
+import openmods.structured.IStructureContainerFactory;
+import openmods.structured.IStructureElement;
+import openmods.structured.StructureObserver;
+import openmods.structured.StructuredDataSlave;
 import openperipheral.addons.glasses.TerminalEvent;
 import openperipheral.addons.glasses.drawable.Drawable;
 import openperipheral.addons.glasses.drawable.DrawableType;

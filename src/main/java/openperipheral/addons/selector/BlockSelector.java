@@ -1,5 +1,7 @@
 package openperipheral.addons.selector;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.AxisAlignedBB;
@@ -11,8 +13,6 @@ import openmods.api.ISelectionAware;
 import openmods.block.BlockRotationMode;
 import openmods.geometry.Orientation;
 import openperipheral.addons.BlockOP;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockSelector extends BlockOP implements ISelectionAware {
 	private AxisAlignedBB selectorAABB;

@@ -3,7 +3,6 @@ package openperipheral.addons.selector;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import openmods.inventory.GenericInventory;

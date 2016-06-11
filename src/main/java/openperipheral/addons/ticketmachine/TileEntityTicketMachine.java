@@ -1,7 +1,8 @@
 package openperipheral.addons.ticketmachine;
 
+import com.google.common.base.Preconditions;
+import cpw.mods.fml.common.registry.GameRegistry;
 import java.util.Set;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.IInventory;
@@ -11,7 +12,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IIcon;
 import net.minecraftforge.common.util.ForgeDirection;
-import openmods.api.*;
+import openmods.api.IHasGui;
+import openmods.api.IIconProvider;
+import openmods.api.IInventoryCallback;
+import openmods.api.IPlaceAwareTile;
 import openmods.include.IncludeInterface;
 import openmods.inventory.GenericInventory;
 import openmods.inventory.IInventoryProvider;
@@ -22,13 +26,12 @@ import openmods.utils.ColorUtils;
 import openmods.utils.ColorUtils.ColorMeta;
 import openmods.utils.ItemUtils;
 import openperipheral.api.adapter.Asynchronous;
-import openperipheral.api.adapter.method.*;
+import openperipheral.api.adapter.method.Arg;
+import openperipheral.api.adapter.method.Optionals;
+import openperipheral.api.adapter.method.ReturnType;
+import openperipheral.api.adapter.method.ScriptCallable;
 import openperipheral.api.architecture.FeatureGroup;
 import openperipheral.api.peripheral.PeripheralTypeId;
-
-import com.google.common.base.Preconditions;
-
-import cpw.mods.fml.common.registry.GameRegistry;
 
 @PeripheralTypeId("openperipheral_ticketmachine")
 @FeatureGroup("openperipheral-ticketmachine")

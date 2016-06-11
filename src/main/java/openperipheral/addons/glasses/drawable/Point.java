@@ -7,7 +7,6 @@ import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;
-
 import org.lwjgl.opengl.GL11;
 
 @ScriptObject

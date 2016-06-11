@@ -1,9 +1,11 @@
 package openperipheral.addons.glasses.drawable;
 
+import com.google.common.base.Preconditions;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-
 import net.minecraft.client.gui.ScaledResolution;
 import openmods.geometry.Box2d;
 import openmods.structured.IStructureElement;
@@ -14,14 +16,11 @@ import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Asynchronous;
 import openperipheral.api.adapter.Property;
-import openperipheral.api.adapter.method.*;
-
+import openperipheral.api.adapter.method.Arg;
+import openperipheral.api.adapter.method.ArgType;
+import openperipheral.api.adapter.method.ReturnType;
+import openperipheral.api.adapter.method.ScriptCallable;
 import org.lwjgl.opengl.GL11;
-
-import com.google.common.base.Preconditions;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @Asynchronous
 @AdapterSourceName("glasses_drawable")

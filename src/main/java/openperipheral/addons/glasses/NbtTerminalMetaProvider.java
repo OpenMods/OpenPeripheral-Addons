@@ -1,13 +1,11 @@
 package openperipheral.addons.glasses;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.Maps;
 import java.util.Map;
-
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import openperipheral.api.meta.IItemStackCustomMetaProvider;
-
-import com.google.common.base.Optional;
-import com.google.common.collect.Maps;
 
 public class NbtTerminalMetaProvider implements IItemStackCustomMetaProvider<Item> {
 

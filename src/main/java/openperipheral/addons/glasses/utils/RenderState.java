@@ -1,7 +1,6 @@
 package openperipheral.addons.glasses.utils;
 
 import java.nio.FloatBuffer;
-
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 

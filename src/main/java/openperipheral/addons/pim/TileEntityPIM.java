@@ -1,9 +1,10 @@
 package openperipheral.addons.pim;
 
+import com.google.common.collect.Sets;
+import com.mojang.authlib.GameProfile;
 import java.lang.ref.WeakReference;
 import java.util.Set;
 import java.util.UUID;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -11,11 +12,7 @@ import net.minecraft.util.MathHelper;
 import openmods.tileentity.OpenTileEntity;
 import openperipheral.api.architecture.IArchitectureAccess;
 import openperipheral.api.architecture.IAttachable;
-
 import org.apache.commons.lang3.ArrayUtils;
-
-import com.google.common.collect.Sets;
-import com.mojang.authlib.GameProfile;
 
 public class TileEntityPIM extends OpenTileEntity implements IInventory, IAttachable {
 

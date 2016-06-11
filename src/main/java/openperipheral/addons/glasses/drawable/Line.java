@@ -4,7 +4,6 @@ import openmods.structured.StructureField;
 import openperipheral.addons.glasses.utils.IPointListBuilder;
 import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.Property;
-
 import org.lwjgl.opengl.GL11;
 
 public abstract class Line<P> extends BoundedShape<P> {

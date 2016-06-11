@@ -1,13 +1,18 @@
 package openperipheral.addons.narcissistic;
 
+import dan200.computercraft.api.peripheral.IPeripheral;
+import dan200.computercraft.api.turtle.ITurtleAccess;
+import dan200.computercraft.api.turtle.ITurtleUpgrade;
+import dan200.computercraft.api.turtle.TurtleCommandResult;
+import dan200.computercraft.api.turtle.TurtleSide;
+import dan200.computercraft.api.turtle.TurtleUpgradeType;
+import dan200.computercraft.api.turtle.TurtleVerb;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import openperipheral.addons.MetasGeneric;
 import openperipheral.addons.ModuleComputerCraft.Icons;
 import openperipheral.api.ApiAccess;
 import openperipheral.api.architecture.cc.IComputerCraftObjectsFactory;
-import dan200.computercraft.api.peripheral.IPeripheral;
-import dan200.computercraft.api.turtle.*;
 
 public class TurtleUpgradeNarcissistic implements ITurtleUpgrade {
 

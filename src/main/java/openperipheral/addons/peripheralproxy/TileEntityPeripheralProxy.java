@@ -1,20 +1,20 @@
 package openperipheral.addons.peripheralproxy;
 
+import com.google.common.base.Preconditions;
+import dan200.computercraft.api.peripheral.IPeripheral;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import openmods.Log;
 import openmods.api.INeighbourAwareTile;
-import openmods.reflection.*;
+import openmods.reflection.FieldAccess;
+import openmods.reflection.MethodAccess;
 import openmods.reflection.MethodAccess.Function0;
 import openmods.reflection.MethodAccess.Function5;
+import openmods.reflection.ReflectionHelper;
 import openmods.tileentity.OpenTileEntity;
 import openperipheral.api.architecture.cc.ICustomPeripheralProvider;
-
-import com.google.common.base.Preconditions;
-
-import dan200.computercraft.api.peripheral.IPeripheral;
 
 public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustomPeripheralProvider, INeighbourAwareTile {
 

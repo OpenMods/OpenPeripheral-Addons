@@ -1,17 +1,14 @@
 package openperipheral.addons.glasses.drawable;
 
+import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.List;
-
 import openmods.structured.StructureField;
 import openperipheral.addons.glasses.utils.IPointListBuilder;
 import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.IndexedProperty;
 import openperipheral.api.adapter.Property;
-
 import org.lwjgl.opengl.GL11;
-
-import com.google.common.collect.Lists;
 
 public abstract class LineStrip<P> extends BoundedShape<P> {
 

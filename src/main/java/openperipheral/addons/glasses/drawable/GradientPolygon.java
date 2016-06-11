@@ -1,6 +1,11 @@
 package openperipheral.addons.glasses.drawable;
 
-import openperipheral.addons.glasses.utils.*;
+import openperipheral.addons.glasses.utils.ColorPoint2d;
+import openperipheral.addons.glasses.utils.ColorPointListBuilder;
+import openperipheral.addons.glasses.utils.GradientPolygonBuilder;
+import openperipheral.addons.glasses.utils.IPointListBuilder;
+import openperipheral.addons.glasses.utils.IPolygonBuilder;
+import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.method.ScriptObject;
 

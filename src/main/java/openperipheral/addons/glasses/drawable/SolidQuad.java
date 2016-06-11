@@ -1,7 +1,10 @@
 package openperipheral.addons.glasses.drawable;
 
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.utils.*;
+import openperipheral.addons.glasses.utils.IPointListBuilder;
+import openperipheral.addons.glasses.utils.Point2d;
+import openperipheral.addons.glasses.utils.PointListBuilder;
+import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.AdapterSourceName;
 import openperipheral.api.adapter.Property;
 import openperipheral.api.adapter.method.ScriptObject;

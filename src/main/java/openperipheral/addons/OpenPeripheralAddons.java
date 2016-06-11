@@ -1,5 +1,15 @@
 package openperipheral.addons;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.network.NetworkRegistry;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.MinecraftForge;
@@ -12,12 +22,15 @@ import openmods.access.ApiProviderRegistry;
 import openmods.api.IProxy;
 import openmods.config.BlockInstances;
 import openmods.config.ItemInstances;
-import openmods.config.game.*;
+import openmods.config.game.GameConfigProvider;
+import openmods.config.game.ModStartupHelper;
+import openmods.config.game.RegisterBlock;
+import openmods.config.game.RegisterItem;
 import openmods.config.properties.ConfigProcessing;
 import openmods.network.event.NetworkEventManager;
 import openperipheral.addons.api.ApiHolder;
 import openperipheral.addons.api.IApiInterface;
-import openperipheral.addons.glasses.*;
+import openperipheral.addons.glasses.BlockGlassesBridge;
 import openperipheral.addons.glasses.GlassesEvent.GlassesChangeBackgroundEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseButtonEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesComponentMouseWheelEvent;
@@ -31,6 +44,15 @@ import openperipheral.addons.glasses.GlassesEvent.GlassesSetGuiVisibilityEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSetKeyRepeatEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesSignalCaptureEvent;
 import openperipheral.addons.glasses.GlassesEvent.GlassesStopCaptureEvent;
+import openperipheral.addons.glasses.ItemGlasses;
+import openperipheral.addons.glasses.ItemGlassesBridge;
+import openperipheral.addons.glasses.ItemKeyboard;
+import openperipheral.addons.glasses.ItemTerminalMetaProvider;
+import openperipheral.addons.glasses.NbtGuidProviders;
+import openperipheral.addons.glasses.NbtTerminalMetaProvider;
+import openperipheral.addons.glasses.TerminalEvent;
+import openperipheral.addons.glasses.TerminalIdAccess;
+import openperipheral.addons.glasses.TileEntityGlassesBridge;
 import openperipheral.addons.glasses.server.TerminalManagerServer;
 import openperipheral.addons.pim.BlockPIM;
 import openperipheral.addons.pim.TileEntityPIM;
@@ -39,16 +61,7 @@ import openperipheral.addons.selector.TileEntitySelector;
 import openperipheral.addons.sensors.AdapterSensor;
 import openperipheral.addons.sensors.BlockSensor;
 import openperipheral.addons.sensors.TileEntitySensor;
-
 import org.apache.commons.lang3.ObjectUtils;
-
-import cpw.mods.fml.common.*;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLMissingMappingsEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
 
 @Mod(modid = OpenPeripheralAddons.MODID, name = "OpenPeripheralAddons", version = "$VERSION$", dependencies = "required-after:OpenMods@[$LIB-VERSION$,$NEXT-LIB-VERSION$);required-after:OpenPeripheralApi@$OP-API-VERSION$;after:ComputerCraft@[1.70,]")
 public class OpenPeripheralAddons {

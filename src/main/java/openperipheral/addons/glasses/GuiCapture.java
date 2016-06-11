@@ -1,7 +1,7 @@
 package openperipheral.addons.glasses;
 
+import com.google.common.collect.Maps;
 import java.util.Map;
-
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import openmods.network.event.NetworkEvent;
@@ -18,11 +18,8 @@ import openperipheral.addons.glasses.client.TerminalManagerClient;
 import openperipheral.addons.glasses.client.TerminalManagerClient.DrawableHitInfo;
 import openperipheral.addons.utils.GuiUtils;
 import openperipheral.addons.utils.GuiUtils.GuiElements;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-
-import com.google.common.collect.Maps;
 
 public class GuiCapture extends GuiScreen {
 

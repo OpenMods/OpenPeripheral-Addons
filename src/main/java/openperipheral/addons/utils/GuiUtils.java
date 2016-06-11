@@ -1,10 +1,8 @@
 package openperipheral.addons.utils;
 
-import java.util.Map;
-
-import net.minecraftforge.client.GuiIngameForge;
-
 import com.google.common.collect.Maps;
+import java.util.Map;
+import net.minecraftforge.client.GuiIngameForge;
 
 public class GuiUtils {
 

@@ -1,14 +1,15 @@
 package openperipheral.addons.glasses.drawable;
 
+import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.List;
-
 import openmods.structured.StructureField;
-import openperipheral.addons.glasses.utils.*;
+import openperipheral.addons.glasses.utils.IPointListBuilder;
+import openperipheral.addons.glasses.utils.IPolygonBuilder;
+import openperipheral.addons.glasses.utils.IRenderCommand;
+import openperipheral.addons.glasses.utils.RenderState;
 import openperipheral.api.adapter.IndexedProperty;
 import openperipheral.api.adapter.Property;
-
-import com.google.common.collect.Lists;
 
 public abstract class Polygon<P> extends BoundedShape<P> {
 

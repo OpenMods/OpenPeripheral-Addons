@@ -1,15 +1,14 @@
 package openperipheral.addons.utils;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import dan200.computercraft.api.turtle.ITurtleAccess;
+import dan200.computercraft.api.turtle.ITurtleUpgrade;
 import java.util.List;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.World;
 import openmods.Mods;
-import cpw.mods.fml.common.registry.GameRegistry;
-import dan200.computercraft.api.turtle.ITurtleAccess;
-import dan200.computercraft.api.turtle.ITurtleUpgrade;
 
 public final class CCUtils {
 	private static final int NUMBER_OF_TURTLE_TOOLS = 7;
