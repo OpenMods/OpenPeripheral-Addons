@@ -121,15 +121,11 @@ public class GuiCapture extends GuiScreen {
 	}
 
 	private NetworkEvent createMouseButtonEvent(int button, boolean state, DrawableHitInfo hit) {
-		return hit != null?
-				new GlassesComponentMouseButtonEvent(guid, hit.id, hit.surfaceType, hit.dx, hit.dy, button, state) :
-				new GlassesMouseButtonEvent(guid, button, state);
+		return hit != null? new GlassesComponentMouseButtonEvent(guid, hit.id, hit.surfaceType, hit.dx, hit.dy, button, state) : new GlassesMouseButtonEvent(guid, button, state);
 	}
 
 	private NetworkEvent createMouseWheelEvent(int wheel, DrawableHitInfo hit) {
-		return hit != null?
-				new GlassesComponentMouseWheelEvent(guid, hit.id, hit.surfaceType, hit.dx, hit.dy, wheel) :
-				new GlassesMouseWheelEvent(guid, wheel);
+		return hit != null? new GlassesComponentMouseWheelEvent(guid, hit.id, hit.surfaceType, hit.dx, hit.dy, wheel) : new GlassesMouseWheelEvent(guid, wheel);
 	}
 
 	@Override
