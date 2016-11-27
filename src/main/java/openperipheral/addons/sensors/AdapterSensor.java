@@ -184,6 +184,34 @@ public class AdapterSensor implements IPeripheralAdapter {
 		return OpcAccess.entityMetaBuilder.createProxy(mob, sensorPos);
 	}
 
+	private static String getBlockType(ISensorEnvironment sensor, int xPos, int yPos, int zPos) {
+		World world = sensor.getWorld();
+
+		if (!world.blockExists(xPos, yPos, zPos)) return null;
+
+		Block block = world.getBlock(xPos, yPos, zPos);
+
+		if (block == null || world.isAirBlock(xPos, yPos, zPos)) return "AIR";
+		else if (block.getMaterial().isLiquid()) return "LIQUID";
+		else if (block.getMaterial().isSolid()) return "SOLID";
+		else return "UNKNOWN";
+	}
+
+	private static String getBlockColorCode(ISensorEnvironment sensor, int xPos, int yPos, int zPos) {
+		World world = sensor.getWorld();
+
+		if (!world.blockExists(xPos, yPos, zPos)) return null;
+
+		Block block = world.getBlock(xPos, yPos, zPos);
+
+		if (block == null) {
+			return "f"; // Default black -- same as air.
+		} else {
+			int rgb = block.getMapColor(block.getDamageValue(world, xPos, yPos, zPos)).colorValue;
+			return ComputerColors.getClosestColor(rgb).code;
+		}
+	}
+
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Get the ids of all the mobs in range. Deprecated, please use getEntityIds('mob')")
 	public List<Integer> getMobIds(ISensorEnvironment env) {
 		return listEntityIds(env, EntityLiving.class);
@@ -245,7 +273,6 @@ public class AdapterSensor implements IPeripheralAdapter {
 	public Map<Integer, Map<String, Object>> sonicScan(ISensorEnvironment env) {
 
 		int range = 1 + env.getSensorRange() / 2;
-		World world = env.getWorld();
 		Map<Integer, Map<String, Object>> results = Maps.newHashMap();
 		Vec3 sensorPos = env.getLocation();
 		int sx = MathHelper.floor_double(sensorPos.xCoord);
@@ -260,25 +287,14 @@ public class AdapterSensor implements IPeripheralAdapter {
 					final int bx = sx + x;
 					final int by = sy + y;
 					final int bz = sz + z;
-					if (!world.blockExists(bx, by, bz)) continue;
 
 					final int distSq = x * x + y * y + z * z;
 					if (distSq == 0 || distSq > rangeSq) continue;
-					Block block = world.getBlock(bx, by, bz);
 
-					String type;
-					if (block == null || world.isAirBlock(bx, by, bz)) type = "AIR";
-					else if (block.getMaterial().isLiquid()) type = "LIQUID";
-					else if (block.getMaterial().isSolid()) type = "SOLID";
-					else type = "UNKNOWN";
+					String type = getBlockType(env, bx, by, bz);
+					String color = getBlockColorCode(env, bx, by, bz);
 
-					final String color;
-					if (block == null) {
-						color = "f"; // Default black -- same as air.
-					} else {
-						int rgb = block.getMapColor(block.getDamageValue(world, bx, by, bz)).colorValue;
-						color = ComputerColors.getClosestColor(rgb).code;
-					}
+					if (type == null || color == null) continue;
 
 					Map<String, Object> tmp = Maps.newHashMap();
 					tmp.put("x", x);
@@ -301,36 +317,20 @@ public class AdapterSensor implements IPeripheralAdapter {
 			@Arg(name = "zOffset", description = "The target's offset from the sensor on the Z-Axis.") int zOff) {
 
 		int range = 1 + env.getSensorRange() / 2;
-		World world = env.getWorld();
 		Vec3 sensorPos = env.getLocation();
-		int sx = MathHelper.floor_double(sensorPos.xCoord);
-		int sy = MathHelper.floor_double(sensorPos.yCoord);
-		int sz = MathHelper.floor_double(sensorPos.zCoord);
-
 		final int rangeSq = range * range;
-
-		final int bx = sx + xOff;
-		final int by = sy + yOff;
-		final int bz = sz + zOff;
-		if (!world.blockExists(bx, by, bz)) return null;
 
 		final int distSq = xOff * xOff + yOff * yOff + zOff * zOff;
 		if (distSq == 0 || distSq > rangeSq) return null;
-		Block block = world.getBlock(bx, by, bz);
 
-		String type;
-		if (block == null || world.isAirBlock(bx, by, bz)) type = "AIR";
-		else if (block.getMaterial().isLiquid()) type = "LIQUID";
-		else if (block.getMaterial().isSolid()) type = "SOLID";
-		else type = "UNKNOWN";
+		int bx = MathHelper.floor_double(sensorPos.xCoord) + xOff;
+		int by = MathHelper.floor_double(sensorPos.yCoord) + yOff;
+		int bz = MathHelper.floor_double(sensorPos.zCoord) + zOff;
 
-		final String color;
-		if (block == null) {
-			color = "f"; // Default black -- same as air.
-		} else {
-			int rgb = block.getMapColor(block.getDamageValue(world, bx, by, bz)).colorValue;
-			color = ComputerColors.getClosestColor(rgb).code;
-		}
+		String type = getBlockType(env, bx, by, bz);
+		String color = getBlockColorCode(env, bx, by, bz);
+
+		if (type == null || color == null) return null;
 
 		Map<String, Object> tmp = Maps.newHashMap();
 		tmp.put("x", xOff);
