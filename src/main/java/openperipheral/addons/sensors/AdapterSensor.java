@@ -51,9 +51,10 @@ public class AdapterSensor implements IPeripheralAdapter {
 		}
 	}
 
-	// LRU cache with a maximum of 1000 entries; maps packed-RGB int -> paint-ID String
-	private static final LinkedHashMap<Integer, String> COLOR_CACHE = new LinkedHashMap<Integer, String>(16, 0.75f, true) {
-	  protected boolean removeEldestEntry(Map.Entry<Integer, String> eldest) {
+	// LRU cache with a maximum of 1000 entries; maps packed-RGB int -> color-bitmask int
+	@SuppressWarnings("serial")
+	private static final LinkedHashMap<Integer, Integer> COLOR_CACHE = new LinkedHashMap<Integer, Integer>(16, 0.75f, true) {
+	  protected boolean removeEldestEntry(Map.Entry<Integer, Integer> eldest) {
 	    return size() > 1000;
 	  }
 	};
@@ -127,26 +128,26 @@ public class AdapterSensor implements IPeripheralAdapter {
 		else return "UNKNOWN";
 	}
 
-	private static String getBlockColorCode(ISensorEnvironment sensor, int xPos, int yPos, int zPos) {
+	private static int getBlockColorBitmask(ISensorEnvironment sensor, int xPos, int yPos, int zPos) {
 		World world = sensor.getWorld();
 
-		if (!world.blockExists(xPos, yPos, zPos)) return null;
+		if (!world.blockExists(xPos, yPos, zPos)) return 0;
 
 		Block block = world.getBlock(xPos, yPos, zPos);
 
 		if (block == null) {
-			return ColorUtils.ColorMeta.BLACK.paintId; // Default black -- same as air.
+			return ColorUtils.ColorMeta.BLACK.bitmask; // Default black -- same as air.
 		} else {
 			int color = block.getMapColor(block.getDamageValue(world, xPos, yPos, zPos)).colorValue;
-			String cached = COLOR_CACHE.get(color);
+			Integer cached = COLOR_CACHE.get(color);
 			if (cached != null) {
 				return cached;
 			}
 
 			RGB rgb = new RGB(color);
-			String nearestColorId = ColorUtils.findNearestColor(rgb, 255).paintId;
-			COLOR_CACHE.put(color, nearestColorId);
-			return nearestColorId;
+			Integer nearestColorBitmask = ColorUtils.findNearestColor(rgb, 255).bitmask;
+			COLOR_CACHE.put(color, nearestColorBitmask);
+			return nearestColorBitmask;
 		}
 	}
 
@@ -230,9 +231,9 @@ public class AdapterSensor implements IPeripheralAdapter {
 					if (distSq == 0 || distSq > rangeSq) continue;
 
 					final String type = getBlockType(env, bx, by, bz);
-					final String color = getBlockColorCode(env, bx, by, bz);
+					if (type == null) continue;
 
-					if (type == null || color == null) continue;
+					final int color = getBlockColorBitmask(env, bx, by, bz);
 
 					Map<String, Object> tmp = Maps.newHashMap();
 					tmp.put("x", x);
@@ -266,9 +267,9 @@ public class AdapterSensor implements IPeripheralAdapter {
 		final int bz = MathHelper.floor_double(sensorPos.zCoord) + zOff;
 
 		final String type = getBlockType(env, bx, by, bz);
-		final String color = getBlockColorCode(env, bx, by, bz);
+		if (type == null) return null;
 
-		if (type == null || color == null) return null;
+		final int color = getBlockColorBitmask(env, bx, by, bz);
 
 		Map<String, Object> tmp = Maps.newHashMap();
 		tmp.put("x", xOff);
