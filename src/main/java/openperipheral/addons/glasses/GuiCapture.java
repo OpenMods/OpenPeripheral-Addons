@@ -138,7 +138,7 @@ public class GuiCapture extends GuiScreen {
 		} else {
 			final boolean state = Keyboard.getEventKeyState();
 			if (state) {
-				final char ch = Keyboard.getEventCharacter();
+				final char ch = sanitizeKeyChar(Keyboard.getEventCharacter());
 
 				final boolean isRepeat = Keyboard.isRepeatEvent();
 				new GlassesKeyDownEvent(guid, ch, key, isRepeat).sendToServer();
@@ -149,6 +149,16 @@ public class GuiCapture extends GuiScreen {
 
 		// looks like twitch controls
 		super.handleKeyboardInput();
+	}
+
+	private static char sanitizeKeyChar(char ch) {
+		switch (Character.getType(ch)) {
+			case Character.PRIVATE_USE: // special case for Macs
+			case Character.UNASSIGNED:
+				return 0;
+			default:
+				return ch;
+		}
 	}
 
 	@Override
