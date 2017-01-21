@@ -19,6 +19,6 @@ public class BlockGlassesBridge extends BlockOP {
 		final TileEntityGlassesBridge te = getTileEntity(world, x, y, z, TileEntityGlassesBridge.class);
 		if (te == null) return false;
 
-		return TerminalIdAccess.instance.setIdFor(player, te.getGuid());
+		return TerminalIdAccess.instance.setIdFor(player, te.getOrCreateGuid());
 	}
 }

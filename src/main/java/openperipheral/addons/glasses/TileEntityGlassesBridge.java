@@ -78,9 +78,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 
 	private Set<IArchitectureAccess> computers = Sets.newIdentityHashSet();
 
-	private long guid;
-
-	private boolean guidSet;
+	private Optional<Long> guid = Optional.absent();
 
 	private SurfaceServer globalSurface;
 
@@ -108,9 +106,18 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		}
 	}
 
+	public long getOrCreateGuid() {
+		if (this.guid.isPresent())
+			return this.guid.get();
+
+		final long newGuid = TerminalUtils.generateGuid();
+		this.guid = Optional.of(newGuid);
+		return newGuid;
+	}
+
 	public void registerTerminal(EntityPlayerMP player) {
 		if (!knownPlayersByUUID.containsKey(player.getGameProfile().getId())) {
-			final PlayerInfo playerInfo = new PlayerInfo(guid, player);
+			final PlayerInfo playerInfo = new PlayerInfo(getOrCreateGuid(), player);
 			final GameProfile gameProfile = player.getGameProfile();
 
 			knownPlayersByUUID.put(gameProfile.getId(), playerInfo);
@@ -165,7 +172,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		super.updateEntity();
 		if (worldObj.isRemote) return;
 
-		Preconditions.checkState(guidSet, "Something went terribly wrong");
+		final long guid = getOrCreateGuid();
 
 		if (globalSurface == null) globalSurface = SurfaceServer.createPublicSurface(guid);
 		TerminalManagerServer.instance.registerBridge(guid, this);
@@ -198,7 +205,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 		if (player.isDead && !isPlayerLogged(player)) return false;
 
 		final Optional<Long> guid = TerminalIdAccess.instance.getIdFrom(player);
-		return guid.isPresent() && guid.get() == this.guid;
+		return guid.isPresent() && guid.get() == getOrCreateGuid();
 	}
 
 	private static boolean isPlayerLogged(EntityPlayerMP player) {
@@ -215,35 +222,28 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	@Override
 	public void writeToNBT(NBTTagCompound tag) {
 		super.writeToNBT(tag);
-		tag.setLong(TAG_GUID, guid);
+		if (guid.isPresent()) tag.setLong(TAG_GUID, guid.get());
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
-		Long guid = TerminalUtils.extractGuid(tag);
-		if (guid != null) this.guid = guid;
-		else this.guid = TerminalUtils.generateGuid();
-
-		this.guidSet = true;
-
+		this.guid = Optional.fromNullable(TerminalUtils.extractGuid(tag));
 	}
 
 	@Override
 	public void onBlockPlacedBy(EntityPlayer player, ForgeDirection side, ItemStack stack, float hitX, float hitY, float hitZ) {
 		NBTTagCompound tag = stack.getTagCompound();
-
-		if (tag != null && tag.hasKey(TAG_GUID)) this.guid = tag.getLong(TAG_GUID);
-		else this.guid = TerminalUtils.generateGuid();
-
-		this.guidSet = true;
+		if (tag != null && tag.hasKey(TAG_GUID)) this.guid = Optional.of(tag.getLong(TAG_GUID));
 	}
 
 	@Override
 	public void addHarvestDrops(EntityPlayer player, List<ItemStack> drops) {
 		ItemStack result = new ItemStack(getBlockType());
-		NBTTagCompound tag = ItemUtils.getItemTag(result);
-		tag.setLong(TAG_GUID, guid);
+		if (guid.isPresent()) {
+			NBTTagCompound tag = ItemUtils.getItemTag(result);
+			tag.setLong(TAG_GUID, guid.get());
+		}
 		drops.add(result);
 	}
 
@@ -358,11 +358,7 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	@Asynchronous
 	@ScriptCallable(returnTypes = ReturnType.STRING, name = "getGuid", description = "Get the Guid of this bridge")
 	public String getGuidString() {
-		return TerminalUtils.formatTerminalId(guid);
-	}
-
-	public long getGuid() {
-		return guid;
+		return TerminalUtils.formatTerminalId(getOrCreateGuid());
 	}
 
 	@Override
@@ -394,6 +390,6 @@ public class TileEntityGlassesBridge extends OpenTileEntity implements IAttachab
 	@ScriptCallable(returnTypes = ReturnType.OBJECT, description = "Returns object used for controlling player capture mode")
 	public GuiCaptureControl getCaptureControl(@Arg(name = "uuid") UUID uuid) {
 		PlayerInfo info = knownPlayersByUUID.get(uuid);
-		return info != null? new GuiCaptureControl(guid, info.player) : null;
+		return info != null? new GuiCaptureControl(getOrCreateGuid(), info.player) : null;
 	}
 }
