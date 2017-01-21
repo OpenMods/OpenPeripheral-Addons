@@ -8,15 +8,17 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import openmods.Log;
 import openmods.api.INeighbourAwareTile;
+import openmods.api.INeighbourTeAwareTile;
 import openmods.reflection.FieldAccess;
 import openmods.reflection.MethodAccess;
 import openmods.reflection.MethodAccess.Function0;
 import openmods.reflection.MethodAccess.Function5;
 import openmods.reflection.ReflectionHelper;
 import openmods.tileentity.OpenTileEntity;
+import openmods.utils.Coord;
 import openperipheral.api.architecture.cc.ICustomPeripheralProvider;
 
-public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustomPeripheralProvider, INeighbourAwareTile {
+public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustomPeripheralProvider, INeighbourAwareTile, INeighbourTeAwareTile {
 
 	private static class Access {
 		public final Class<?> ccClass = ReflectionHelper.getClass("dan200.computercraft.ComputerCraft");
@@ -57,14 +59,27 @@ public class TileEntityPeripheralProxy extends OpenTileEntity implements ICustom
 		}
 	}
 
+	private void handlePeripheralUpdate(ForgeDirection targetDir) {
+		boolean isConnected = isProxyActive(targetDir);
+		ForgeDirection modemDir = targetDir.getOpposite();
+		updateModem(modemDir, isConnected);
+	}
+
 	@Override
 	public void onNeighbourChanged(Block block) {
 		if (!worldObj.isRemote && (block == null || block == attachedBlock)) {
 			ForgeDirection targetDir = getOrientation().up();
-			boolean isConnected = isProxyActive(targetDir);
+			handlePeripheralUpdate(targetDir);
+		}
+	}
 
-			ForgeDirection modemDir = targetDir.getOpposite();
-			updateModem(modemDir, isConnected);
+	@Override
+	public void onNeighbourTeChanged(int x, int y, int z) {
+		if (!worldObj.isRemote) {
+			ForgeDirection targetDir = getOrientation().up();
+			if (getPosition().offset(targetDir).equals(new Coord(x, y, z))) {
+				handlePeripheralUpdate(targetDir);
+			}
 		}
 	}
 
